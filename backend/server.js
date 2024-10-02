@@ -1,11 +1,32 @@
-const connectDB = require("./database/db")
-const appServer  = require("./app")
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const colors = require("colors");
+const connectDB=require("./database/db")
 
+const authRoutes = require("./routes/authRoutes");
+const todoRoutes = require("./routes/todoRoutes");
+const cookieParser = require("cookie-parser");
 
-// dotenv configer
-require("dotenv").config()
+require("dotenv").config();
 
-// connect mongoDB
-const URL = process.env.DB_URL
-connectDB(URL)
-appServer()
+const URL = process.env.DB_URL;
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: ["*", "http://localhost:5173"],
+    credentials: true,
+  })
+);
+
+app.use("/api/auth", authRoutes);
+app.use("/api/todo", todoRoutes);
+
+app.listen(PORT, () => {
+    connectDB(URL);
+  console.log(`Server running on Post- ${PORT}`.bgBlue.black);
+});
