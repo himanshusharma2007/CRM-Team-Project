@@ -81,12 +81,12 @@ exports.login = async (req, res) =>{
         })
     }
 
-    if(!userData.verify){
-      return res.status(203).send({
-        success: false,
-        message: "You are not verify by admin"
-      })
-    }
+    // if(!userData.verify){
+    //   return res.status(203).send({
+    //     success: false,
+    //     message: "You are not verify by admin"
+    //   })
+    // }
 
     generateToken(userData.id, res)
     userData.password = "*****"
