@@ -15,8 +15,9 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const userData = await login(email, password);
+      // console.log("userData :>> ", userData);
       saveUser(userData);
-      
+      alert("Login successful");
       navigate('/dashboard');
     } catch (error) {
       console.log(error);

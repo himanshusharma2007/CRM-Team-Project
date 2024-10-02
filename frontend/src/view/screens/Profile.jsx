@@ -31,10 +31,10 @@ const Profile = () => {
         <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">Profile</h1>
         <div className="space-y-6">
           {[
-            { label: 'Name', value: user.name },
-            { label: 'Email', value: user.email },
-            { label: 'Role', value: user.role },
-            { label: 'Team', value: user.team || 'N/A' },
+            { label: 'Name', value: user.userdata.name || "N/A" },
+            { label: 'Email', value: user.userdata.email || "N/A" },
+            { label: 'Role', value: user.userdata.role || "N/A" },
+            { label: 'Team', value: user.userdata.team || 'N/A' },
           ].map((item, index) => (
             <div key={index} className="flex items-center justify-between border-b pb-2">
               <span className="text-lg font-semibold text-gray-600">{item.label}:</span>

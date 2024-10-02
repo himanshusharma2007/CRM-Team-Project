@@ -59,7 +59,8 @@ export const reset = async (email, password, oldPassword) => {
 
 export const getUser = async () => {
   try {
-    const response = await api.get("/auth/getuser");
+    console.log("get user called")
+    const response = await api.get("/profile");
     return response.data;
   } catch (error) {
     console.error(

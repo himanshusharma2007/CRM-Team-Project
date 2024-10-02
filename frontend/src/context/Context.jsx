@@ -19,8 +19,6 @@ export const Context = ({ children }) => {
     let isMounted = true; // Track whether the component is mounted
   
     const loadUser = async () => {
-      console.log("loadUser called");
-      console.log("user", user)
       setLoading(true);
       try {
         const userData = await getUser();
