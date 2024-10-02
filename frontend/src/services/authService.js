@@ -61,7 +61,6 @@ export const getUser = async () => {
   try {
     console.log("get user called")
     const response = await api.get("/profile");
-    console.log('response :>> ', response);
     return response.data;
   } catch (error) {
     console.error(
@@ -87,7 +86,11 @@ export const forgotPassword = async (email) => {
 
 export const verifyOTP = async (email, otp, password) => {
   try {
-    const response = await api.post("/auth/verify-otp", { email, otp, password });
+    const response = await api.post("/auth/verify-otp", {
+      email,
+      otp,
+      password,
+    });
     return response.data;
   } catch (error) {
     console.error(

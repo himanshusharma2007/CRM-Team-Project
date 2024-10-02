@@ -16,12 +16,12 @@ export const Context = ({ children }) => {
   const saveUser = (userData) => {
     setUser(userData);
   };
+  
 
   useEffect(() => {
     let isMounted = true; // Track whether the component is mounted
 
     const loadUser = async () => {
-      console.log("loadUser called");
       setLoading(true);
       try {
         const userData = await getUser();
