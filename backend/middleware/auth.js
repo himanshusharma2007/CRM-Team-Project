@@ -26,14 +26,20 @@ const jwtToken = async (req, res, next) => {
 
 const checkAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') {
-    return res.status(403).send('Admin access required');
+    return res.status(403).send({
+      success: false,
+      message: 'Admin access required'
+    });
   }
   next();
 };
 
 const checkSubAdmin = (req, res, next) => {
-  if (req.user.role !== 'sub-admin') {
-    return res.status(403).send('Sub-admin access required');
+  if (req.user.role !== 'devAdmin' || req.user.role !== 'marAdmin' || req.user.role !== 'admin') {
+    return res.status(403).send({
+      success: false,
+      message: 'Sub-admin access required'
+    });
   }
   next();
 };

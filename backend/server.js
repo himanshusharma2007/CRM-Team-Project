@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 const colors = require("colors");
 const connectDB=require("./database/db")
-
+const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const todoRoutes = require("./routes/todoRoutes");
 const cookieParser = require("cookie-parser");
@@ -25,6 +25,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/todo", todoRoutes);
+app.use("/api/profile", userRoutes);
 
 app.listen(PORT, () => {
     connectDB(URL);
