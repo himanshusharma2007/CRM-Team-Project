@@ -8,22 +8,25 @@ const AuthContext = createContext();
 export const Context = ({ children }) => {
   const [user, setUser] = useState(null); // Initial state as null
   const [loading, setLoading] = useState(true); // Start as true since you're fetching data
-  const [error, setError] = useState('')
-  
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    console.log("user :>> ", user);
+  }, [user]);
   const saveUser = (userData) => {
     setUser(userData);
   };
 
   useEffect(() => {
     let isMounted = true; // Track whether the component is mounted
-  
+
     const loadUser = async () => {
       console.log("loadUser called");
       setLoading(true);
       try {
         const userData = await getUser();
         if (isMounted) {
-          setUser(userData); 
+          setUser(userData);
         }
       } catch (error) {
         console.error("Failed to load user:", error);
@@ -32,11 +35,11 @@ export const Context = ({ children }) => {
         }
       } finally {
         if (isMounted) {
-          setLoading(false); 
+          setLoading(false);
         }
       }
     };
-  
+
     loadUser();
 
     return () => {
