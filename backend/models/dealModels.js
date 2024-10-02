@@ -1,37 +1,46 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const dealSchema = new mongoose.Schema({
+const dealSchema = new mongoose.Schema(
+  {
     dealName: {
-        type: String,
-        required: [true, "dealName is required"],
+      type: String,
+      required: [true, "dealName is required"],
     },
     companyName: {
-        type: String,
-        required: [true, "companyName is required"],
+      type: String,
+      required: [true, "companyName is required"],
     },
     contactName: {
-        type: String,
-        required: [true, "contactName is required"]
+      type: String,
+      required: [true, "contactName is required"],
     },
-    amount:{
-        type: Number,
-        required: [true, "amount is required"]
+    amount: {
+      type: Number,
+      required: [true, "amount is required"],
     },
-    description:{
-        type: String,
-        required: [true, 'description is required'],
+    description: {
+      type: String,
+      required: [true, "description is required"],
     },
-    stage:{
-        type: String,
-        enum: ['Qualification', "Need Analysis", "Proposal/Price Quote", "Negotiation/Review", "Closed Won", "Closed Lost"],
-        default: "Qualification"
+    stage: {
+      type: String,
+      enum: [
+        "Qualification",
+        "Need Analysis",
+        "Proposal/Price Quote",
+        "Negotiation/Review",
+        "Closed Won",
+        "Closed Lost",
+      ],
+      default: "Qualification",
     },
     team: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"team"
-    }
-},{timestamps:true});
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "team",
+    },
+  },
+  { timestamps: true }
+);
 
-
-const deal = mongoose.model('deal', dealSchema);
+const deal = mongoose.model("deal", dealSchema);
 module.exports = deal;
