@@ -14,8 +14,8 @@ export const Context = ({ children }) => {
     console.log("user in context :>> ", user);
   }, [user]);
   const saveUser = (userData) => {
-    console.log("User in Save user", userData);
-    userData;
+    console.log("user fetch from login :>> ", userData);
+    setUser(userData);
   };
 
   useEffect(() => {
@@ -25,6 +25,7 @@ export const Context = ({ children }) => {
       setLoading(true);
       try {
         const userData = await getUser();
+        console.log("userData in loaduser:>> ", userData);
         if (isMounted) {
           console.log("userData in load user", userData);
           setUser(userData);

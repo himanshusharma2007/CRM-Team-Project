@@ -58,6 +58,7 @@ exports.registerUser = async (req, res) => {
 // "/login"
 exports.login = async (req, res) => {
   const { email, password } = req.body;
+  console.log('req.body :>> ', req.body);
   try {
     if (!email || !password) {
       return res.status(400).send({
@@ -80,16 +81,24 @@ exports.login = async (req, res) => {
       });
     }
 
-    generateToken(userData.id, res);
-    userData.password = "*****"; // Mask the password in the response
+    // if(!userData.verify){
+    //   return res.status(203).send({
+    //     success: false,
+    //     message: "You are not verify by admin"
+    //   })
+    // }
 
-    // Return only the inner user object
-    return res.status(200).send(userData);
+    generateToken(userData.id, res);
+    userData.password = "*****";
+    console.log("user in userController",userData)
+    return res
+      .status(200)
+      .json(userData);
   } catch (err) {
     console.log(err);
     res.status(500).send({
       success: false,
-      message: "Internal server error",
+      message: "Internel server error",
     });
   }
 };
