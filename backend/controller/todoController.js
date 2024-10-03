@@ -2,10 +2,10 @@ const todo = require("../models/todoModels")
 
 
 exports.createTodo = async (req, res) => {
-  const { title, description,status,priority} = req.body;
-
+  const { title, description="",status,taskPriority} = req.body;
+console.log('req.body', req.body)
   try {
-    if(!title || !description){
+    if(!title || !taskPriority){
       return res.status(400).send({
         success:false,
         message: "please fill all fields"
@@ -13,16 +13,12 @@ exports.createTodo = async (req, res) => {
     }
     const tododata = await todo.create({
       title,
-      description,
+      description:description || "",
       status,
-      priority,
+      priority:taskPriority,
       userId: req.user._id,
     });
-    res.status(201).send({
-      success: true,
-      message: "todo task created",
-      data: tododata
-    });
+    res.status(201).json(tododata);
   } catch (err) {
     console.log(err)
     res.status(500).send({
@@ -36,9 +32,9 @@ exports.createTodo = async (req, res) => {
 //  update/:id
 exports.updateTodo = async (req,res) =>{
 
-  const { title, description, priority } = req.body;
+  const { title, description, taskPriority,status } = req.body;
     try {
-        if(!title && !description && !priority &&!status){
+        if(!title && !taskPriority &&!status){
           return res.status(400).send({
             success: false,
             message: "please fill any fields for update"
@@ -58,7 +54,7 @@ exports.updateTodo = async (req,res) =>{
         // Update task fields
         tododata.title = title || tododata.title;
         tododata.description = description || tododata.description;
-        tododata.priority = priority || tododata.priority;
+        tododata.priority = taskPriority || tododata.taskPriority;
         tododata.status = status || tododata.status;
 
         await tododata.save();
@@ -80,11 +76,7 @@ exports.updateTodo = async (req,res) =>{
 exports.getTodo = async(req, res)=>{
   try{
     const tododata = await todo.find({userId: req.user.id });
-    return res.status(200).send({
-      success: true,
-      message: "all todo data",
-      data: tododata
-    })
+    return res.status(200).json(tododata)
   } catch (err) {
         console.log(err)
         res.status(500).send({

@@ -2,7 +2,7 @@ import api from "./api";
 
 export const taskSave = async (title,taskPriority) => {
     try {
-      const response = await api.post("/tasks", { title,taskPriority });
+      const response = await api.post("/todo/create", { title,taskPriority });
       console.log('response taskSave', response)
       return response.data;
     } catch (error) {
@@ -13,7 +13,8 @@ export const taskSave = async (title,taskPriority) => {
 
   export const updateTask = async (id, task)=> {
     try {
-      const response = await api.post(`/tasks/update/${id}`,  task );
+      console.log("task in updateTask", task)
+      const response = await api.put(`/todo/update/${id}`,  task );
       console.log('response updateTask', response)
       return response.data;
     } catch (error) {
@@ -23,6 +24,6 @@ export const taskSave = async (title,taskPriority) => {
   };
 
   export const getAllTasks = async ()=>{
-    const response = await api.get('/tasks');
+    const response = await api.get('/todo');
     return response.data;
   };
