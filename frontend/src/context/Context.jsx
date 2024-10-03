@@ -11,12 +11,12 @@ export const Context = ({ children }) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    console.log("user :>> ", user);
+    console.log("user in context :>> ", user);
   }, [user]);
   const saveUser = (userData) => {
-    setUser(userData);
+    console.log("User in Save user", userData);
+    userData;
   };
-  
 
   useEffect(() => {
     let isMounted = true; // Track whether the component is mounted
@@ -26,6 +26,7 @@ export const Context = ({ children }) => {
       try {
         const userData = await getUser();
         if (isMounted) {
+          console.log("userData in load user", userData);
           setUser(userData);
         }
       } catch (error) {

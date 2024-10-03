@@ -10,13 +10,14 @@ import {
 } from "react-icons/fa";
 import { FaPersonCircleCheck } from "react-icons/fa6";
 import { MdQueryBuilder } from "react-icons/md";
-import { dummyUser } from "../../services/dummy";
+// import { dummyUser } from "../../services/dummy";
 import { useAuth } from "../../context/Context";
 
 const Sidebar = () => {
-  const role = dummyUser[0].role;
+  // const role = dummyUser[0].role;
   const navigate = useNavigate();
-  const { saveUser } = useAuth();
+  const { saveUser, user } = useAuth();
+  console.log("user in sidebar:", user);
 
   const handleLogout = () => {
     logout();
@@ -26,10 +27,18 @@ const Sidebar = () => {
 
   return (
     <>
-      {role === "admin" && <AdminSidebar handleLogout={handleLogout} />}
-      {role === "marAdmin" && <SubAdminSidebar handleLogout={handleLogout} />}
-      {role === "devAdmin" && <SubAdminSidebar handleLogout={handleLogout} />}
-      {role === "emp" && <EmployeeSidebar handleLogout={handleLogout} />}
+      {user?.data.role === "admin" && (
+        <AdminSidebar handleLogout={handleLogout} />
+      )}
+      {user?.data.role === "marAdmin" && (
+        <SubAdminSidebar handleLogout={handleLogout} />
+      )}
+      {user?.data.role === "devAdmin" && (
+        <SubAdminSidebar handleLogout={handleLogout} />
+      )}
+      {user?.data.role === "emp" && (
+        <EmployeeSidebar handleLogout={handleLogout} />
+      )}
     </>
   );
 };
