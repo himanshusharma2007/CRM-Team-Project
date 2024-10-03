@@ -71,3 +71,62 @@ exports.updateLead = async (req, res) => {
       .json({ message: "Error updating lead", error: error.message });
   }
 };
+
+
+
+exports.updateStage = async (req, res) => {
+  try {
+    console.log("update lead called");
+    const { id } = req.params;
+    let leaddata = await lead.findOne({ _id: id });
+    const { stage } = req.body;
+    if (!leaddata) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+    leaddata.stage = stage || leaddata.stage;
+    await leaddata.save();
+
+    console.log("Lead updateStage successfully");
+    res.status(200).json(leaddata);
+  } catch (error) {
+    console.log("Error in updateStage:>> ", error);
+    res
+      .status(400)
+      .json({ message: "Error updateStage lead", error: error.message });
+  }
+};
+
+exports.deleteLead = async (req, res) => {
+  try {
+    console.log("delete lead called");
+    const { id } = req.params;
+    const deletedLead = await lead.findByIdAndDelete(id);
+    if (!deletedLead) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+    res.status(200).json({ message: "Lead deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting lead", error: error.message });
+  }
+};
+
+exports.getLeadById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("get lead by id called", id);
+    const leadData = await lead
+      .findOne({ _id: id })
+      .populate("assignedTo", "team", "-password");
+    console.log("lead in get lead by id:>> ", leadData);
+    if (!leadData) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+    res.status(200).json(leadData);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching leads", error: error.message });
+  }
+};
