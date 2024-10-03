@@ -206,7 +206,7 @@ const Lead = () => {
                               Edit
                             </button>
                           </>
-                        ) : role === "marAdmin" || role === "devAdmin" ? (
+                        ) : role === "subAdmin" || role === "subAdmin" ? (
                           <button
                             onClick={handleAssign}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"

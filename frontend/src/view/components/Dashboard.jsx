@@ -6,8 +6,8 @@ const Dashboard = () => {
   return (
     <>
       {role === "admin" && <AdminDashboard />}
-      {role === "marAdmin" && <SubAdminDashboard />}
-      {role === "devAdmin" && <SubAdminDashboard />}
+      {role === "subAdmin" && <SubAdminDashboard />}
+      {role === "subAdmin" && <SubAdminDashboard />}
       {role === "emp" && <EmployeeDashboard />}
     </>
   );
