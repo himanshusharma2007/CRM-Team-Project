@@ -5,12 +5,13 @@ const {
   deleteLead,
   getLeadById,
   updateStage,
+  getLeads,
 } = require("../controller/leadController");
 const { jwtToken } = require("../middleware/auth");
 
 const routers = express.Router();
 
-routers.get("/create", jwtToken, createLead);
+routers.post("/create", jwtToken, createLead);
 routers.get("/lead-details/:id", jwtToken, getLeadById);
 routers.get("/", jwtToken, getLeads);
 routers.put("/update/:id", jwtToken, updateLead);

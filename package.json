@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "install": "^0.13.0",
+    "npm": "^10.8.3",
+    "sweetalert2": "^11.14.1",
+    "sweetalert2-react-content": "^5.0.7"
+  }
+}

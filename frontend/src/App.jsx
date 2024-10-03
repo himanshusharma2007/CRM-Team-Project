@@ -88,7 +88,7 @@ function App() {
             }
           />
           <Route
-            path="/leadDetails"
+            path="/lead-details/:id"
             element={
               <Layout>
                 <LeadDetails />

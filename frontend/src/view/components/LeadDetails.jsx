@@ -1,96 +1,76 @@
-export const leads = [
-  // 0
-  {
-    title: "Website Redesign Project",
-    companyName: "Tech Innovations Inc.",
-    contactName: "John Doe",
-    phone: "555-1234",
-    description:
-      "Redesign the corporate website to improve user experience and integrate e-commerce features.",
-    stage: "New-Lead",
-    team: "6510f3b645f2c70012f8bcee",
-    assignedTo: "6510f3b645f2c70012f8babc",
-    createdAt: "2024-09-15T09:30:00Z",
-    updatedAt: "2024-09-15T09:30:00Z",
-  },
-  //   1
-  {
-    title: "Mobile App Development",
-    companyName: "GreenTech Solutions",
-    contactName: "Jane Smith",
-    phone: "555-9876",
-    description:
-      "Develop a mobile application for the company’s environmental monitoring system.",
-    stage: "Need-Analysis",
-    team: "6510f3b645f2c70012f8cdef",
-    assignedTo: "6510f3b645f2c70012f8c123",
-    createdAt: "2024-09-18T12:45:00Z",
-    updatedAt: "2024-09-18T12:45:00Z",
-  },
-  //   2
-  {
-    title: "SEO and Digital Marketing Campaign",
-    companyName: "Global Exports Ltd.",
-    contactName: "David Lee",
-    phone: "555-6543",
-    description:
-      "Implement an SEO strategy to increase online visibility and execute digital marketing campaigns.",
-    stage: "Price",
-    team: "6510f3b645f2c70012f8babc",
-    assignedTo: "6510f3b645f2c70012f8bcdf",
-    createdAt: "2024-09-20T08:20:00Z",
-    updatedAt: "2024-09-22T10:05:00Z",
-  },
-  //   3
-  {
-    title: "Custom CRM Software",
-    companyName: "FinTech Solutions",
-    contactName: "Emily Johnson",
-    phone: "555-7890",
-    description:
-      "Develop a custom CRM software tailored to financial institutions.",
-    stage: "Negotiation",
-    team: "6510f3b645f2c70012f8bcee",
-    assignedTo: "6510f3b645f2c70012f8bcba",
-    createdAt: "2024-09-25T11:15:00Z",
-    updatedAt: "2024-09-29T14:30:00Z",
-  },
-  //   4
-  {
-    title: "E-commerce Platform Setup",
-    companyName: "Fashion Hub",
-    contactName: "Sarah Williams",
-    phone: "555-3210",
-    description:
-      "Set up a fully integrated e-commerce platform for selling fashion items online.",
-    stage: "Lead-Won",
-    team: "6510f3b645f2c70012f8cdef",
-    assignedTo: "6510f3b645f2c70012f8caaa",
-    createdAt: "2024-09-10T14:50:00Z",
-    updatedAt: "2024-09-28T16:30:00Z",
-  },
-  //   5
-  {
-    title: "ERP System Implementation",
-    companyName: "Industrial Machinery Co.",
-    contactName: "Michael Brown",
-    phone: "555-4321",
-    description:
-      "Implement a company-wide ERP system to manage operations more efficiently.",
-    stage: "Lead-Lost",
-    team: "6510f3b645f2c70012f8babc",
-    assignedTo: "6510f3b645f2c70012f8baba",
-    createdAt: "2024-09-12T10:00:00Z",
-    updatedAt: "2024-09-20T13:15:00Z",
-  },
-];
-
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getLeadById, updateLead, deleteLead } from '../../services/leadServices';
+import { useAuth } from '../../context/Context';
 
 const LeadDetails = () => {
-  //   const location = useLocation();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const lead = leads[0];
+  const { user } = useAuth();
+  const [lead, setLead] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+   console.log('lead details called id', id)
+  useEffect(() => {
+    fetchLeadDetails();
+  }, [id]);
+
+  const fetchLeadDetails = async () => {
+    try {
+      setLoading(true);
+      const data = await getLeadById(id);
+      setLead(data);
+    } catch (err) {
+      console.error('Error fetching lead details:', err);
+      setError('Failed to fetch lead details. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setLead(prevLead => ({ ...prevLead, [name]: value }));
+  };
+
+  const handleUpdate = async () => {
+    try {
+      setError(null);
+      await updateLead(id, lead);
+      setIsEditing(false);
+      // Optionally, refresh lead data after update
+      await fetchLeadDetails();
+    } catch (err) {
+      console.error('Error updating lead:', err);
+      setError('Failed to update lead. Please try again.');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this lead?')) {
+      try {
+        setError(null);
+        await deleteLead(id);
+        navigate('/lead');
+      } catch (err) {
+        console.error('Error deleting lead:', err);
+        setError('Failed to delete lead. Please try again.');
+      }
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center mt-8">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center mt-8 text-red-500">{error}</div>;
+  }
+
+  if (!lead) {
+    return <div className="text-center mt-8">Lead not found.</div>;
+  }
 
   return (
     <div className="p-6 max-w-3xl mx-auto bg-white rounded-lg shadow-lg">
@@ -99,31 +79,104 @@ const LeadDetails = () => {
       </h1>
 
       <div className="space-y-4">
-        <p className="text-xl text-gray-700">
-          <strong>Company Name:</strong> {lead.companyName}
-        </p>
-        <p className="text-xl text-gray-700">
-          <strong>Contact Name:</strong> {lead.contactName}
-        </p>
-        <p className="text-xl text-gray-700">
-          <strong>Team:</strong> {lead.team}
-        </p>
-        <p className="text-xl text-gray-700">
-          <strong>Description:</strong> {lead.description}
-        </p>
-        <p className="text-xl text-gray-700">
-          <strong>Current Stage:</strong> {lead.stage}
-        </p>
+        {isEditing ? (
+          <>
+            <input
+              type="text"
+              name="title"
+              value={lead.title}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="companyName"
+              value={lead.companyName}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="contactName"
+              value={lead.contactName}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="phone"
+              value={lead.phone}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            <textarea
+              name="description"
+              value={lead.description}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+              rows="4"
+            />
+            <select
+              name="stage"
+              value={lead.stage}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            >
+              <option value="New-Lead">New Lead</option>
+              <option value="Need-Analysis">Need Analysis</option>
+              <option value="Price">Price</option>
+              <option value="Negotiation">Negotiation</option>
+              <option value="Lead-Won">Lead Won</option>
+              <option value="Lead-Lost">Lead Lost</option>
+            </select>
+          </>
+        ) : (
+          <>
+            <p className="text-xl text-gray-700"><strong>Title:</strong> {lead.title}</p>
+            <p className="text-xl text-gray-700"><strong>Company Name:</strong> {lead.companyName}</p>
+            <p className="text-xl text-gray-700"><strong>Contact Name:</strong> {lead.contactName}</p>
+            <p className="text-xl text-gray-700"><strong>Phone:</strong> {lead.phone}</p>
+            <p className="text-xl text-gray-700"><strong>Description:</strong> {lead.description}</p>
+            <p className="text-xl text-gray-700"><strong>Current Stage:</strong> {lead.stage}</p>
+            <p className="text-xl text-gray-700"><strong>Team:</strong> {lead.team}</p>
+            <p className="text-xl text-gray-700"><strong>Assigned To:</strong> {lead.assignedTo?.name || 'Not Assigned'}</p>
+          </>
+        )}
       </div>
 
-      {/* Back to Leads Button */}
-      <div className="mt-6">
+      <div className="mt-6 space-x-4">
         <button
-          onClick={() => navigate("/lead")}
+          onClick={() => navigate('/lead')}
           className="px-6 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition duration-300"
         >
           Back to Leads
         </button>
+        
+        {(user.role === 'admin') && (
+          <>
+            {isEditing ? (
+              <button
+                onClick={handleUpdate}
+                className="px-6 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition duration-300"
+              >
+                Save Changes
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-300"
+              >
+                Edit Lead
+              </button>
+            )}
+            <button
+              onClick={handleDelete}
+              className="px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300"
+            >
+              Delete Lead
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
