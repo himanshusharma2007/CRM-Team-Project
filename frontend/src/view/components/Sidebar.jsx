@@ -76,7 +76,7 @@ const AdminSidebar = ({ handleLogout }) => {
           </li>
           <li>
             <Link
-              to="/dealform"
+              to="/lead"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHandshake className="mr-3" />
@@ -165,7 +165,7 @@ const SubAdminSidebar = ({ handleLogout }) => {
           </li>
           <li>
             <Link
-              to="/dealform"
+              to="/lead"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHandshake className="mr-3" />
