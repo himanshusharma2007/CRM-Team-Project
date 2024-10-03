@@ -4,7 +4,9 @@ const user = require("../models/userModels")
 exports.getUser = async(req, res) => {
   try {
     let user = req.user;
-    res.status(200).send(user);
+    res
+      .status(200)
+      .json(user);
   } catch (error) {
     console.log(err)
     res.status(500).send({

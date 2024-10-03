@@ -14,9 +14,9 @@ export const Context = ({ children }) => {
     console.log("user :>> ", user);
   }, [user]);
   const saveUser = (userData) => {
+    console.log("user fetch from login :>> ", userData);
     setUser(userData);
   };
-  
 
   useEffect(() => {
     let isMounted = true; // Track whether the component is mounted
@@ -25,6 +25,7 @@ export const Context = ({ children }) => {
       setLoading(true);
       try {
         const userData = await getUser();
+        console.log("userData in loaduser:>> ", userData);
         if (isMounted) {
           setUser(userData);
         }
