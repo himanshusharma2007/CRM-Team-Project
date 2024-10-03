@@ -27,18 +27,14 @@ const Sidebar = () => {
 
   return (
     <>
-      {user?.data.role === "admin" && (
-        <AdminSidebar handleLogout={handleLogout} />
-      )}
-      {user?.data.role === "marAdmin" && (
+      {user?.role === "admin" && <AdminSidebar handleLogout={handleLogout} />}
+      {user?.role === "marAdmin" && (
         <SubAdminSidebar handleLogout={handleLogout} />
       )}
-      {user?.data.role === "devAdmin" && (
+      {user?.role === "devAdmin" && (
         <SubAdminSidebar handleLogout={handleLogout} />
       )}
-      {user?.data.role === "emp" && (
-        <EmployeeSidebar handleLogout={handleLogout} />
-      )}
+      {user?.role === "emp" && <EmployeeSidebar handleLogout={handleLogout} />}
     </>
   );
 };

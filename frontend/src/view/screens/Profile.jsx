@@ -35,10 +35,10 @@ const Profile = () => {
         </h1>
         <div className="space-y-6">
           {[
-            { label: "Name", value: user.data.name || "N/A" },
-            { label: "Email", value: user.data.email || "N/A" },
-            { label: "Role", value: user.data.role || "N/A" },
-            { label: "Team", value: user.data.team || "N/A" },
+            { label: "Name", value: user.name || "N/A" },
+            { label: "Email", value: user.email || "N/A" },
+            { label: "Role", value: user.role || "N/A" },
+            { label: "Team", value: user.team || "N/A" },
           ].map((item, index) => (
             <div
               key={index}
