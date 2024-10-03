@@ -17,7 +17,7 @@ const todoSchema = new mongoose.Schema({
     status:{
         type: String,
         enum: ['todo', "doing", "done"],
-        default: "todo"
+        default: "odo"
     },
     description: {
         type: String,
