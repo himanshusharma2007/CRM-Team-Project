@@ -10,9 +10,6 @@ export const Context = ({ children }) => {
   const [loading, setLoading] = useState(true); // Start as true since you're fetching data
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    console.log("user in context :>> ", user);
-  }, [user]);
   const saveUser = (userData) => {
     console.log("user fetch from login :>> ", userData);
     setUser(userData);
@@ -31,7 +28,6 @@ export const Context = ({ children }) => {
           setUser(userData);
         }
       } catch (error) {
-        console.error("Failed to load user:", error);
         if (isMounted) {
           setError("Failed to load user");
         }

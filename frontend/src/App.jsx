@@ -23,6 +23,7 @@ import Lead from "./view/components/Lead";
 function App() {
   return (
     <Context>
+
       <BrowserRouter>
         <Routes>
           {/* Home page is public */}

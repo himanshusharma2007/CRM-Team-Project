@@ -16,12 +16,12 @@ const todoSchema = new mongoose.Schema({
     },
     status:{
         type: String,
-        enum: ['Todo', "Doing", "Done"],
+        enum: ['todo', "doing", "done"],
         default: "Todo"
     },
     description: {
         type: String,
-        required: [true, "description is required"]
+        default: ""
     }
 },{timestamps:true});
 

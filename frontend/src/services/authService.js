@@ -29,20 +29,22 @@ export const register = async (name, email, password) => {
 
 export const logout = async () => {
   try {
-    const response = await api.post("/auth/logout");
+    const response = await api.get("/auth/logout");
     return response.data;
+    // console.log("logout response", response)
   } catch (error) {
     console.error(
       "Error during logout:",
       error.response?.data || error.message
     );
     throw error;
+    // console.log("error in logout", error)
   }
 };
 
 export const reset = async (email, password, oldPassword) => {
   try {
-    const response = await api.post("/auth/reset", {
+    const response = await api.put("/auth/reset", {
       email,
       password,
       oldPassword,
