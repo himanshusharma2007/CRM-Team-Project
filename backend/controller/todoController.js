@@ -32,9 +32,10 @@ console.log('req.body', req.body)
 //  update/:id
 exports.updateTodo = async (req,res) =>{
 
-  const { title, description, taskPriority,status } = req.body;
+  const { title, description, priority,status } = req.body;
+  console.log("req.body in updateTodo", req.body)
     try {
-        if(!title && !taskPriority &&!status){
+        if(!title && !priority &&!status){
           return res.status(400).send({
             success: false,
             message: "please fill any fields for update"
@@ -54,7 +55,7 @@ exports.updateTodo = async (req,res) =>{
         // Update task fields
         tododata.title = title || tododata.title;
         tododata.description = description || tododata.description;
-        tododata.priority = taskPriority || tododata.taskPriority;
+        tododata.priority = priority || tododata.priority;
         tododata.status = status || tododata.status;
 
         await tododata.save();
