@@ -23,6 +23,7 @@ import QueryPage from "./view/components/Query";
 function App() {
   return (
     <Context>
+
       <BrowserRouter>
         <Routes>
           {/* Home page is public */}
