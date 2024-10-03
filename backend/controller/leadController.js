@@ -1,4 +1,4 @@
-const lead = require("../models/leadModel");
+const lead = require("../models/leadModels");
 const user = require("../models/userModels");
 
 exports.createLead = async (req, res) => {
