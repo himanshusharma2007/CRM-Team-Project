@@ -1,5 +1,4 @@
 const lead = require("../models/leadModels")
-const user = require("../models/userModels")
 
 
 exports.createLead = async (req, res) => {
