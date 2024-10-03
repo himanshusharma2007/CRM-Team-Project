@@ -18,4 +18,4 @@ routers.put("/update/:id", jwtToken, updateLead);
 routers.delete("/delete/:id", jwtToken, deleteLead);
 routers.put("/update-stage/:id", jwtToken, updateStage);
 
-module.exports = router
+module.exports = routers;
