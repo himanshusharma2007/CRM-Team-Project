@@ -146,7 +146,7 @@ exports.verify = async (req, res) => {
       userdata.team = team;
     }
     // Check if the user is a sub-admin
-    else if (req.user.role === "devAdmin" || req.user.role === "marAdmin") {
+    else if (req.user.role === "subAdmin" || req.user.role === "subAdmin") {
       // Sub-admin can set team only
       userdata.verify = true;
       userdata.team = team;

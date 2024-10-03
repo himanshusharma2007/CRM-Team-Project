@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
-const dealSchema = new mongoose.Schema(
+const leadSchema = new mongoose.Schema(
   {
-    dealName: {
+    title: {
       type: String,
-      required: [true, "dealName is required"],
+      required: [true, "title is required"],
     },
     companyName: {
       type: String,
@@ -14,9 +14,9 @@ const dealSchema = new mongoose.Schema(
       type: String,
       required: [true, "contactName is required"],
     },
-    amount: {
-      type: Number,
-      required: [true, "amount is required"],
+    phone: {
+      type: String,
+      required: [true, "phone no. is required"],
     },
     description: {
       type: String,
@@ -25,22 +25,26 @@ const dealSchema = new mongoose.Schema(
     stage: {
       type: String,
       enum: [
-        "Qualification",
-        "Need Analysis",
-        "Proposal/Price Quote",
-        "Negotiation/Review",
-        "Closed Won",
-        "Closed Lost",
+        "New-Lead",
+        "Need-Analysis",
+        "Price",
+        "Negotiation",
+        "Lead-Won",
+        "Lead-Lost",
       ],
-      default: "Qualification",
+      default: "New-Lead",
     },
     team: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "team",
     },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
   { timestamps: true }
 );
 
-const deal = mongoose.model("deal", dealSchema);
-module.exports = deal;
+const lead = mongoose.model("lead", leadSchema);
+module.exports = lead;
