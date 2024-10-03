@@ -5,8 +5,10 @@ const colors = require("colors");
 const connectDB=require("./database/db")
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
+const leadRouter = require("./routes/leadRoutes");
 const todoRoutes = require("./routes/todoRoutes");
-const leadRoutes = require("./routes/leadRoutes")
+
+
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
@@ -27,7 +29,8 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/todo", todoRoutes);
 app.use("/api/profile", userRoutes);
-app.use("/api/lead", leadRoutes);
+app.use("/api/lead", leadRouter);
+
 
 app.listen(PORT, () => {
     connectDB(URL);

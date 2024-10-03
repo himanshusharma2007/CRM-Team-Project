@@ -1,8 +1,10 @@
 import React from "react";
-import { dummyUser } from "../../services/dummy";
+import { useAuth } from "../../context/Context";
 const Dashboard = () => {
-  const role = dummyUser[0].role;
-  // console.log(role);
+  const { user } = useAuth();
+  console.log("User:", user);
+  const role = user?.role;
+  console.log(role);
   return (
     <>
       {role === "admin" && <AdminDashboard />}
@@ -20,7 +22,6 @@ const AdminDashboard = () => {
     <div className="flex h-screen">
       {/* Main Content */}
       <div className="flex-1 bg-gray-100">
-
         {/* Dashboard Content */}
         <div className="p-6">
           <div className="grid grid-cols-3 gap-6">

@@ -2,14 +2,14 @@ import Sidebar from "../Sidebar";
 
 const Layout = ({ children }) => {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex overflow-hidden max-h-screen">
       {/* Sidebar Section */}
-      <div className="w-1/4 bg-gray-800 text-white min-h-screen hidden md:block">
+      <div className="bg-red-500 w-[20vw] h-[100dvh] text-white overflow-hidden max-h-screen hidden md:block">
         <Sidebar />
       </div>
 
       {/* Main Content Section */}
-      <div className="flex-1 bg-gray-100 p-4">{children}</div>
+      <div className="w-full md:w-[80vw] bg-gray-100 p-4">{children}</div>
     </div>
   );
 };

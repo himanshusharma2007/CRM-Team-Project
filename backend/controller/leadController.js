@@ -1,8 +1,10 @@
-const lead = require("../models/leadModels")
-
+const lead = require("../models/leadModel");
+const user = require("../models/userModels");
 
 exports.createLead = async (req, res) => {
-  const { title, companyName, contactName,phone, description, stage} = req.body;
+  console.log('req.body in create lead', req.body)
+  const { title, companyName, contactName, phone, description, stage } =
+    req.body;
 
   try {
     if(!title || !companyName || !contactName || !phone || !description){
@@ -77,16 +79,16 @@ exports.updateStage = async (req, res) => {
   try {
     console.log("update lead called");
     const { id } = req.params;
-    let leaddata = await lead.findOne({ _id: id });
+    let leadData = await lead.findOne({ _id: id });
     const { stage } = req.body;
-    if (!leaddata) {
+    if (!leadData) {
       return res.status(404).json({ message: "Lead not found" });
     }
-    leaddata.stage = stage || leaddata.stage;
-    await leaddata.save();
+    leadData.stage = stage;
+    await leadData.save();
 
     console.log("Lead updateStage successfully");
-    res.status(200).json(leaddata);
+    res.status(200).json(leadData);
   } catch (error) {
     console.log("Error in updateStage:>> ", error);
     res
@@ -117,13 +119,11 @@ exports.getLeadById = async (req, res) => {
     console.log("get lead by id called", id);
     const leadData = await lead
       .findOne({ _id: id })
-      .populate("assignedTo", "team", "-password");
+      .populate("assignedTo", "-password");
     console.log("lead in get lead by id:>> ", leadData);
-    if (!leadData) {
-      return res.status(404).json({ message: "Lead not found" });
-    }
     res.status(200).json(leadData);
   } catch (error) {
+    console.log('error in getLeadById', error)
     res
       .status(500)
       .json({ message: "Error fetching leads", error: error.message });

@@ -1,14 +1,21 @@
-const express = require("express")
-const { createLead, getLeads,updateLead, getLeadById, deleteLead, updateStage} = require("../controller/leadController")
-const { jwtToken, checkSubAdmin, checkAdmin} = require("../middleware/auth")
-const router = express.Router()
+const express = require("express");
+const {
+  createLead,
+  updateLead,
+  deleteLead,
+  getLeadById,
+  updateStage,
+  getLeads,
+} = require("../controller/leadController");
+const { jwtToken } = require("../middleware/auth");
 
-router.get("/",jwtToken,checkSubAdmin,getLeads)
-router.post("/create",jwtToken,checkSubAdmin, createLead)
-router.put("/update/:id",jwtToken,checkAdmin,updateLead)
-router.get("/lead-details/:id", jwtToken, checkSubAdmin, getLeadById);
-router.delete("/delete/:id", jwtToken,checkAdmin, deleteLead);
-router.put("/update-stage/:id", jwtToken, checkSubAdmin, updateStage);
+const routers = express.Router();
 
+routers.post("/create", jwtToken, createLead);
+routers.get("/lead-details/:id", jwtToken, getLeadById);
+routers.get("/", jwtToken, getLeads);
+routers.put("/update/:id", jwtToken, updateLead);
+routers.delete("/delete/:id", jwtToken, deleteLead);
+routers.put("/update-stage/:id", jwtToken, updateStage);
 
 module.exports = router

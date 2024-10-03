@@ -10,13 +10,14 @@ import {
 } from "react-icons/fa";
 import { FaPersonCircleCheck } from "react-icons/fa6";
 import { MdQueryBuilder } from "react-icons/md";
-import { dummyUser } from "../../services/dummy";
+// import { dummyUser } from "../../services/dummy";
 import { useAuth } from "../../context/Context";
 
 const Sidebar = () => {
-  const role = dummyUser[0].role;
+  // const role = dummyUser[0].role;
   const navigate = useNavigate();
-  const { saveUser } = useAuth();
+  const { saveUser, user } = useAuth();
+  console.log("user in sidebar:", user);
 
   const handleLogout = () => {
     logout();
@@ -26,10 +27,14 @@ const Sidebar = () => {
 
   return (
     <>
-      {role === "admin" && <AdminSidebar handleLogout={handleLogout} />}
-      {role === "subAdmin" && <SubAdminSidebar handleLogout={handleLogout} />}
-      {role === "subAdmin" && <SubAdminSidebar handleLogout={handleLogout} />}
-      {role === "emp" && <EmployeeSidebar handleLogout={handleLogout} />}
+      {user?.role === "admin" && <AdminSidebar handleLogout={handleLogout} />}
+      {user?.role === "marAdmin" && (
+        <SubAdminSidebar handleLogout={handleLogout} />
+      )}
+      {user?.role === "devAdmin" && (
+        <SubAdminSidebar handleLogout={handleLogout} />
+      )}
+      {user?.role === "emp" && <EmployeeSidebar handleLogout={handleLogout} />}
     </>
   );
 };
@@ -38,7 +43,7 @@ export default Sidebar;
 
 const AdminSidebar = ({ handleLogout }) => {
   return (
-    <div className="flex flex-col h-screen w-64 bg-gray-900 text-gray-100 shadow-lg">
+    <div className="flex flex-col h-[100dvh] max-h-screen w-full bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
       <div className="p-5 text-center text-2xl font-semibold bg-gray-800">
         <span className="text-purple-400">CRM</span> Dashboard
@@ -80,7 +85,7 @@ const AdminSidebar = ({ handleLogout }) => {
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHandshake className="mr-3" />
-              Deal Form
+              Leads
             </Link>
           </li>
           <li className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700">
@@ -169,7 +174,7 @@ const SubAdminSidebar = ({ handleLogout }) => {
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHandshake className="mr-3" />
-              Deal Form
+              Leads
             </Link>
           </li>
           <li className=" flex items-center p-3 text-gray-300 rounded hover:bg-gray-700">

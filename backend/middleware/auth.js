@@ -41,8 +41,7 @@ const checkAdmin = (req, res, next) => {
 
 const checkSubAdmin = (req, res, next) => {
   if (
-    req.user.role !== "devAdmin" &&
-    req.user.role !== "marAdmin" &&
+    req.user.role !== "subAdmin" &&
     req.user.role !== "admin"
   ) {
     return res.status(403).send({
