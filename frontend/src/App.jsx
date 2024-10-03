@@ -19,11 +19,11 @@ import Home from "./view/screens/Home";
 import MainLayout from "./view/components/Layout/MainLayout";
 import QueryPage from "./view/components/Query";
 import Lead from "./view/components/Lead";
+import LeadDetails from "./view/components/LeadDetails";
 
 function App() {
   return (
     <Context>
-
       <BrowserRouter>
         <Routes>
           {/* Home page is public */}
@@ -84,6 +84,14 @@ function App() {
             element={
               <Layout>
                 <Lead />
+              </Layout>
+            }
+          />
+          <Route
+            path="/leadDetails"
+            element={
+              <Layout>
+                <LeadDetails />
               </Layout>
             }
           />

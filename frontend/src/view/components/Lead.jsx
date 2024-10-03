@@ -1,24 +1,25 @@
 import { useState } from "react";
 import { Container, Draggable } from "react-smooth-dnd";
-import { dummyUser } from "../../services/dummy";
-import { IoMdClose } from "react-icons/io";
+import { useAuth } from "../../context/Context";
+import { useNavigate } from "react-router-dom";
+import { leads } from "./LeadDetails";
 
 const initialPipeline = {
   newLead: [],
   needAnalysis: [],
   proposal: [],
   negotiation: [],
-  closedWon: [],
-  closedLost: [],
+  leadWon: [],
+  leadLost: [],
 };
 
 const stages = [
   { id: "newLead", title: "New Lead" },
   { id: "needAnalysis", title: "Need Analysis" },
-  { id: "proposal", title: "Proposal/Price Quote" },
-  { id: "negotiation", title: "Negotiation/Review" },
-  { id: "closedWon", title: "Closed Won" },
-  { id: "closedLost", title: "Closed Lost" },
+  { id: "proposal", title: "Price" },
+  { id: "negotiation", title: "Negotiation" },
+  { id: "leadWon", title: "Lead Won" },
+  { id: "leadLost", title: "Lead Lost" },
 ];
 
 const Lead = () => {
@@ -32,10 +33,11 @@ const Lead = () => {
     description: "",
     team: "",
   });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingDealId, setEditingDealId] = useState(null);
   const [listModal, setListModal] = useState(false);
-  const [teamListModal, setTeamListModal] = useState(false);
+
+  const navigate = useNavigate();
+
+  const user = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -45,54 +47,21 @@ const Lead = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (isEditing) {
-      // Update existing deal
-      const updatedPipeline = { ...pipeline };
-      const oldStage = Object.keys(updatedPipeline).find((stageId) =>
-        updatedPipeline[stageId].some((deal) => deal.id === editingDealId)
-      );
+    // Add new lead
+    const newLead = {
+      id: Date.now().toString(),
+      name: formData.leadName,
+      company: formData.companyName,
+      contact: formData.contactName,
+      description: formData.description,
+      currentStage: formData.stage,
+      team: formData.team,
+    };
 
-      if (oldStage) {
-        // Remove the deal from its old stage
-        updatedPipeline[oldStage] = updatedPipeline[oldStage].filter(
-          (deal) => deal.id !== editingDealId
-        );
-
-        // Add the updated deal to the new stage
-        const updatedDeal = {
-          id: editingDealId,
-          name: formData.dealName,
-          company: formData.companyName,
-          contact: formData.contactName,
-          description: formData.description,
-          currentStage: formData.stage,
-          team: formData.team,
-        };
-
-        updatedPipeline[formData.stage] = [
-          ...updatedPipeline[formData.stage],
-          updatedDeal,
-        ];
-
-        setPipeline(updatedPipeline);
-      }
-    } else {
-      // Add new deal
-      const newDeal = {
-        id: Date.now().toString(),
-        name: formData.dealName,
-        company: formData.companyName,
-        contact: formData.contactName,
-        description: formData.description,
-        currentStage: formData.stage,
-        team: formData.team,
-      };
-
-      setPipeline((prevPipeline) => ({
-        ...prevPipeline,
-        [formData.stage]: [...prevPipeline[formData.stage], newDeal],
-      }));
-    }
+    setPipeline((prevPipeline) => ({
+      ...prevPipeline,
+      [formData.stage]: [...prevPipeline[formData.stage], newLead],
+    }));
 
     setShowModal(false);
     resetForm();
@@ -106,21 +75,6 @@ const Lead = () => {
       stage: "newLead",
       description: "",
     });
-    setIsEditing(false);
-    setEditingDealId(null);
-  };
-
-  const handleEdit = (deal) => {
-    setFormData({
-      dealName: deal.name,
-      companyName: deal.company,
-      contactName: deal.contact,
-      stage: deal.currentStage,
-      description: deal.description,
-    });
-    setIsEditing(true);
-    setEditingDealId(deal.id);
-    setShowModal(true);
   };
 
   const onColumnDrop = (dropResult, stageId) => {
@@ -147,12 +101,15 @@ const Lead = () => {
     }
   };
 
-  const role = dummyUser[1].role;
-
   const handleAssign = () => {
     setListModal(true);
-    setTeamListModal(true);
   };
+
+  const handleViewDetails = (lead) => {
+    // Navigate to the LeadDetails page and pass the lead details
+    navigate("/leadDetails");
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
       <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
@@ -164,7 +121,7 @@ const Lead = () => {
           onClick={() => setShowModal(true)}
           className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition duration-300"
         >
-          Add New Deal
+          Add New Lead
         </button>
       </div>
 
@@ -185,33 +142,34 @@ const Lead = () => {
               dropClass="bg-blue-100"
               render={(ref) => (
                 <div ref={ref} className="space-y-4 h-96 overflow-y-auto">
-                  {pipeline[stage.id].map((deal) => (
-                    <Draggable key={deal.id}>
+                  {pipeline[stage.id].map((lead) => (
+                    <Draggable key={lead.id}>
                       <div className="p-4 bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
                         <p className="font-bold text-lg text-gray-700">
-                          {deal.name}
+                          {lead.name}
                         </p>
-                        <p className="text-gray-500">Company: {deal.company}</p>
-                        <p className="text-gray-500">Contact: {deal.contact}</p>
-                        <p className="text-gray-500">Team: {deal.team}</p>
-                        <p className="text-green-500 font-semibold">
-                          Amount: ${deal.amount}
-                        </p>
-                        {role === "admin" ? (
-                          <>
-                            <button
-                              onClick={() => handleEdit(deal)}
-                              className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
-                            >
-                              Edit
-                            </button>
-                          </>
-                        ) : role === "marAdmin" || role === "devAdmin" ? (
+                        <p className="text-gray-500">Company: {lead.company}</p>
+                        <p className="text-gray-500">Contact: {lead.contact}</p>
+                        <p className="text-gray-500">Team: {lead.team}</p>
+                        {/* <p className="text-green-500 font-semibold">
+                          Amount: ${lead.amount}
+                        </p> */}
+                        {/* View Details Button */}
+                        <button
+                          onClick={() => handleViewDetails(lead)}
+                          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+                        >
+                          View Details
+                        </button>
+
+                        {/* Assign to member button */}
+                        {user.role === "marAdmin" ||
+                        user.role === "devAdmin" ? (
                           <button
                             onClick={handleAssign}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
                           >
-                            Assign To Employee
+                            Assign To Member
                           </button>
                         ) : (
                           <></>
@@ -230,17 +188,17 @@ const Lead = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-h-screen overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-              {isEditing ? "Edit Deal" : "Add New Deal"}
+              Add New Lead
             </h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-5">
                 <label className="block text-gray-700 text-sm font-medium mb-1">
-                  Deal Name
+                  Title
                 </label>
                 <input
                   type="text"
                   name="dealName"
-                  value={formData.dealName}
+                  value={formData.leadName}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                   required
@@ -303,7 +261,6 @@ const Lead = () => {
                   <option value="">Select a team</option>
                   <option value="marketing">Marketing</option>
                   <option value="developer">Developer</option>
-                  {/* Add more teams as needed */}
                 </select>
               </div>
 
@@ -317,57 +274,26 @@ const Lead = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                   rows="3"
-                />
+                  required
+                ></textarea>
               </div>
-              <div className="flex justify-end">
+
+              <div className="text-right">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="mr-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
+                  className="px-4 py-2 mr-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+                  className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-300"
                 >
-                  {isEditing ? "Update Deal" : "Add Deal"}
+                  Add Lead
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {listModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md max-h-[80vh] overflow-y-auto relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setListModal(false)}
-              className="absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded"
-            >
-              <IoMdClose size={24} />
-            </button>
-
-            {/* Modal Header */}
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              List of Employees
-            </h2>
-
-            {/* Filtered List of Employees */}
-            <ul className="space-y-3">
-              {dummyUser
-                .filter((user) => user.team === "developer")
-                .map((user, index) => (
-                  <li
-                    key={index}
-                    className="text-lg text-gray-700 bg-gray-100 p-3 rounded-md hover:bg-purple-100 transition-all duration-300"
-                  >
-                    {user.name}
-                  </li>
-                ))}
-            </ul>
           </div>
         </div>
       )}
