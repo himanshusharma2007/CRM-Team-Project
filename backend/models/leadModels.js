@@ -16,15 +16,15 @@ const leadSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: [true, "phone no. is required"]
+      required: [true, "phone no. is required"],
     },
     description: {
       type: String,
       required: [true, "description is required"],
     },
-    stage: {
-      type: String,
-      enum: [
+    stages: {  
+      type: Array,
+      default: [
         "New-Lead",
         "Need-Analysis",
         "Price",
@@ -32,7 +32,10 @@ const leadSchema = new mongoose.Schema(
         "Lead-Won",
         "Lead-Lost",
       ],
-      default: "New-Lead",
+    },
+    currentStages:{
+      type:String,
+      default:"New-Lead"
     },
     team: {
       type: mongoose.Schema.Types.ObjectId,
