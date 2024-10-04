@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../../services/authService";
 import {
   FaHome,
@@ -12,7 +12,7 @@ import { FaPersonCircleCheck } from "react-icons/fa6";
 import { MdQueryBuilder } from "react-icons/md";
 // import { dummyUser } from "../../services/dummy";
 import { useAuth } from "../../context/Context";
-
+import logo from "../../assets/logoDevPurple.png";
 const Sidebar = () => {
   // const role = dummyUser[0].role;
   const navigate = useNavigate();
@@ -45,74 +45,75 @@ const AdminSidebar = ({ handleLogout }) => {
   return (
     <div className="flex flex-col h-[100dvh] max-h-screen w-full bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
-      <div className="p-5 text-center text-2xl font-semibold bg-gray-800">
-        <span className="text-purple-400">CRM</span> Dashboard
+      <div className="font-semibold bg-gray-900 flex justify-center">
+        {/* <span className="text-purple-400">CRM</span> Dashboard */}
+        <img src={logo} alt="Logo Image" className="h-[100px]" />
       </div>
 
       {/* Sidebar Navigation */}
       <nav className="flex-grow p-4">
         <ul className="space-y-2">
           <li>
-            <Link
+            <NavLink
               to="/dashboard"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHome className="mr-3" />
               Dashboard
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/profile"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaUser className="mr-3" />
               Profile
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/todo"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaClipboardList className="mr-3" />
               To-Do
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/lead"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHandshake className="mr-3" />
               Leads
-            </Link>
+            </NavLink>
           </li>
           <li className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700">
             <FaUsers className="mr-3" />
-            <Link to="/contact">Contact</Link>
+            <NavLink to="/connection">Connection</NavLink>
           </li>
           <li className=" flex items-center p-3 text-gray-300 rounded hover:bg-gray-700">
             <FaPersonCircleCheck className="mr-3" />
-            <Link to="/userverification">User Verification</Link>
+            <NavLink to="/userverification">User Verification</NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/resetpassword"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaLock className="mr-3" />
               Reset Password
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/query"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <MdQueryBuilder className="mr-3" />
               Query
-            </Link>
+            </NavLink>
           </li>
         </ul>
       </nav>
@@ -142,53 +143,53 @@ const SubAdminSidebar = ({ handleLogout }) => {
       <nav className="flex-grow p-4">
         <ul className="space-y-2">
           <li>
-            <Link
+            <NavLink
               to="/dashboard"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHome className="mr-3" />
               Dashboard
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/profile"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaUser className="mr-3" />
               Profile
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/todo"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaClipboardList className="mr-3" />
               To-Do
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/lead"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHandshake className="mr-3" />
               Leads
-            </Link>
+            </NavLink>
           </li>
           <li className=" flex items-center p-3 text-gray-300 rounded hover:bg-gray-700">
             <FaPersonCircleCheck className="mr-3" />
-            <Link to="/userverification">User Verification</Link>
+            <NavLink to="/userverification">User Verification</NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/resetpassword"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaLock className="mr-3" />
               Reset Password
-            </Link>
+            </NavLink>
           </li>
         </ul>
       </nav>
@@ -218,40 +219,40 @@ const EmployeeSidebar = ({ handleLogout }) => {
       <nav className="flex-grow p-4">
         <ul className="space-y-2">
           <li>
-            <Link
+            <NavLink
               to="/dashboard"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaHome className="mr-3" />
               Dashboard
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/profile"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaUser className="mr-3" />
               Profile
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/todo"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaClipboardList className="mr-3" />
               To-Do
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link
+            <NavLink
               to="/resetpassword"
               className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
             >
               <FaLock className="mr-3" />
               Reset Password
-            </Link>
+            </NavLink>
           </li>
         </ul>
       </nav>

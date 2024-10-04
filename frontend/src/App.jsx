@@ -12,7 +12,7 @@ import AboutUs from "./view/screens/AboutUs";
 import Layout from "./view/components/Layout/Layout";
 import Landing from "./view/components/Landing";
 import Dashboard from "./view/components/Dashboard";
-import Contact from "./view/components/Contact";
+import Connection from "./view/components/Connection";
 import ForgetPassword from "./view/components/ForgetPassword";
 import UserVerification from "./view/components/UserVerification";
 import Home from "./view/screens/Home";
@@ -96,10 +96,10 @@ function App() {
             }
           />
           <Route
-            path="/contact"
+            path="/connection"
             element={
               <Layout>
-                <Contact />
+                <Connection />
               </Layout>
             }
           />
