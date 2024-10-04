@@ -1,5 +1,4 @@
 const todo = require("../models/todoModels");
-const { addTodoStatus } = require("./todoStatusController");
 
 
 exports.createTodo = async (req, res) => {
@@ -12,7 +11,6 @@ console.log('req.body', req.body)
         message: "please fill all fields",
       });
     }
-    const statusData=await addTodoStatus.find({status:currentStatus});
     
     const tododata = await todo.create({
       title,
@@ -35,10 +33,10 @@ console.log('req.body', req.body)
 //  update/:id
 exports.updateTodo = async (req,res) =>{
 
-  const { title, description, priority,status } = req.body;
+  const { title, description, priority, currentStatus } = req.body;
   console.log("req.body in updateTodo", req.body)
     try {
-        if(!title && !priority &&!status){
+        if(!title && !priority && !currentStatus){
           return res.status(400).send({
             success: false,
             message: "please fill any fields for update"
@@ -59,7 +57,7 @@ exports.updateTodo = async (req,res) =>{
         tododata.title = title || tododata.title;
         tododata.description = description || tododata.description;
         tododata.priority = priority || tododata.priority;
-        tododata.status = status || tododata.status;
+        tododata.currentStatus = currentStatus || tododata.currentStatus;
 
         await tododata.save();
         return res.status(200).send({
@@ -112,4 +110,18 @@ exports.getSingleTodo = async (req, res)=>{
         message: "Internel server error"
       });
     }
+}
+
+
+exports.getAllTodoByAdmin = async (req, res) => {
+  try {
+    const tododata = await todo.find({});
+    return res.status(200).json(tododata)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send({
+      success: false,
+      message: "Internel server error"
+    });
+  }
 }
