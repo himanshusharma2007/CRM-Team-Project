@@ -5,7 +5,6 @@ import { Context } from "./context/Context";
 import LoginPage from "./view/components/Login";
 import Register from "./view/components/Register";
 import ToDo from "./view/screens/ToDo";
-import DealForm from "./view/components/DealForm";
 import ResetPass from "./view/components/ResetPass";
 import Profile from "./view/screens/Profile";
 import ContactUs from "./view/screens/ContactUs";
@@ -19,11 +18,12 @@ import UserVerification from "./view/components/UserVerification";
 import Home from "./view/screens/Home";
 import MainLayout from "./view/components/Layout/MainLayout";
 import QueryPage from "./view/components/Query";
+import Lead from "./view/components/Lead";
+import LeadDetails from "./view/components/LeadDetails";
 
 function App() {
   return (
     <Context>
-
       <BrowserRouter>
         <Routes>
           {/* Home page is public */}
@@ -80,10 +80,18 @@ function App() {
             }
           />
           <Route
-            path="/dealform"
+            path="/lead"
             element={
               <Layout>
-                <DealForm />
+                <Lead />
+              </Layout>
+            }
+          />
+          <Route
+            path="/lead-details/:id"
+            element={
+              <Layout>
+                <LeadDetails />
               </Layout>
             }
           />

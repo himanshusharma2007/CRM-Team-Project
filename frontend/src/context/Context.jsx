@@ -24,6 +24,7 @@ export const Context = ({ children }) => {
         const userData = await getUser();
         console.log("userData in loaduser:>> ", userData);
         if (isMounted) {
+          console.log("userData in load user", userData);
           setUser(userData);
         }
       } catch (error) {

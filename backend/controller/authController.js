@@ -4,11 +4,11 @@ const bcrypt = require("bcryptjs");
 const hashPassword = require("../utils/password");
 
 // Generate JWT token
-const generateToken = (id, res) => {
-  console.log("id", id);
-  const token = jwt.sign({ id }, process.env.JWT_KEY, { expiresIn: "1h" });
-  res.cookie("token", token);
-  console.log("token " + token);
+const generateToken = (id,res) => {
+  console.log("id",id);
+  const token = jwt.sign({ id }, process.env.JWT_KEY, { expiresIn: '1d' });
+  res.cookie("token",token)
+  console.log("token " + token)
   // return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
@@ -146,7 +146,7 @@ exports.verify = async (req, res) => {
       userdata.team = team;
     }
     // Check if the user is a sub-admin
-    else if (req.user.role === "devAdmin" || req.user.role === "marAdmin") {
+    else if (req.user.role === "subAdmin" || req.user.role === "subAdmin") {
       // Sub-admin can set team only
       userdata.verify = true;
       userdata.team = team;

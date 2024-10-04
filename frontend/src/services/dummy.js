@@ -18,7 +18,7 @@ export const dummyUser = [
       "otp": "789012",
       "otpExpiry": "2024-09-29T17:45:00Z",
       "team": "marketing",
-      "role": "marAdmin",
+      "role": "subAdmin",
       "verify": false,
       "createdAt": "2024-09-15T09:20:00Z",
       "updatedAt": "2024-09-25T11:30:00Z"
@@ -42,7 +42,7 @@ export const dummyUser = [
       "otp": null,
       "otpExpiry": null,
       "team": "developer",
-      "role": "devAdmin",
+      "role": "subAdmin",
       "verify": true,
       "createdAt": "2024-08-25T08:00:00Z",
       "updatedAt": "2024-09-05T10:10:00Z"

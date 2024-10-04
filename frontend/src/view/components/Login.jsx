@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { login } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context";
-
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -23,14 +22,16 @@ const LoginPage = () => {
     try {
       const userData = await login(email, password);
       saveUser(userData);
-      mySwal.fire({
-        title: "Login Successful",
-        text: "Welcome to the dashboard",
-        icon: "success",
-        confirmButtonText: "OK",
-      }).then(() => {
-        navigate("/dashboard");
-      });
+      mySwal
+        .fire({
+          title: "Login Successful",
+          text: "Welcome to the dashboard",
+          icon: "success",
+          confirmButtonText: "OK",
+        })
+        .then(() => {
+          navigate("/dashboard");
+        });
     } catch (error) {
       mySwal.fire({
         title: "Login Failed",
