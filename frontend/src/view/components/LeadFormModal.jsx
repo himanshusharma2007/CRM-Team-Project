@@ -12,144 +12,150 @@ const LeadFormModal = ({
   if (!showModal) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-h-screen overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          Add New Lead
-        </h2>
-        <form
-          onSubmit={(e) => {
-            handleSubmit(e);
-            resetForm(); // Optional reset of form after submission
-          }}
-        >
-          {/* Title */}
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium mb-1">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-4">Add New Lead</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="title"
+            >
               Title
             </label>
             <input
               type="text"
+              id="title"
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
-
-          {/* Company Name */}
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium mb-1">
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="companyName"
+            >
               Company Name
             </label>
             <input
               type="text"
+              id="companyName"
               name="companyName"
               value={formData.companyName}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
-
-          {/* Contact Name */}
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium mb-1">
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="contactName"
+            >
               Contact Name
             </label>
             <input
               type="text"
+              id="contactName"
               name="contactName"
               value={formData.contactName}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
-
-          {/* Phone Number */}
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium mb-1">
-              Phone Number
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="phone"
+            >
+              Phone
             </label>
             <input
               type="tel"
+              id="phone"
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Enter phone number"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
-
-          {/* Stage */}
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium mb-1">
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="stageName"
+            >
               Stage
             </label>
             <select
-              name="stage"
-              value={formData.stage}
+              id="stageName"
+              name="stageName"
+              value={formData.stageName}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
             >
+              <option value="">Select a stage</option>
               {stages.map((stage) => (
-                <option key={stage.id} value={stage.id}>
-                  {stage.title}
+                <option key={stage.stageName} value={stage.stageName}>
+                  {stage.stageName}
                 </option>
               ))}
             </select>
           </div>
-
-          {/* Team */}
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium mb-1">
-              Team
-            </label>
-            <select
-              name="team"
-              value={formData.team}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="description"
             >
-              <option value="">Select a team</option>
-              <option value="marketing">Marketing</option>
-              <option value="developer">Developer</option>
-            </select>
-          </div>
-
-          {/* Description */}
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium mb-1">
               Description
             </label>
             <textarea
+              id="description"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               rows="3"
               required
             ></textarea>
           </div>
-
-          {/* Buttons */}
-          <div className="text-right">
-            <button
-              type="button"
-              onClick={() => setShowModal(false)}
-              className="px-4 py-2 mr-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300"
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="team"
             >
-              Cancel
-            </button>
+              Team
+            </label>
+            <input
+              type="text"
+              id="team"
+              name="team"
+              value={formData.team}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div className="flex items-center justify-between">
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-300"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Add Lead
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowModal(false);
+                resetForm();
+              }}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Cancel
             </button>
           </div>
         </form>

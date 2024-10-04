@@ -82,6 +82,7 @@ exports.updateLead = async (req, res) => {
 
 exports.updateStage = async (req, res) => {
   try {
+    console.log('req.body in update Stage', req.body)
     const { stageName } = req.body;
     const { id } = req.params;
     const leadData = await lead.findById(id);
