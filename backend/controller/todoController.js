@@ -1,21 +1,24 @@
-const todo = require("../models/todoModels")
+const todo = require("../models/todoModels");
+const { addTodoStatus } = require("./todoStatusController");
 
 
 exports.createTodo = async (req, res) => {
-  const { title, description="",status,taskPriority} = req.body;
+  const { title, description="",currentStatus,taskPriority} = req.body;
 console.log('req.body', req.body)
   try {
-    if(!title || !taskPriority){
+    if (!title || !taskPriority || !currentStatus) {
       return res.status(400).send({
-        success:false,
-        message: "please fill all fields"
-      })
+        success: false,
+        message: "please fill all fields",
+      });
     }
+    const statusData=await addTodoStatus.find({status:currentStatus});
+    
     const tododata = await todo.create({
       title,
-      description:description || "",
-      status,
-      priority:taskPriority,
+      description: description || "",
+      currentStatus,
+      priority: taskPriority,
       userId: req.user._id,
     });
     res.status(201).json(tododata);
