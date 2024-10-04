@@ -22,17 +22,9 @@ const leadSchema = new mongoose.Schema(
       type: String,
       required: [true, "description is required"],
     },
-    stage: {
+    currentStage:{
       type: String,
-      enum: [
-        "New-Lead",
-        "Need-Analysis",
-        "Price",
-        "Negotiation",
-        "Lead-Won",
-        "Lead-Lost",
-      ],
-      default: "New-Lead",
+      required: [true, "currentStage is required"],
     },
     team: {
       type: mongoose.Schema.Types.ObjectId,
