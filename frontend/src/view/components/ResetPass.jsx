@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { reset } from "../../services/authService";
-import { useAuth } from "../../context/Context";
+
 const ResetPassword = () => {
+  
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
-  const { user } = useAuth();
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-    if (newPassword === confirmPassword && user) {
+    if (newPassword === confirmPassword) {
       try {
-        await reset(user.email, newPassword, oldPassword);
+        await reset(newPassword, oldPassword);
         alert("Password has been reset successfully!");
         navigate("/login");
       } catch (error) {

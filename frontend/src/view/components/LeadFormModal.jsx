@@ -12,135 +12,141 @@ const LeadFormModal = ({
   if (!showModal) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4">Add New Lead</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="title"
-            >
-              Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl max-h-screen overflow-y-auto">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Add New Lead
+        </h2>
+        <form
+          onSubmit={(e) => {
+            handleSubmit(e);
+            resetForm(); // Optional reset of form after submission
+          }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Title */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 text-sm font-medium mb-1">
+                Title
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+            </div>
+
+            {/* Company Name */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 text-sm font-medium mb-1">
+                Company Name
+              </label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+            </div>
+
+            {/* Contact Name */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 text-sm font-medium mb-1">
+                Contact Name
+              </label>
+              <input
+                type="text"
+                name="contactName"
+                value={formData.contactName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+            </div>
+
+            {/* Phone Number */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 text-sm font-medium mb-1">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter phone number"
+                required
+              />
+            </div>
+
+            {/* Stage */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 text-sm font-medium mb-1">
+                Stage
+              </label>
+              <select
+                name="stage"
+                value={formData.stage}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                {stages.map((stage) => (
+                  <option key={stage.id} value={stage.id}>
+                    {stage.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Team */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 text-sm font-medium mb-1">
+                Team
+              </label>
+              <select
+                name="team"
+                value={formData.team}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              >
+                <option value="">Select a team</option>
+                <option value="marketing">Marketing</option>
+                <option value="developer">Developer</option>
+              </select>
+            </div>
+
+            {/* Description */}
+            <div className="col-span-1 md:col-span-2 flex flex-col">
+              <label className="text-gray-700 text-sm font-medium mb-1">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                rows="3"
+                required
+              ></textarea>
+            </div>
           </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="companyName"
+
+          {/* Buttons */}
+          <div className="text-right mt-6">
+            <button
+              type="button"
+              onClick={() => setShowModal(false)}
+              className="px-4 py-2 mr-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300"
             >
-              Company Name
-            </label>
-            <input
-              type="text"
-              id="companyName"
-              name="companyName"
-              value={formData.companyName}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="contactName"
-            >
-              Contact Name
-            </label>
-            <input
-              type="text"
-              id="contactName"
-              name="contactName"
-              value={formData.contactName}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="phone"
-            >
-              Phone
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="stageName"
-            >
-              Stage
-            </label>
-            <select
-              id="stageName"
-              name="stageName"
-              value={formData.stageName}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            >
-              <option value="">Select a stage</option>
-              {stages.map((stage) => (
-                <option key={stage.stageName} value={stage.stageName}>
-                  {stage.stageName}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="description"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              rows="3"
-              required
-            ></textarea>
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="team"
-            >
-              Team
-            </label>
-            <input
-              type="text"
-              id="team"
-              name="team"
-              value={formData.team}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-          <div className="flex items-center justify-between">
+              Cancel
+            </button>
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
