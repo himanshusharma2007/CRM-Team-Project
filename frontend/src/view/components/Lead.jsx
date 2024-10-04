@@ -53,7 +53,9 @@ const Lead = () => {
     try {
       setLoading(true);
       const leads = await getAllLeads();
+      console.log("Leads Fetch from getaAllLeads", leads);
       const groupedLeads = groupLeadsByStage(leads);
+      console.log("Group Leads Fetch from getaAllLeads", groupedLeads);
       setPipeline(groupedLeads);
       setLoading(false);
     } catch (err) {
@@ -65,7 +67,7 @@ const Lead = () => {
 
   const groupLeadsByStage = (leads) => {
     return stages.reduce((acc, stage) => {
-      acc[stage.id] = leads.filter((lead) => lead.stage === stage.id);
+      acc[stage.id] = leads.filter((lead) => lead.currentStages === stage.id);
       return acc;
     }, {});
   };
@@ -84,6 +86,7 @@ const Lead = () => {
         [formData.stage]: [...(prev[formData.stage] || []), newLead],
       }));
       setShowModal(false);
+      fetchLeads();
       resetForm();
     } catch (err) {
       console.error("Error creating lead:", err);
@@ -97,7 +100,7 @@ const Lead = () => {
       companyName: "",
       contactName: "",
       phone: "",
-      stage: "New-Lead",
+      currentStages: "New-Lead",
       description: "",
       team: "",
     });

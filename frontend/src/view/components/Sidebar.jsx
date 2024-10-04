@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { logout } from "../../services/authService";
 import {
   FaHome,
@@ -10,14 +10,13 @@ import {
 } from "react-icons/fa";
 import { FaPersonCircleCheck } from "react-icons/fa6";
 import { MdQueryBuilder } from "react-icons/md";
-// import { dummyUser } from "../../services/dummy";
 import { useAuth } from "../../context/Context";
 import logo from "../../assets/logoDevPurple.png";
+
 const Sidebar = () => {
-  // const role = dummyUser[0].role;
   const navigate = useNavigate();
   const { saveUser, user } = useAuth();
-  console.log("user in sidebar:", user);
+  const location = useLocation(); // Get current location
 
   const handleLogout = () => {
     logout();
@@ -27,94 +26,83 @@ const Sidebar = () => {
 
   return (
     <>
-      {user?.role === "admin" && <AdminSidebar handleLogout={handleLogout} />}
+      {user?.role === "admin" && (
+        <AdminSidebar handleLogout={handleLogout} location={location} />
+      )}
       {user?.role === "marAdmin" && (
-        <SubAdminSidebar handleLogout={handleLogout} />
+        <SubAdminSidebar handleLogout={handleLogout} location={location} />
       )}
       {user?.role === "devAdmin" && (
-        <SubAdminSidebar handleLogout={handleLogout} />
+        <SubAdminSidebar handleLogout={handleLogout} location={location} />
       )}
-      {user?.role === "emp" && <EmployeeSidebar handleLogout={handleLogout} />}
+      {user?.role === "emp" && (
+        <EmployeeSidebar handleLogout={handleLogout} location={location} />
+      )}
     </>
   );
 };
 
 export default Sidebar;
 
-const AdminSidebar = ({ handleLogout }) => {
+const AdminSidebar = ({ handleLogout, location }) => {
   return (
     <div className="flex flex-col h-[100dvh] max-h-screen w-full bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
       <div className="font-semibold bg-gray-900 flex justify-center">
-        {/* <span className="text-purple-400">CRM</span> Dashboard */}
-        <img src={logo} alt="Logo Image" className="h-[100px]" />
+        <img src={logo} alt="Logo Image" className="w-[200px]" />
       </div>
 
       {/* Sidebar Navigation */}
       <nav className="flex-grow p-4">
         <ul className="space-y-2">
-          <li>
-            <NavLink
-              to="/dashboard"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaHome className="mr-3" />
-              Dashboard
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/profile"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaUser className="mr-3" />
-              Profile
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/todo"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaClipboardList className="mr-3" />
-              To-Do
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/lead"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaHandshake className="mr-3" />
-              Leads
-            </NavLink>
-          </li>
-          <li className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700">
-            <FaUsers className="mr-3" />
-            <NavLink to="/connection">Connection</NavLink>
-          </li>
-          <li className=" flex items-center p-3 text-gray-300 rounded hover:bg-gray-700">
-            <FaPersonCircleCheck className="mr-3" />
-            <NavLink to="/userverification">User Verification</NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/resetpassword"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaLock className="mr-3" />
-              Reset Password
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/query"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <MdQueryBuilder className="mr-3" />
-              Query
-            </NavLink>
-          </li>
+          <SidebarItem
+            to="/dashboard"
+            icon={<FaHome />}
+            text="Dashboard"
+            location={location}
+          />
+          <SidebarItem
+            to="/profile"
+            icon={<FaUser />}
+            text="Profile"
+            location={location}
+          />
+          <SidebarItem
+            to="/todo"
+            icon={<FaClipboardList />}
+            text="To-Do"
+            location={location}
+          />
+          <SidebarItem
+            to="/lead"
+            icon={<FaHandshake />}
+            text="Leads"
+            location={location}
+          />
+          <SidebarItem
+            to="/connection"
+            icon={<FaUsers />}
+            text="Connection"
+            location={location}
+          />
+          <SidebarItem
+            to="/userverification"
+            icon={<FaPersonCircleCheck />}
+            text="User Verification"
+            location={location}
+          />
+          <SidebarItem
+            to="/resetpassword"
+            icon={<FaLock />}
+            text="Reset Password"
+            location={location}
+          />
+          <SidebarItem
+            to="/query"
+            icon={<MdQueryBuilder />}
+            text="Query"
+            location={location}
+          />
         </ul>
       </nav>
 
@@ -131,7 +119,28 @@ const AdminSidebar = ({ handleLogout }) => {
   );
 };
 
-const SubAdminSidebar = ({ handleLogout }) => {
+// SidebarItem component to handle active state
+const SidebarItem = ({ to, icon, text, location }) => {
+  const isActive = location.pathname === to; // Check if current path matches
+
+  return (
+    <li>
+      <NavLink
+        to={to}
+        className={`flex items-center p-3 space-x-2 rounded ${
+          isActive
+            ? "bg-gray-700 text-white"
+            : "text-gray-300 hover:bg-gray-700"
+        }`}
+      >
+        <div>{icon}</div>
+        <div>{text}</div>
+      </NavLink>
+    </li>
+  );
+};
+
+const SubAdminSidebar = ({ handleLogout, location }) => {
   return (
     <div className="flex flex-col h-screen w-64 bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
@@ -142,55 +151,42 @@ const SubAdminSidebar = ({ handleLogout }) => {
       {/* Sidebar Navigation */}
       <nav className="flex-grow p-4">
         <ul className="space-y-2">
-          <li>
-            <NavLink
-              to="/dashboard"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaHome className="mr-3" />
-              Dashboard
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/profile"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaUser className="mr-3" />
-              Profile
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/todo"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaClipboardList className="mr-3" />
-              To-Do
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/lead"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaHandshake className="mr-3" />
-              Leads
-            </NavLink>
-          </li>
-          <li className=" flex items-center p-3 text-gray-300 rounded hover:bg-gray-700">
-            <FaPersonCircleCheck className="mr-3" />
-            <NavLink to="/userverification">User Verification</NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/resetpassword"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaLock className="mr-3" />
-              Reset Password
-            </NavLink>
-          </li>
+          <SidebarItem
+            to="/dashboard"
+            icon={<FaHome />}
+            text="Dashboard"
+            location={location}
+          />
+          <SidebarItem
+            to="/profile"
+            icon={<FaUser />}
+            text="Profile"
+            location={location}
+          />
+          <SidebarItem
+            to="/todo"
+            icon={<FaClipboardList />}
+            text="To-Do"
+            location={location}
+          />
+          <SidebarItem
+            to="/lead"
+            icon={<FaHandshake />}
+            text="Leads"
+            location={location}
+          />
+          <SidebarItem
+            to="/userverification"
+            icon={<FaPersonCircleCheck />}
+            text="User Verification"
+            location={location}
+          />
+          <SidebarItem
+            to="/resetpassword"
+            icon={<FaLock />}
+            text="Reset Password"
+            location={location}
+          />
         </ul>
       </nav>
 
@@ -207,7 +203,7 @@ const SubAdminSidebar = ({ handleLogout }) => {
   );
 };
 
-const EmployeeSidebar = ({ handleLogout }) => {
+const EmployeeSidebar = ({ handleLogout, location }) => {
   return (
     <div className="flex flex-col h-screen w-64 bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
@@ -218,42 +214,30 @@ const EmployeeSidebar = ({ handleLogout }) => {
       {/* Sidebar Navigation */}
       <nav className="flex-grow p-4">
         <ul className="space-y-2">
-          <li>
-            <NavLink
-              to="/dashboard"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaHome className="mr-3" />
-              Dashboard
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/profile"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaUser className="mr-3" />
-              Profile
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/todo"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaClipboardList className="mr-3" />
-              To-Do
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/resetpassword"
-              className="flex items-center p-3 text-gray-300 rounded hover:bg-gray-700"
-            >
-              <FaLock className="mr-3" />
-              Reset Password
-            </NavLink>
-          </li>
+          <SidebarItem
+            to="/dashboard"
+            icon={<FaHome />}
+            text="Dashboard"
+            location={location}
+          />
+          <SidebarItem
+            to="/profile"
+            icon={<FaUser />}
+            text="Profile"
+            location={location}
+          />
+          <SidebarItem
+            to="/todo"
+            icon={<FaClipboardList />}
+            text="To-Do"
+            location={location}
+          />
+          <SidebarItem
+            to="/resetpassword"
+            icon={<FaLock />}
+            text="Reset Password"
+            location={location}
+          />
         </ul>
       </nav>
 
