@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Container } from 'react-smooth-dnd';
 import { getAllTasks, taskSave, updateTask } from '../../services/taskService';
 
 const ToDo = () => {
@@ -14,6 +13,7 @@ const ToDo = () => {
   const [editTask, setEditTask] = useState(null);
   const [editInput, setEditInput] = useState('');
   const [editPriority, setEditPriority] = useState('Medium');
+  const [draggedTask, setDraggedTask] = useState(null); // To track the dragged task
 
   const handleInputChange = (e) => {
     setTitle(e.target.value);
@@ -40,17 +40,35 @@ const ToDo = () => {
   };
 
   const moveTask = async (task, from, to) => {
-    console.log("Moving task:", task);
+    if (from === to) return;
+
     setTasks((prevTasks) => {
       const fromTasks = prevTasks[from].filter((t) => t._id !== task._id);
-      const toTasks = [...prevTasks[to], {...task, status: to}];
+      const toTasks = [...prevTasks[to], { ...task, status: to }];
       return {
         ...prevTasks,
         [from]: fromTasks,
         [to]: toTasks
       };
     });
-    await updateTask(task._id, {...task, status: to});
+
+    await updateTask(task._id, { ...task, status: to });
+  };
+
+  const handleDragStart = (task) => {
+    setDraggedTask(task);
+  };
+
+  const handleDrop = (e, section) => {
+    e.preventDefault();
+    if (draggedTask && draggedTask.status !== section) {
+      moveTask(draggedTask, draggedTask.status, section);
+    }
+    setDraggedTask(null);
+  };
+
+  const allowDrop = (e) => {
+    e.preventDefault(); // Allow dropping by preventing the default behavior
   };
 
   const handleEditChange = (e) => {
@@ -74,7 +92,6 @@ const ToDo = () => {
         const fromTasks = prevTasks[editTask.section].filter(
           (t) => t._id !== editTask._id
         );
-        
         return {
           ...prevTasks,
           [editTask.section]: [...fromTasks, updatedTask]
@@ -96,7 +113,6 @@ const ToDo = () => {
   const fetchTasks = async () => {
     try {
       const fetchedTasks = await getAllTasks();
-      console.log("fetchedTasks", fetchedTasks);
       setTasks({
         todo: fetchedTasks.filter((task) => task.status.toLowerCase() === 'todo'),
         doing: fetchedTasks.filter((task) => task.status.toLowerCase() === 'doing'),
@@ -180,66 +196,62 @@ const ToDo = () => {
       {/* Task Sections */}
       <div className="flex space-x-6">
         {['todo', 'doing', 'done'].map((section) => (
-          <div key={section} className="w-1/3 bg-gray-50 p-4 rounded-lg shadow-md">
+          <div
+            key={section}
+            onDrop={(e) => handleDrop(e, section)}
+            onDragOver={allowDrop}
+            className="w-1/3 bg-gray-50 p-4 rounded-lg shadow-md"
+          >
             <h2 className="text-xl font-semibold mb-4 text-gray-800 capitalize">{section}</h2>
-            <Container
-              onDrop={(dropResult) => {
-                const { removedIndex, addedIndex, payload } = dropResult;
-                if (removedIndex !== null || addedIndex !== null) {
-                  moveTask(payload, section, section);
-                }
-              }}
-              dragClass="shadow-lg"
-              dropClass="bg-blue-100"
-              getChildPayload={index => tasks[section][index]}
-            >
-              <div className="space-y-4 h-96 overflow-y-auto">
-                {tasks[section].map((task) => (
-                  <div key={task._id}>
-                    <div className="flex justify-between items-center p-3 bg-white rounded-md shadow-sm">
-                      <span className="font-medium text-gray-700">
-                        {task.title}{' '}
-                        <span
-                          className={`ml-2 text-sm ${
-                            task.priority === 'High'
-                              ? 'text-red-500'
-                              : task.priority === 'Medium'
-                              ? 'text-yellow-500'
-                              : 'text-green-500'
-                          }`}
-                        >
-                          ({task.priority})
-                        </span>
-                      </span>
-                      <div className="space-x-2">
-                        {section !== 'done' && (
-                          <button
-                            onClick={() =>
-                              moveTask(
-                                task,
-                                section,
-                                section === 'todo' ? 'doing' : 'done'
-                              )
-                            }
-                            className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600"
-                          >
-                            {section === 'todo' ? 'Start' : 'Complete'}
-                          </button>
-                        )}
-                        {section === 'doing' && (
-                          <button
-                            onClick={() => startEditing(task, section)}
-                            className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
-                          >
-                            Edit
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>  
-                ))}
-              </div>
-            </Container>
+            <div className="space-y-4 h-96 overflow-y-auto">
+              {tasks[section].map((task) => (
+                <div
+                  key={task._id}
+                  draggable
+                  onDragStart={() => handleDragStart(task)}
+                  className="flex justify-between items-center p-3 bg-white rounded-md shadow-sm"
+                >
+                  <span className="font-medium text-gray-700">
+                    {task.title}{' '}
+                    <span
+                      className={`ml-2 text-sm ${
+                        task.priority === 'High'
+                          ? 'text-red-500'
+                          : task.priority === 'Medium'
+                          ? 'text-yellow-500'
+                          : 'text-green-500'
+                      }`}
+                    >
+                      ({task.priority})
+                    </span>
+                  </span>
+                  <div className="space-x-2">
+                    {section !== 'done' && (
+                      <button
+                        onClick={() =>
+                          moveTask(
+                            task,
+                            section,
+                            section === 'todo' ? 'doing' : 'done'
+                          )
+                        }
+                        className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600"
+                      >
+                        {section === 'todo' ? 'Start' : 'Complete'}
+                      </button>
+                    )}
+                    {section === 'doing' && (
+                      <button
+                        onClick={() => startEditing(task, section)}
+                        className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
