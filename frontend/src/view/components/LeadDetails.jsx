@@ -119,7 +119,7 @@ const LeadDetails = () => {
             />
             <select
               name="stage"
-              value={lead.stage}
+              value={lead.currentStage}
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
             >
@@ -149,7 +149,7 @@ const LeadDetails = () => {
               <strong>Description:</strong> {lead.description}
             </p>
             <p className="text-xl text-gray-700">
-              <strong>Current Stage:</strong> {lead.stage}
+              <strong>Current Stage:</strong> {lead.currentStage}
             </p>
             <p className="text-xl text-gray-700">
               <strong>Team:</strong> {lead.team}

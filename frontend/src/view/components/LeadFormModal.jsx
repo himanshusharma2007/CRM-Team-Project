@@ -9,6 +9,7 @@ const LeadFormModal = ({
   resetForm,
   stages,
 }) => {
+  console.log("Stages in Form Model:", stages);
   if (!showModal) return null;
 
   return (
@@ -75,7 +76,7 @@ const LeadFormModal = ({
                 Phone Number
               </label>
               <input
-                type="tel"
+                type="number  "
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
@@ -97,8 +98,12 @@ const LeadFormModal = ({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
                 {stages.map((stage) => (
-                  <option key={stage.id} value={stage.id}>
-                    {stage.title}
+                  <option
+                    key={stage._id}
+                    value={stage._id}
+                    className="text-black"
+                  >
+                    {stage.stageName}
                   </option>
                 ))}
               </select>
