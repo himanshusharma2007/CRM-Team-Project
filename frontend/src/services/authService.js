@@ -42,11 +42,10 @@ export const logout = async () => {
   }
 };
 
-export const reset = async (email, password, oldPassword) => {
+export const reset = async ( newPassword, oldPassword) => {
   try {
     const response = await api.put("/auth/reset", {
-      email,
-      password,
+      newPassword,
       oldPassword,
     });
     return response.data;

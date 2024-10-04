@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "install": "^0.13.0",
+    "lodash": "^4.17.21",
     "npm": "^10.8.3"
   }
 }
