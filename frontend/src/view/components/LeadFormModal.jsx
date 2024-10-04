@@ -144,20 +144,7 @@ const LeadFormModal = ({
           </div>
 
           {/* Buttons */}
-          <div className="text-right mt-6">
-            <button
-              type="button"
-              onClick={() => setShowModal(false)}
-              className="px-4 py-2 mr-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Add Lead
-            </button>
+          <div className=" space-x-4 text-right mt-6">
             <button
               type="button"
               onClick={() => {
@@ -167,6 +154,12 @@ const LeadFormModal = ({
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Add Lead
             </button>
           </div>
         </form>
