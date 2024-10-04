@@ -22,20 +22,9 @@ const leadSchema = new mongoose.Schema(
       type: String,
       required: [true, "description is required"],
     },
-    stages: {  
-      type: Array,
-      default: [
-        "New-Lead",
-        "Need-Analysis",
-        "Price",
-        "Negotiation",
-        "Lead-Won",
-        "Lead-Lost",
-      ],
-    },
-    currentStages:{
-      type:String,
-      default:"New-Lead"
+    currentStage:{
+      type: String,
+      required: [true, "currentStage is required"],
     },
     team: {
       type: mongoose.Schema.Types.ObjectId,
