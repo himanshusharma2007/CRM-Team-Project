@@ -4,12 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context";
 import LeadFormModal from "./LeadFormModal";
 import {
+  AiFillEdit,
+  AiFillCheckCircle,
+  AiFillCloseCircle,
+} from "react-icons/ai";
+import { FaTrashCan } from "react-icons/fa6";
+import {
   getAllLeads,
   createLead,
   updateStage,
 } from "../../services/leadServices";
 
-const stages = [
+const initialStages = [
   { id: "New-Lead", title: "New Lead" },
   { id: "Need-Analysis", title: "Need Analysis" },
   { id: "Price", title: "Price" },
@@ -32,6 +38,9 @@ const Lead = () => {
     description: "",
     team: "",
   });
+  const [stages, setStages] = useState(initialStages); // Editable stages array
+  const [editingStage, setEditingStage] = useState(null); // For renaming stage
+  const [tempTitle, setTempTitle] = useState(""); // Temporary storage for stage title during edit
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -68,7 +77,6 @@ const Lead = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Handle Submit Called Formdata:", formData);
     try {
       const newLead = await createLead(formData);
       setPipeline((prev) => ({
@@ -119,19 +127,52 @@ const Lead = () => {
       setPipeline(updatedPipeline);
 
       try {
-        // Call the updateStage service
         await updateStage(lead._id, { stage: newStage });
       } catch (err) {
         console.error("Error updating lead stage:", err);
         setError("Failed to update lead stage. Please try again.");
-        // Revert the change in case of error
-        fetchLeads();
+        fetchLeads(); // Revert change in case of error
       }
     }
   };
 
   const handleViewDetails = (lead) => {
     navigate(`/lead-details/${lead._id}`);
+  };
+
+  // Handle deleting a stage
+  const handleDeleteStage = (stageId) => {
+    alert("Sure! You want to delete Stage");
+    setStages(stages.filter((stage) => stage.id !== stageId));
+    const updatedPipeline = { ...pipeline };
+    delete updatedPipeline[stageId];
+    setPipeline(updatedPipeline);
+  };
+
+  // Handle adding a new stage
+  const handleAddStage = () => {
+    const newStage = { id: `Stage-${Date.now()}`, title: "New Stage" };
+    setStages([...stages, newStage]);
+    setPipeline({ ...pipeline, [newStage.id]: [] });
+  };
+
+  // Handle renaming a stage (Save functionality)
+  const handleSaveStageName = (stageId) => {
+    const updatedStages = stages.map((stage) =>
+      stage.id === stageId ? { ...stage, title: tempTitle } : stage
+    );
+    setStages(updatedStages);
+    setEditingStage(null);
+  };
+
+  // Handle canceling renaming a stage
+  const handleCancelEdit = () => {
+    setEditingStage(null);
+  };
+
+  const handleStartEditingStage = (stage) => {
+    setEditingStage(stage.id);
+    setTempTitle(stage.title); // Store the current title in tempTitle
   };
 
   if (loading) {
@@ -155,18 +196,67 @@ const Lead = () => {
         >
           Add New Lead
         </button>
+        <button
+          onClick={handleAddStage}
+          className="bg-green-500 text-white px-6 py-2 rounded-lg shadow hover:bg-green-600 transition duration-300 ml-4"
+        >
+          Add Stage
+        </button>
       </div>
 
-      <div className="flex space-x-4 overflow-x-auto pb-4" style={{ height: "calc(100vh - 200px)" }}>
+      <div
+        className="flex space-x-4 overflow-x-auto pb-4"
+        style={{ height: "calc(100vh - 200px)" }}
+      >
         {stages.map((stage) => (
           <div
             key={stage.id}
             className="w-64 bg-gray-50 p-4 rounded-lg shadow-md flex-shrink-0 flex flex-col"
             style={{ maxHeight: "100%" }}
           >
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-              {stage.title}
-            </h2>
+            {editingStage === stage.id ? (
+              <div className="flex items-center justify-center space-x-1">
+                <input
+                  type="text"
+                  value={tempTitle}
+                  onChange={(e) => setTempTitle(e.target.value)}
+                  className="text-lg font-semibold text-gray-800 w-40 h-10 outline-none p-2 border border-gray-300 rounded flex-1"
+                />
+                <span
+                  className="text-green-600 cursor-pointer flex items-center justify-center "
+                  onClick={() => handleSaveStageName(stage.id)}
+                >
+                  <AiFillCheckCircle size={20} />
+                </span>
+                <span
+                  className="text-red-500 cursor-pointer flex items-center justify-center "
+                  onClick={handleCancelEdit}
+                >
+                  <AiFillCloseCircle size={20} />
+                </span>
+              </div>
+            ) : (
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  {stage.title}
+                </h2>
+                <div className="flex space-x-2">
+                  <span
+                    className="text-blue-600 cursor-pointer"
+                    onClick={() => handleStartEditingStage(stage)}
+                  >
+                    <AiFillEdit size={20} />
+                  </span>
+                  <span
+                    className="text-red-500 cursor-pointer"
+                    onClick={() => handleDeleteStage(stage.id)}
+                  >
+                    <FaTrashCan />
+                  </span>
+                </div>
+              </div>
+            )}
+
             <Container
               groupName="columns"
               onDrop={(dropResult) => onColumnDrop(dropResult, stage.id)}
