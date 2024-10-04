@@ -16,7 +16,7 @@ const leadSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: [true, "phone no. is required"]
+      required: [true, "phone no. is required"],
     },
     description: {
       type: String,
