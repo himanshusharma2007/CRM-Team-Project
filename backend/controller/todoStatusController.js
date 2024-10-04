@@ -1,4 +1,4 @@
-const TodoStatus = require("../models/todoStatusModel");
+const todo = require("../models/todoModels");
 
 exports.addTodoStatus = async (req, res) => {
   try {
@@ -8,28 +8,24 @@ exports.addTodoStatus = async (req, res) => {
         message: "status is required",
       });
     }
-    if (await TodoStatus.findOne({status: req.body.status})) {
-      return res.status(400).send({
-        success: false,
-        message: "status already exists",
-      });
-    }
-    const todosData = await TodoStatus.create(req.body);
-    res.status(200).send(todosData);
+    const userTodoDatas = await todo.find({userId: req.user._id});
+
+    const statusDatas = await userTodoDatas.map(async (item) => {
+      if(item.status.includes(req.body.status)){
+        return res.status(400).send({
+          success: false,
+          message: "status already exists",
+        });
+      }
+      item.status.push(req.body.status)
+      await item.save()
+    });
+    return res.status(200).send({
+      success: true,
+      message: "status added successfully"
+    });
   } catch (err) {
     console.log("err", err)
-    res.status(500).send({
-      success: false,
-      message: "Internal server error",
-    });
-  }
-};
-
-exports.getTodosStatus = async (req, res) => {
-  try {
-    const todosStatusData = await to.find();
-    res.status(200).send(todosStatusData);
-  } catch (err) {
     res.status(500).send({
       success: false,
       message: "Internal server error",
@@ -46,26 +42,26 @@ exports.deleteTodoStatus= async (req, res) => {
         message: "status is required",
       });
     }
-    const todosData = await TodoStatus.findOne({status});
-    if (!todosData) {
-      return res.status(404).send({
-        success: false,
-        message: "status not found",
-      });
-    }
-    if(todosData.leads.length > 0) {
-      return res.status(400).send({
-        success: false,
-        message: "status has leads, so it cannot be deleted",
-      });
-    }
-    const statusToDelete = await TodoStatus.findOneAndDelete({status});
-    res.status(200).send({
-        success: true,
-        message: "status deleted successfully",
+    const userTodoDatas = await todo.find({userId: req.user._id});
+    const statusDatas = await userTodoDatas.map(async (item) => {
+      if(!(item.status.includes(req.body.status))){
+        return res.status(400).send({
+          success: false,
+          message: "status not exists",
+        });
+      }
+      item.status.splice(item.status.indexOf(req.body.status), 1);
+      await item.save()
     });
+
+    return res.status(200).send({
+      success: true,
+      message: "status deleted successfully"
+    });
+
   } catch (err) {
-    res.status(500).send({
+    console.log("err", err)
+    return res.status(500).send({
       success: false,
       message: "Internal server error",
     });
@@ -75,31 +71,47 @@ exports.deleteTodoStatus= async (req, res) => {
 exports.updateTodoStatus= async (req, res) => {
   try {
     const { status, newStatusName} = req.body;
-    if (!status || !newTodoName) {
+    if (!status || !newStatusName) {
       return res.status(400).send({
         success: false,
-        message: "status and newStatusNameare required",
+        message: "status and newStatusName are required",
       });
     }
-    if(! (await TodoStatus.findOne({status}))){
+    const userTodoDatas = await todo.find({userId: req.user._id});
+    const statusDatas = await userTodoDatas.map(async (item) => {
+      if(!(item.status.includes(req.body.status))){
         return res.status(400).send({
-            success: false,
-            message: "status does not exist",
-          });
-    }
-    if (await TodoStatus.findOne({status: newTodoName})) {
-      return res.status(400).send({
-        success: false,
-        message: "newStatusNamealready exists",
-      });
-    }
-    const statusToUpdate = await TodoStatus.findOneAndUpdate({status}, {status: newTodoName}, {new: true});
-    res.status(200).send(status);
+          success: false,
+          message: "status not exists",
+        });
+      }
+      const index = item.status.indexOf(status);
+      item.status[index] = newStatusName;
+      await item.save()
+    });
+    return res.status(200).send({
+      success: true,
+      message: "status updated successfully",
+    });
   } catch (err) {
-    res.status(500).send({
+    console.log("err", err)
+    return res.status(500).send({
       success: false,
       message: "Internal server error",
     });
   }
 }
 
+
+exports.getTodoStatus= async (req, res) => {
+  try {
+    const userTodoDatas = await todo.findOne({userId: req.user._id});
+    return res.status(200).send(userTodoDatas.status);
+  } catch (err) {
+    console.log("err", err)
+    return res.status(500).send({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
