@@ -4,7 +4,7 @@ const {
   updateLead,
   deleteLead,
   getLeadById,
-  updateStage,
+   updateStage,
   getLeads,
 } = require("../controller/leadController");
 const { jwtToken } = require("../middleware/auth");

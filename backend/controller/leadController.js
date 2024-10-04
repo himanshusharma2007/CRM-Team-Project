@@ -1,4 +1,4 @@
-const lead = require("../models/leadModel");
+const lead = require("../models/leadModels");
 const user = require("../models/userModels");
 
 exports.createLead = async (req, res) => {
@@ -114,7 +114,7 @@ exports.getLeadById = async (req, res) => {
     const { id } = req.params;
     console.log("get lead by id called", id);
     const leadData = await lead
-      .findOne({ _id: id })
+``      .findOne({ _id: id })
       .populate("assignedTo", "-password");
     console.log("lead in get lead by id:>> ", leadData);
     res.status(200).json(leadData);
