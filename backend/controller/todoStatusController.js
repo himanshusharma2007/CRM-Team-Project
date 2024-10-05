@@ -1,5 +1,4 @@
-const Todo = require("../models/todoModels");
-const Status = require("../models/todoStatusModels");
+const todo = require("../models/todoModels");
 
 exports.addTodoStatus = async (req, res) => {
   try {
@@ -9,18 +8,22 @@ exports.addTodoStatus = async (req, res) => {
         message: "status is required",
       });
     }
-    const existingStatus = await Status.findOne({name: req.body.status, userId: req.user._id});
-    if(existingStatus){
-      return res.status(400).send({
-        success: false,
-        message: "status already exists",
-      });
-    }
-    const statusData = await Status.create({
-      name: req.body.status,
-      userId: req.user._id
+    const userTodoDatas = await todo.find({userId: req.user._id});
+
+    const statusDatas = await userTodoDatas.map(async (item) => {
+      if(item.status.includes(req.body.status)){
+        return res.status(400).send({
+          success: false,
+          message: "status already exists",
+        });
+      }
+      item.status.push(req.body.status)
+      await item.save()
     });
-    return res.status(200).send(statusData);
+    return res.status(200).send({
+      success: true,
+      message: "status added successfully"
+    });
   } catch (err) {
     console.log("err", err)
     res.status(500).send({
@@ -32,35 +35,30 @@ exports.addTodoStatus = async (req, res) => {
 
 exports.deleteTodoStatus= async (req, res) => {
   try {
-    const { statusId } = req.params;
-    if (!statusId) {
+    const { status } = req.body;
+    if (!status) {
       return res.status(400).send({
         success: false,
         message: "status is required",
       });
     }
-    console.log("body: ", req.body)
-    const statusData = await Status.findById(statusId)
-    if(!statusData){
-      return res.status(400).send({
-        success: false,
-        message: "status not exists",
-      });
-    }
-    console.log(statusData._id)
-    const statusTodoData = await Todo.find({status: statusData._id})
-    console.log("statusTodoData", statusTodoData)
-    if(statusTodoData.length > 0){
-      return res.status(400).send({
-        success: false,
-        message: "status is used in todo",
-      });
-    }
-    await Status.findByIdAndDelete(statusData._id)
+    const userTodoDatas = await todo.find({userId: req.user._id});
+    const statusDatas = await userTodoDatas.map(async (item) => {
+      if(!(item.status.includes(req.body.status))){
+        return res.status(400).send({
+          success: false,
+          message: "status not exists",
+        });
+      }
+      item.status.splice(item.status.indexOf(req.body.status), 1);
+      await item.save()
+    });
+
     return res.status(200).send({
       success: true,
-      message: "status deleted successfully",
+      message: "status deleted successfully"
     });
+
   } catch (err) {
     console.log("err", err)
     return res.status(500).send({
@@ -79,11 +77,21 @@ exports.updateTodoStatus= async (req, res) => {
         message: "status and newStatusName are required",
       });
     }
-    const statusData = await Status.findOneAndUpdate({name: status}, {name: newStatusName}, {new: true});
+    const userTodoDatas = await todo.find({userId: req.user._id});
+    const statusDatas = await userTodoDatas.map(async (item) => {
+      if(!(item.status.includes(req.body.status))){
+        return res.status(400).send({
+          success: false,
+          message: "status not exists",
+        });
+      }
+      const index = item.status.indexOf(status);
+      item.status[index] = newStatusName;
+      await item.save()
+    });
     return res.status(200).send({
       success: true,
       message: "status updated successfully",
-      status: statusData.name
     });
   } catch (err) {
     console.log("err", err)
@@ -97,25 +105,8 @@ exports.updateTodoStatus= async (req, res) => {
 
 exports.getTodoStatus= async (req, res) => {
   try {
-    console.log('get all status callled')
-    const userTodoStatusDatas = await Status.find({userId: req.user._id}).select("-userId");
-    console.log('userTodoStatusDatas', userTodoStatusDatas)
-    return res.status(200).send(userTodoStatusDatas);
-  } catch (err) {
-    console.log("err", err)
-    return res.status(500).send({
-      success: false,
-      message: "Internal server error",
-    });
-  }
-}
-exports.getStatusData= async (req, res) => {
-  try {
-    const {status}=req.body;
-    console.log('get status callled',req.body)
-    const statusData = await Status.findOne({userId: req.user._id, name: status}).select("-userId");
-    console.log('statusData in controller', statusData)
-    return res.status(200).send(statusData);
+    const userTodoDatas = await todo.findOne({userId: req.user._id});
+    return res.status(200).send(userTodoDatas.status);
   } catch (err) {
     console.log("err", err)
     return res.status(500).send({
