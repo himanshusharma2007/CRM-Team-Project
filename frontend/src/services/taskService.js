@@ -11,6 +11,7 @@ export const taskSave = async (title,taskPriority) => {
     }
   };
 
+
   export const updateTask = async (id, task)=> {
     try {
       console.log("task in updateTask", task)

@@ -16,10 +16,10 @@ exports.addStage = async (req, res) => {
       });
     }
     const stagesData = await stages.create(req.body);
-    res.status(200).send(stagesData);
+    return res.status(200).send(stagesData);
   } catch (err) {
     console.log("err", err)
-    res.status(500).send({
+    return res.status(500).send({
       success: false,
       message: "Internal server error",
     });
@@ -29,9 +29,9 @@ exports.addStage = async (req, res) => {
 exports.getStages = async (req, res) => {
   try {
     const stagesData = await stages.find();
-    res.status(200).send(stagesData);
+    return res.status(200).send(stagesData);
   } catch (err) {
-    res.status(500).send({
+    return res.status(500).send({
       success: false,
       message: "Internal server error",
     });
@@ -61,12 +61,12 @@ exports.deleteStage = async (req, res) => {
       });
     }
     const stage = await stages.findOneAndDelete({stageName});
-    res.status(200).send({
+    return res.status(200).send({
         success: true,
         message: "stage deleted successfully",
     });
   } catch (err) {
-    res.status(500).send({
+    return res.status(500).send({
       success: false,
       message: "Internal server error",
     });
@@ -95,9 +95,9 @@ exports.updateStage = async (req, res) => {
       });
     }
     const stage = await stages.findOneAndUpdate({stageName}, {stageName: newStageName}, {new: true});
-    res.status(200).send(stage);
+    return res.status(200).send(stage);
   } catch (err) {
-    res.status(500).send({
+    return res.status(500).send({
       success: false,
       message: "Internal server error",
     });

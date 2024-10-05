@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const leadRouter = require("./routes/leadRoutes");
 const todoRoutes = require("./routes/todoRoutes");
 const stageRoutes = require("./routes/leadStageRoutes");
+const todoStatusRoutes = require("./routes/todoStatusRoutes");
 
 const cookieParser = require("cookie-parser");
 
@@ -31,6 +32,7 @@ app.use("/api/todo", todoRoutes);
 app.use("/api/profile", userRoutes);
 app.use("/api/lead", leadRouter);
 app.use("/api/stage", stageRoutes);
+app.use("/api/todoStatus", todoStatusRoutes);
 
 
 app.listen(PORT, () => {

@@ -1,15 +1,87 @@
 import { useState, useEffect } from "react";
 import { getAllTasks, taskSave, updateTask } from "../../services/taskService";
+import { todoStatusService } from "../../services/taskStatusService";
 import "../styles/animation.css";
-import { FaEdit, FaPlayCircle, FaCheckCircle } from "react-icons/fa";
+import { FaEdit, FaCheckCircle, FaPlus, FaTimes } from "react-icons/fa";
+
+
+const StatusManager = ({ statuses, onStatusAdd, onStatusEdit, onStatusDelete }) => {
+  const [newStatus, setNewStatus] = useState("");
+  const [editingStatus, setEditingStatus] = useState(null);
+
+  const handleAddStatus = () => {
+    if (newStatus.trim()) {
+      onStatusAdd(newStatus.trim());
+      setNewStatus("");
+    }
+  };
+
+  const handleEditStatus = (oldStatus, newStatus) => {
+    if (newStatus.trim() && oldStatus !== newStatus.trim()) {
+      onStatusEdit(oldStatus, newStatus.trim());
+      setEditingStatus(null);
+    }
+  };
+
+  return (
+    <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+      <h3 className="text-lg font-semibold mb-2">Manage Statuses</h3>
+      <div className="flex mb-4">
+        <input
+          type="text"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
+          className="flex-grow border border-gray-300 p-2 rounded-l-lg"
+          placeholder="New status"
+        />
+        <button
+          onClick={handleAddStatus}
+          className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600"
+        >
+          <FaPlus />
+        </button>
+      </div>
+      <div className="space-y-2">
+        {statuses.map((status) => (
+          <div key={status} className="flex items-center">
+            {editingStatus === status ? (
+              <input
+                type="text"
+                defaultValue={status}
+                onBlur={(e) => handleEditStatus(status, e.target.value)}
+                className="flex-grow border border-gray-300 p-1 rounded-lg mr-2"
+              />
+            ) : (
+              <span className="flex-grow">{status}</span>
+            )}
+            <button
+              onClick={() => setEditingStatus(status)}
+              className="text-blue-500 p-1 hover:text-blue-700 mr-2"
+            >
+              <FaEdit />
+            </button>
+            <button
+              onClick={() => onStatusDelete(status)}
+              className="text-red-500 p-1 hover:text-red-700"
+            >
+              <FaTimes />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const ToDo = () => {
-  const [tasks, setTasks] = useState({
-    todo: [],
-    doing: [],
-    done: [],
-  });
+  // const [tasks, setTasks] = useState({
+  //   todo: [],
+  //   doing: [],
+  //   done: [],
+  // });
 
+  const [tasks, settasks] = useState({});
+  const [statuses, setStatuses] = useState(["todo", "doing", "done"]);
   const [title, setTitle] = useState("");
   const [taskPriority, setTaskPriority] = useState("Medium");
   const [editTask, setEditTask] = useState(null);
@@ -18,6 +90,7 @@ const ToDo = () => {
   const [draggedTask, setDraggedTask] = useState(null);
   const [dragOverSection, setDragOverSection] = useState(null);
   const [recentlyDropped, setRecentlyDropped] = useState(null);
+  const [taskStage, settaskStage] = useState(null)
 
   const handleInputChange = (e) => {
     setTitle(e.target.value);
@@ -26,11 +99,19 @@ const ToDo = () => {
   const handlePriorityChange = (e) => {
     setTaskPriority(e.target.value);
   };
+  const handleStageChange = (e) => {
+    settaskStage(e.target.value);
+  };
 
   const addTask = async () => {
+    console.log("taskStage", taskStage)
     if (title.trim()) {
       try {
-        const newTask = await taskSave(title, taskPriority);
+        const newTask = await taskSave({
+          title: title.trim(),
+          priority: taskPriority,
+          status: taskStage
+        });
         setTasks((prevTasks) => ({
           ...prevTasks,
           todo: [...prevTasks.todo, newTask],
@@ -39,7 +120,23 @@ const ToDo = () => {
         setTaskPriority("Medium");
       } catch (error) {
         console.error("Failed to save task:", error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error("Server responded with:", error.response.data);
+          alert(`Failed to save task: ${error.response.data.message}`);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("No response received:", error.request);
+          alert("Failed to save task: No response from server");
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error("Error setting up request:", error.message);
+          alert(`Failed to save task: ${error.message}`);
+        }
       }
+    } else {
+      alert("Please enter a task title");
     }
   };
 
@@ -146,20 +243,57 @@ const ToDo = () => {
     setEditPriority("Medium");
   };
 
+  const handleStatusAdd = async (newStatus) => {
+    try {
+      await todoStatusService.addTodoStatus(newStatus);
+      setStatuses([...statuses, newStatus]);
+      setTasks({ ...tasks, [newStatus]: [] });
+    } catch (error) {
+      console.error("Failed to add status:", error);
+    }
+  };
+  const handleStatusEdit = async (oldStatus, newStatus) => {
+    try {
+      await todoStatusService.updateTodoStatus(oldStatus, newStatus);
+      setStatuses(statuses.map(s => s === oldStatus ? newStatus : s));
+      setTasks(prevTasks => {
+        const updatedTasks = { ...prevTasks, [newStatus]: prevTasks[oldStatus] };
+        delete updatedTasks[oldStatus];
+        return updatedTasks;
+      });
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
+
+  const handleStatusDelete = async (statusToDelete) => {
+    if (statuses.length <= 1) {
+      alert("Cannot delete the last remaining status.");
+      return;
+    }
+    try {
+      await todoStatusService.deleteTodoStatus(statusToDelete);
+      setStatuses(statuses.filter(s => s !== statusToDelete));
+      setTasks(prevTasks => {
+        const { [statusToDelete]: deletedStatus, ...remainingTasks } = prevTasks;
+        return remainingTasks;
+      });
+    } catch (error) {
+      console.error("Failed to delete status:", error);
+    }
+  };
+
   const fetchTasks = async () => {
     try {
       const fetchedTasks = await getAllTasks();
-      setTasks({
-        todo: fetchedTasks.filter(
-          (task) => task.status.toLowerCase() === "todo"
-        ),
-        doing: fetchedTasks.filter(
-          (task) => task.status.toLowerCase() === "doing"
-        ),
-        done: fetchedTasks.filter(
-          (task) => task.status.toLowerCase() === "done"
-        ),
-      });
+      const fetchedStatuses = await todoStatusService.getTodoStatuses();
+      console.log('fetchedStatuses', fetchedStatuses)
+      setStatuses(fetchedStatuses);
+      const groupedTasks = fetchedStatuses.reduce((acc, status) => {
+        acc[status] = fetchedTasks.filter(task => task.status === status);
+        return acc;
+      }, {});
+      setTasks(groupedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -170,7 +304,7 @@ const ToDo = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 ">
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-gray-800 p-6">
           <h1 className="text-4xl font-extrabold text-center text-white">
@@ -197,6 +331,17 @@ const ToDo = () => {
               <option value="Medium">Medium</option>
               <option value="Low">Low</option>
             </select>
+            <select
+              value={taskStage}
+              onChange={handleStageChange}
+              className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            >
+             <option value="">--select status---</option>
+              {statuses.map((status) => (
+                <option key={status} value={taskStage}>{taskStage}</option>
+              ))}
+            </select>
             <button
               onClick={addTask}
               className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300"
@@ -205,6 +350,13 @@ const ToDo = () => {
             </button>
           </div>
         </div>
+
+        <StatusManager
+          statuses={statuses}
+          onStatusAdd={handleStatusAdd}
+          onStatusEdit={handleStatusEdit}
+          onStatusDelete={handleStatusDelete}
+        />
 
         {/* Edit Task Section */}
         {editTask && (
@@ -248,7 +400,7 @@ const ToDo = () => {
 
         {/* Task Sections */}
         <div className="flex flex-col lg:flex-row p-6 gap-6">
-          {["todo", "doing", "done"].map((section) => (
+          {statuses.map((section) => (
             <div
               key={section}
               onDrop={(e) => handleDrop(e, section)}
@@ -263,7 +415,7 @@ const ToDo = () => {
                 {section}
               </h2>
               <div className="p-4 space-y-4 h-96 overflow-y-auto">
-                {tasks[section].map((task) => (
+                {tasks[section] && tasks[section].map((task) => (
                   <div
                     key={task._id}
                     draggable
