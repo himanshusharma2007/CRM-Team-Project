@@ -2,10 +2,10 @@ const todo = require("../models/todoModels");
 
 
 exports.createTodo = async (req, res) => {
-  const { title, description="",taskPriority, status} = req.body;
+  const { title, description="",priority, status} = req.body;
 console.log('req.body', req.body)
   try {
-    if (!title || !taskPriority || !status) {
+    if (!title || !priority || !status) {
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
@@ -16,7 +16,7 @@ console.log('req.body', req.body)
       title,
       description: description || "",
       status,
-      priority: taskPriority,
+      priority,
       userId: req.user._id,
     });
     res.status(201).json(tododata);
@@ -57,7 +57,7 @@ exports.updateTodo = async (req,res) =>{
         tododata.title = title || tododata.title;
         tododata.description = description || tododata.description;
         tododata.priority = priority || tododata.priority;
-        tododata.status = status || tododata.status;
+        tododata.status = status|| tododata.status;
 
         await tododata.save();
         return res.status(200).send(tododata);
