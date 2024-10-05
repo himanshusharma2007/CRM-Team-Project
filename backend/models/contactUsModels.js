@@ -17,6 +17,11 @@ const contactUsShcema = new mongoose.Schema({
         type: String,
         required: [true, "Message is required"]
     },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        default: null
+    }
 }, {timestamps:true})
 
 const contactUsModule = mongoose.model("contectUs", contactUsShcema)

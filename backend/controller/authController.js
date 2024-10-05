@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const user = require("../models/userModels");
+const Status = require("../models/todoStatusModels");
 const bcrypt = require("bcryptjs");
 const hashPassword = require("../utils/password");
 
@@ -42,6 +43,18 @@ exports.registerUser = async (req, res) => {
         message: "Error in User Creation",
       });
     }
+    await Status.create({
+      name: "Todo",
+      userId: userData._id
+    });
+    await Status.create({
+      name: "Doing",
+      userId: userData._id
+    });
+    await Status.create({
+      name: "Done",
+      userId: userData._id
+    });
     res.status(201).send({
       success: true,
       massage: "User Register successfully",
