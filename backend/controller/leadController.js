@@ -1,19 +1,20 @@
 const lead = require("../models/leadModels");
-const stage = require("../models/leadStagesModels");
+const stages = require("../models/leadStagesModels");
 
 exports.createLead = async (req, res) => {
   console.log('req.body in create lead', req.body)
-  const { title, companyName, contactName, phone, description, stageName } =
+  const { title, companyName, contactName, phone, description, stage } =
     req.body;
 
   try {
-    if (!title || !companyName || !contactName || !phone || !description || !stageName) {
+    if (!title || !companyName || !contactName || !phone || !description ) {
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
       });
     }
-    const stageData = await stage.findOne({stageName});
+    const stageData = await stages.findOne({_id:stage});
+    console.log('stageData', stageData)
     if(!stageData){
       return res.status(400).send({
         success: false,
@@ -82,6 +83,7 @@ exports.updateLead = async (req, res) => {
 
 exports.updateStage = async (req, res) => {
   try {
+    console.log('req.body in update Stage', req.body)
     const { stageName } = req.body;
     const { id } = req.params;
     const leadData = await lead.findById(id);
@@ -97,7 +99,7 @@ exports.updateStage = async (req, res) => {
         message: "lead already in this stage",
       });
     }
-    const stageData = await stage.findOne({stageName});
+    const stageData = await stages.findOne({stageName});
     if(!stageData){
       return res.status(400).send({
         success: false,
@@ -107,7 +109,7 @@ exports.updateStage = async (req, res) => {
     stageData.leads.push(leadData._id);
     await stageData.save();
 
-    const oldStageData = await stage.findOne({stageName: leadData.currentStage});
+    const oldStageData = await stages.findOne({stageName: leadData.currentStage});
     oldStageData.leads = oldStageData.leads.filter((lead) => lead.toString() !== leadData._id.toString());
     await oldStageData.save();
 
@@ -132,7 +134,7 @@ exports.deleteLead = async (req, res) => {
       return res.status(404).json({ message: "Lead not found" });
     }
 
-    const stageData = await stage.findOne({stageName: deletedLead.currentStage});
+    const stageData = await stages.findOne({stageName: deletedLead.currentStage});
     stageData.leads = stageData.leads.filter((lead) => lead.toString() !== deletedLead._id.toString());
     await stageData.save();
 
