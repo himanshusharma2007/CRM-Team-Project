@@ -2,10 +2,10 @@ const todo = require("../models/todoModels");
 
 
 exports.createTodo = async (req, res) => {
-  const { title, description="",currentStatus,taskPriority} = req.body;
+  const { title, description="",taskPriority, status} = req.body;
 console.log('req.body', req.body)
   try {
-    if (!title || !taskPriority || !currentStatus) {
+    if (!title || !taskPriority || !status) {
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
@@ -15,7 +15,7 @@ console.log('req.body', req.body)
     const tododata = await todo.create({
       title,
       description: description || "",
-      currentStatus,
+      status,
       priority: taskPriority,
       userId: req.user._id,
     });
@@ -33,7 +33,7 @@ console.log('req.body', req.body)
 //  update/:id
 exports.updateTodo = async (req,res) =>{
 
-  const { title, description, priority, currentStatus } = req.body;
+  const { title, description, priority, status } = req.body;
   console.log("req.body in updateTodo", req.body)
     try {
         if(!title && !priority && !currentStatus){
@@ -57,14 +57,10 @@ exports.updateTodo = async (req,res) =>{
         tododata.title = title || tododata.title;
         tododata.description = description || tododata.description;
         tododata.priority = priority || tododata.priority;
-        tododata.currentStatus = currentStatus || tododata.currentStatus;
+        tododata.status = status || tododata.status;
 
         await tododata.save();
-        return res.status(200).send({
-          success: true,
-          message: "todo updated",
-          data: tododata
-        });
+        return res.status(200).send(tododata);
     } catch (err) {
         console.log(err)
         res.status(500).send({
@@ -77,7 +73,7 @@ exports.updateTodo = async (req,res) =>{
 
 exports.getTodo = async(req, res)=>{
   try{
-    const tododata = await todo.find({userId: req.user.id });
+    const tododata = await todo.find({userId: req.user.id }).populate('status');
     return res.status(200).json(tododata)
   } catch (err) {
         console.log(err)
@@ -91,18 +87,14 @@ exports.getTodo = async(req, res)=>{
 
 exports.getSingleTodo = async (req, res)=>{
   try{
-    const tododata = await todo.findById(req.params.id);
+    const tododata = await todo.findById(req.params.id).populate('status');
     if(!tododata.userId.equals(req.user._id)){
       return res.status(401).send({
         success: false,
         message: "not access other user data"
       })
     }
-    return res.status(200).send({
-      success: true,
-      message: "todo data",
-      data: tododata
-    })
+    return res.status(200).send(tododata)
   } catch (err) {
         console.log(err)
         res.status(500).send({
@@ -115,7 +107,7 @@ exports.getSingleTodo = async (req, res)=>{
 
 exports.getAllTodoByAdmin = async (req, res) => {
   try {
-    const tododata = await todo.find({});
+    const tododata = await todo.find({}).populate('status');
     return res.status(200).json(tododata)
   } catch (err) {
     console.log(err)
