@@ -77,7 +77,7 @@ const StatusManager = ({
         />
         <button
           onClick={handleAddStatus}
-          className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+          className="bg-blue-500 text-white p-2 mx-2 rounded-lg hover:bg-blue-600"
         >
           Create Status
         </button>
