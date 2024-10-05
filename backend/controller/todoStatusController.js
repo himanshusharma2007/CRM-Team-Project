@@ -97,7 +97,9 @@ exports.updateTodoStatus= async (req, res) => {
 
 exports.getTodoStatus= async (req, res) => {
   try {
+    console.log('get all status callled')
     const userTodoStatusDatas = await Status.find({userId: req.user._id}).select("-userId");
+    console.log('userTodoStatusDatas', userTodoStatusDatas)
     return res.status(200).send(userTodoStatusDatas);
   } catch (err) {
     console.log("err", err)
@@ -107,4 +109,18 @@ exports.getTodoStatus= async (req, res) => {
     });
   }
 }
-
+exports.getStatusData= async (req, res) => {
+  try {
+    const {status}=req.body;
+    console.log('get status callled',req.body)
+    const statusData = await Status.findOne({userId: req.user._id, name: status}).select("-userId");
+    console.log('statusData in controller', statusData)
+    return res.status(200).send(statusData);
+  } catch (err) {
+    console.log("err", err)
+    return res.status(500).send({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
