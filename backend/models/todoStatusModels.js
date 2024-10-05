@@ -4,7 +4,6 @@ const statusSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Status name is required"],
-    unique: [true, "Status name already exists"]
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
