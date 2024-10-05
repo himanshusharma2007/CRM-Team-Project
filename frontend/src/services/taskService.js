@@ -12,5 +12,6 @@ export const taskSave = async (task) => {
 
 export const updateTask = async (id, task) => {
   const response = await api.put(`/todo/update/${id}`, task);
+  console.log('response', response)
   return response.data;
 };

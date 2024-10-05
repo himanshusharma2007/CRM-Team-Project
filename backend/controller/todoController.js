@@ -57,7 +57,7 @@ exports.updateTodo = async (req,res) =>{
         tododata.title = title || tododata.title;
         tododata.description = description || tododata.description;
         tododata.priority = priority || tododata.priority;
-        tododata.status = status || tododata.status;
+        tododata.status = status|| tododata.status;
 
         await tododata.save();
         return res.status(200).send(tododata);

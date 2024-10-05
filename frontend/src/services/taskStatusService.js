@@ -24,6 +24,7 @@ export const todoStatusService = {
   },
 
   deleteTodoStatus: async (statusId) => {
+    console.log('delete status called in services', statusId)
     const response = await api.delete(
       `/todoStatus/deleteTodoStatus/${statusId}`
     );

@@ -56,13 +56,16 @@ const StatusManager = ({
 
   return (
     <div className="mb-6 p-4 bg-gray-100 rounded-lg">
-      <h3 className="text-lg font-semibold mb-2">Manage Statuses</h3>
+      <div className="wraper flex justify-between">
+      <h3 className="text-2xl font-semibold mb-2">Manage Statuses</h3>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="mb-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+        className="flex items-center justify-center gap-2 mb-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
       >
-        <FaPlus /> Add New Status
+        <FaPlus /> <div >Add New Status</div>
       </button>
+      </div>
+      
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <h2 className="text-xl font-bold mb-4">Add New Status</h2>
         <input
@@ -197,11 +200,17 @@ const ToDo = () => {
   };
 
   const moveTask = async (task, from, to) => {
+    from=from.name;
+    let dataOfStatus= await todoStatusService.getStatusData(to);
+
     if (from === to) return;
-console.log('tasks', tasks)
+    console.log('statuses in move task', from, dataOfStatus)
+  
+
     setTasks((prevTasks) => {
       const fromTasks = prevTasks[from].filter((t) => t._id !== task._id);
-      const toTasks = [...(prevTasks[to] || []), { ...task, status: to }];
+      const updatedTask = { ...task, status: dataOfStatus };
+      const toTasks = [...(prevTasks[to] || []), updatedTask];
       return {
         ...prevTasks,
         [from]: fromTasks,
@@ -210,7 +219,7 @@ console.log('tasks', tasks)
     });
 
     try {
-      await updateTask(task._id, { ...task, status: to });
+      await updateTask(task._id, { ...task, status: dataOfStatus._id });
     } catch (error) {
       console.error("Failed to update task:", error);
       // Revert the state if the API call fails
@@ -221,6 +230,7 @@ console.log('tasks', tasks)
       }));
     }
   };
+
 
   const handleDragStart = (e, task) => {
     setDraggedTask(task);
@@ -356,15 +366,14 @@ console.log('tasks', tasks)
   };
 
   const handleStatusDelete = async (statusToDelete) => {
+    console.log('statusToDelete in handleStatusDelete', statusToDelete)
     if (statuses.length <= 1) {
       alert("Cannot delete the last remaining status.");
       return;
     }
     try {
       // Find the status object with the matching name
-      const statusObj = await todoStatusService
-        .getTodoStatuses()
-        .then((statuses) => statuses.find((s) => s.name === statusToDelete));
+    let statusObj = await todoStatusService.getStatusData(statusToDelete);
       if (!statusObj) {
         throw new Error("Status not found");
       }
@@ -389,7 +398,7 @@ console.log('tasks', tasks)
 
   
   return (
-    <div>
+    <div className="min-h-screen overflow-auto ">
       {/* Add Task Section */}
       <div className="p-6 bg-white border-b border-gray-200">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -479,7 +488,7 @@ console.log('tasks', tasks)
       )}
 
       {/* Task Sections */}
-      <div className="flex flex-col lg:flex-row p-6 gap-6">
+      <div className="flex flex-col lg:flex-row p-6 gap-6 overflow-auto mb-10" >
         {statuses.map((section) => (
           <div
             key={section}
@@ -487,7 +496,7 @@ console.log('tasks', tasks)
             onDragOver={allowDrop}
             onDragEnter={(e) => handleDragEnter(e, section)}
             onDragLeave={handleDragLeave}
-            className={`flex-1 bg-white rounded-lg shadow-md transition-all duration-300 ${
+            className={`flex-1 bg-white rounded-lg shadow-md transition-all duration-300 min-w-64 ${
               dragOverSection === section ? "ring-2 ring-blue-500" : ""
             }`}
           >
@@ -531,20 +540,7 @@ console.log('tasks', tasks)
                           >
                             <FaEdit />
                           </button>
-                          {section !== statuses[statuses.length - 1] && (
-                            <button
-                              onClick={() =>
-                                moveTask(
-                                  task,
-                                  section,
-                                  statuses[statuses.indexOf(section) + 1]
-                                )
-                              }
-                              className="text-green-500 hover:text-green-700"
-                            >
-                              <FaCheckCircle />
-                            </button>
-                          )}
+                         
                         </div>
                         <div className="text-sm text-gray-500">
                           {new Date(task.createdAt).toLocaleDateString(
