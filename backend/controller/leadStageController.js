@@ -94,9 +94,15 @@ exports.updateStage = async (req, res) => {
         message: "newStageName already exists",
       });
     }
-    const stage = await stages.findOneAndUpdate({stageName}, {stageName: newStageName}, {new: true});
+    const stage = await stages.findOneAndUpdate({stageName}, {stageName: newStageName}, {new: true}).populate('leads');
+    console.log('stage', stage)
+    await stage.leads.map((item) => {
+      item.currentStage = newStageName;
+      item.save();
+    })
     return res.status(200).send(stage);
   } catch (err) {
+    console.log("err", err)
     return res.status(500).send({
       success: false,
       message: "Internal server error",

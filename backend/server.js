@@ -10,6 +10,7 @@ const todoRoutes = require("./routes/todoRoutes");
 const stageRoutes = require("./routes/leadStageRoutes");
 const todoStatusRoutes = require("./routes/todoStatusRoutes");
 const contactUsRoutes = require("./routes/contactUsRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
@@ -33,6 +34,7 @@ app.use("/api/profile", userRoutes);
 app.use("/api/lead", leadRouter);
 app.use("/api/stage", stageRoutes);
 app.use("/api/todoStatus", todoStatusRoutes);
+app.use("/api/contact", contactRoutes);
 app.use("/api/contactUs", contactUsRoutes);
 
 app.listen(PORT, () => {

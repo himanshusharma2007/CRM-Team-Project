@@ -47,3 +47,20 @@ exports.getContactUs = async (req, res) => {
     });
   }
 };
+
+exports.deleteContactUs = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const contactUsData = await contactUs.findByIdAndDelete(id);
+    return res.status(200).send({
+      success: true,
+      message: "Contact Us deleted successfully",
+    });
+  } catch (err) {
+    console.log("err", err)
+    return res.status(500).send({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+} 

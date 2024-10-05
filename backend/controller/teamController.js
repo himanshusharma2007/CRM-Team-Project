@@ -65,3 +65,31 @@ exports.updateTeam = async (req, res) => {
 }
 
 
+exports.deleteTeam = async (req, res) => {
+  try {
+    const teamId = req.params.id;
+    const teamData = await Team.findById(teamId).populate("participants");
+    if(!teamData){
+      return res.status(400).send({
+        success: false,
+        message: "Team not found",
+      });
+    }
+    await teamData.participants.map((item) => {
+      item.teamId = null;
+      item.save();
+    })
+    await teamData.deleteOne();
+    return res.status(200).send({
+      success: true,
+      message: "Team deleted successfully",
+    });
+  } catch (err) {
+    console.log("err", err)
+    return res.status(500).send({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
