@@ -97,6 +97,7 @@ exports.updateStage = async (req, res) => {
     const stage = await stages.findOneAndUpdate({stageName}, {stageName: newStageName}, {new: true});
     return res.status(200).send(stage);
   } catch (err) {
+    console.log("err", err)
     return res.status(500).send({
       success: false,
       message: "Internal server error",

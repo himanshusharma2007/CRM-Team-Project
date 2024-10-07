@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getAllTasks, taskSave, updateTask } from "../../services/taskService";
-import { todoStatusService } from "../../services/taskStatusService";
 import "../styles/animation.css";
 import axios from "axios";
 import {
@@ -114,8 +114,12 @@ const StatusManager = ({
 };
 
 const ToDo = () => {
-  const [tasks, setTasks] = useState({});
-  const [statuses, setStatuses] = useState([]);
+  const [tasks, setTasks] = useState({
+    todo: [],
+    doing: [],
+    done: [],
+  });
+
   const [title, setTitle] = useState("");
   const [taskPriority, setTaskPriority] = useState("Medium");
   const [editTask, setEditTask] = useState(null);
@@ -165,12 +169,8 @@ const ToDo = () => {
     setTaskPriority(e.target.value);
   };
 
-  const handleStageChange = (e) => {
-    setTaskStage(e.target.value);
-  };
-
   const addTask = async () => {
-    if (title.trim() && taskStage) {
+    if (title.trim()) {
       try {
         const statusData = await todoStatusService.getStatusData(taskStage);
         const newTask = await taskSave({
@@ -189,13 +189,10 @@ const ToDo = () => {
         }));
         setTitle("");
         setTaskPriority("Medium");
-        setTaskStage(null);
       } catch (error) {
         console.error("Failed to save task:", error);
         alert(`Failed to save task: ${error.response?.data?.message || error.message}`);
       }
-    } else {
-      alert("Please enter a task title and select a status");
     }
   };
 
@@ -347,28 +344,19 @@ const ToDo = () => {
         title: editInput,
         priority: editPriority,
       };
-      try {
-        await updateTask(editTask._id, updatedTask);
-        setTasks((prevTasks) => {
-          const fromTasks = prevTasks[editTask.section].filter(
-            (t) => t._id !== editTask._id
-          );
-          return {
-            ...prevTasks,
-            [editTask.section]: [...fromTasks, updatedTask],
-          };
-        });
-        setEditTask(null);
-        setEditInput("");
-        setEditPriority("Medium");
-      } catch (error) {
-        console.error("Failed to update task:", error);
-        alert(
-          `Failed to update task: ${
-            error.response?.data?.message || error.message
-          }`
+      setTasks((prevTasks) => {
+        const fromTasks = prevTasks[editTask.section].filter(
+          (t) => t._id !== editTask._id
         );
-      }
+        return {
+          ...prevTasks,
+          [editTask.section]: [...fromTasks, updatedTask],
+        };
+      });
+      await updateTask(editTask._id, updatedTask);
+      setEditTask(null);
+      setEditInput("");
+      setEditPriority("Medium");
     }
   };
 
@@ -378,75 +366,29 @@ const ToDo = () => {
     setEditPriority("Medium");
   };
 
-  const handleStatusAdd = async (newStatus) => {
+  const fetchTasks = async () => {
     try {
-      await todoStatusService.addTodoStatus(newStatus);
-      setStatuses([...statuses, newStatus]);
-      setTasks({ ...tasks, [newStatus]: [] });
-    } catch (error) {
-      console.error("Failed to add status:", error);
-      alert(
-        `Failed to add status: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    }
-  };
-
-  const handleStatusEdit = async (oldStatus, newStatus) => {
-    try {
-      await todoStatusService.updateTodoStatus(oldStatus, newStatus);
-      setStatuses(statuses.map((s) => (s === oldStatus ? newStatus : s)));
-      setTasks((prevTasks) => {
-        const updatedTasks = {
-          ...prevTasks,
-          [newStatus]: prevTasks[oldStatus],
-        };
-        delete updatedTasks[oldStatus];
-        return updatedTasks;
+      const fetchedTasks = await getAllTasks();
+      setTasks({
+        todo: fetchedTasks.filter(
+          (task) => task.status.toLowerCase() === "todo"
+        ),
+        doing: fetchedTasks.filter(
+          (task) => task.status.toLowerCase() === "doing"
+        ),
+        done: fetchedTasks.filter(
+          (task) => task.status.toLowerCase() === "done"
+        ),
       });
     } catch (error) {
-      console.error("Failed to update status:", error);
-      alert(
-        `Failed to update status: ${
-          error.response?.data?.message || error.message
-        }`
-      );
+      console.error("Error fetching tasks:", error);
     }
   };
 
-  const handleStatusDelete = async (statusToDelete) => {
-    console.log('statusToDelete in handleStatusDelete', statusToDelete)
-    if (statuses.length <= 1) {
-      alert("Cannot delete the last remaining status.");
-      return;
-    }
-    try {
-      // Find the status object with the matching name
-    let statusObj = await todoStatusService.getStatusData(statusToDelete);
-      if (!statusObj) {
-        throw new Error("Status not found");
-      }
-      await todoStatusService.deleteTodoStatus(statusObj._id);
-      setStatuses(statuses.filter((s) => s !== statusToDelete));
-      setTasks((prevTasks) => {
-        const { [statusToDelete]: deletedStatus, ...remainingTasks } =
-          prevTasks;
-        return remainingTasks;
-      });
-    } catch (error) {
-      console.error("Failed to delete status:", error);
-      alert(
-        `Failed to delete status: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    }
-  };
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
-  
-
-  
   return (
     <>
 
@@ -506,65 +448,64 @@ const ToDo = () => {
         onStatusDelete={handleStatusDelete}
       />
 
-      {/* Edit Task Section */}
-      {editTask && (
-        <div className="p-6 bg-gray-50 border-b border-gray-200">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-            Edit Task
-          </h2>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="text"
-              value={editInput}
-              onChange={handleEditChange}
-              className="flex-grow border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <select
-              value={editPriority}
-              onChange={handleEditPriorityChange}
-              className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
-            </select>
-            <div className="flex gap-2">
-              <button
-                onClick={saveEdit}
-                className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+        {/* Edit Task Section */}
+        {editTask && (
+          <div className="p-6 bg-gray-50 border-b border-gray-200">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+              Edit Task
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <input
+                type="text"
+                value={editInput}
+                onChange={handleEditChange}
+                className="flex-grow border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <select
+                value={editPriority}
+                onChange={handleEditPriorityChange}
+                className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                Save
-              </button>
-              <button
-                onClick={cancelEdit}
-                className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-300"
-              >
-                Cancel
-              </button>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <div className="flex gap-2">
+                <button
+                  onClick={saveEdit}
+                  className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={cancelEdit}
+                  className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-300"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Task Sections */}
-      <div className="flex flex-col lg:flex-row p-6 gap-6 overflow-auto mb-10" >
-        {statuses.map((section) => (
-          <div
-            key={section}
-            onDrop={(e) => handleDrop(e, section)}
-            onDragOver={allowDrop}
-            onDragEnter={(e) => handleDragEnter(e, section)}
-            onDragLeave={handleDragLeave}
-            className={`flex-1 bg-white rounded-lg shadow-md transition-all duration-300 min-w-64 ${
-              dragOverSection === section ? "ring-2 ring-blue-500" : ""
-            }`}
-          >
-            <h2 className="text-xl font-bold p-4 bg-gray-200 text-gray-800 rounded-t-lg capitalize">
-              {section}
-            </h2>
-            <div className="p-4 space-y-4 h-96 overflow-y-auto">
-              {tasks[section] &&
-                tasks[section].map((task) => (
+        {/* Task Sections */}
+        <div className="flex flex-col lg:flex-row p-6 gap-6">
+          {["todo", "doing", "done"].map((section) => (
+            <div
+              key={section}
+              onDrop={(e) => handleDrop(e, section)}
+              onDragOver={allowDrop}
+              onDragEnter={(e) => handleDragEnter(e, section)}
+              onDragLeave={handleDragLeave}
+              className={`flex-1 bg-white rounded-lg shadow-md transition-all duration-300 ${
+                dragOverSection === section ? "ring-2 ring-blue-500" : ""
+              }`}
+            >
+              <h2 className="text-xl font-bold p-4 bg-gray-200 text-gray-800 rounded-t-lg capitalize">
+                {section}
+              </h2>
+              <div className="p-4 space-y-4 h-96 overflow-y-auto">
+                {tasks[section].map((task) => (
                   <div
                     key={task._id}
                     draggable
@@ -579,7 +520,7 @@ const ToDo = () => {
                         {task.title}
                       </span>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full ${
+                        className={`text-xs px-1 py-1 rounded-full ${
                           task.priority === "High"
                             ? "bg-red-100 text-red-800"
                             : task.priority === "Medium"
@@ -590,17 +531,43 @@ const ToDo = () => {
                         {task.priority}
                       </span>
                     </div>
+                    {/* Display createdAt timestamp */}
                     <div className="mt-2 space-x-2">
                       <div className="flex items-center justify-between gap-4">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => startEditing(task, section)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <FaEdit />
-                          </button>
-                         
-                        </div>
+                        {section !== "done" && (
+                          <div className="flex spaxe-x-1">
+                            {/* Task Action Button */}
+
+                            <button
+                              onClick={() =>
+                                moveTask(
+                                  task,
+                                  section,
+                                  section === "todo" ? "doing" : "done"
+                                )
+                              }
+                              className=""
+                            >
+                              {section === "todo" ? (
+                                <span className="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md transition duration-300 ">Start</span>
+                              ) : (
+                                <FaCheckCircle className="text-green-500 bg-transparent !important" />
+                              )}
+                            </button>
+
+                            {/* Edit Button */}
+                            {section === "doing" && (
+                              <button
+                                onClick={() => startEditing(task, section)}
+                                className="px-3 py-1 text-blue-500 rounded-md transition duration-300"
+                              >
+                                <FaEdit />
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Timestamp Section */}
                         <div className="text-sm text-gray-500">
                           {new Date(task.createdAt).toLocaleDateString(
                             undefined,

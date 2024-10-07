@@ -12,7 +12,7 @@ const teamSchema = new mongoose.Schema(
       required: [true, "Team Name is required"],
       unique: [true, "team name is unique "],
     },
-    members: [
+    participants: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
