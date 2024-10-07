@@ -39,7 +39,7 @@ exports.getAllTeam = async (req, res) => {
 
 exports.getTeamById = async (req, res) => {
   try {
-    const team = await Team.findById(req.params.id).populate("participants", "leaderId");
+    const team = await Team.findById(req.params.id).populate("participants leaderId");
     if(!team){
       return res.status(400).send({
         success: false,
