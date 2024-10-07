@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAllTasks, taskSave, updateTask } from "../../services/taskService";
-import LoadingSpinner from "../components/UI/LoadingSpinner"
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { todoStatusService } from "../../services/taskStatusService";
 import "../styles/animation.css";
 import axios from "axios";
@@ -31,7 +31,6 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-
 const ToDo = () => {
   const [tasks, setTasks] = useState({});
   const [statuses, setStatuses] = useState([]);
@@ -49,10 +48,10 @@ const ToDo = () => {
   const [editStatusName, setEditStatusName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStatus, setNewStatus] = useState("");
-const [isLoading, setIsLoading] = useState(false);
-const [isAddingTask, setIsAddingTask] = useState(false);
-const [isUpdatingTask, setIsUpdatingTask] = useState(false);
-const [isManagingStatus, setIsManagingStatus] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [isUpdatingTask, setIsUpdatingTask] = useState(false);
+  const [isManagingStatus, setIsManagingStatus] = useState(false);
   const fetchTasks = async () => {
     setIsLoading(true);
     try {
@@ -387,56 +386,56 @@ const [isManagingStatus, setIsManagingStatus] = useState(false);
     setEditStatusName("");
   };
 
- const saveEditedStatus = async (oldStatus) => {
-   if (editStatusName.trim() === "") {
-     alert("Status name cannot be empty.");
-     return;
-   }
+  const saveEditedStatus = async (oldStatus) => {
+    if (editStatusName.trim() === "") {
+      alert("Status name cannot be empty.");
+      return;
+    }
 
-   if (editStatusName.trim() === oldStatus) {
-     cancelEditingStatus();
-     return;
-   }
+    if (editStatusName.trim() === oldStatus) {
+      cancelEditingStatus();
+      return;
+    }
 
-   if (statuses.includes(editStatusName.trim())) {
-     alert("This status name already exists.");
-     return;
-   }
+    if (statuses.includes(editStatusName.trim())) {
+      alert("This status name already exists.");
+      return;
+    }
 
-   setIsManagingStatus(true);
-   try {
-     await handleStatusEdit(oldStatus, editStatusName.trim());
-     setStatuses((prevStatuses) =>
-       prevStatuses.map((status) =>
-         status === oldStatus ? editStatusName.trim() : status
-       )
-     );
-     setTasks((prevTasks) => {
-       const updatedTasks = { ...prevTasks };
-       updatedTasks[editStatusName.trim()] = updatedTasks[oldStatus];
-       delete updatedTasks[oldStatus];
-       return updatedTasks;
-     });
-     cancelEditingStatus();
-   } catch (error) {
-     console.error("Failed to update status:", error);
-     alert(
-       `Failed to update status: ${
-         error.response?.data?.message || error.message
-       }`
-     );
-   } finally {
-     setIsManagingStatus(false);
-   }
- };
+    setIsManagingStatus(true);
+    try {
+      await handleStatusEdit(oldStatus, editStatusName.trim());
+      setStatuses((prevStatuses) =>
+        prevStatuses.map((status) =>
+          status === oldStatus ? editStatusName.trim() : status
+        )
+      );
+      setTasks((prevTasks) => {
+        const updatedTasks = { ...prevTasks };
+        updatedTasks[editStatusName.trim()] = updatedTasks[oldStatus];
+        delete updatedTasks[oldStatus];
+        return updatedTasks;
+      });
+      cancelEditingStatus();
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      alert(
+        `Failed to update status: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      setIsManagingStatus(false);
+    }
+  };
 
- const handleAddStatus = () => {
-   if (newStatus.trim()) {
-     handleStatusAdd(newStatus.trim());
-     setNewStatus("");
-     setIsModalOpen(false);
-   }
- };
+  const handleAddStatus = () => {
+    if (newStatus.trim()) {
+      handleStatusAdd(newStatus.trim());
+      setNewStatus("");
+      setIsModalOpen(false);
+    }
+  };
   return (
     <>
       <div className="min-h-screen overflow-auto ">
