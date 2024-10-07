@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getAllTasks, taskSave, updateTask } from "../../services/taskService";
 import { todoStatusService } from "../../services/taskStatusService";
 import "../styles/animation.css";
+import axios from "axios";
 import {
   FaEdit,
-  FaCheckCircle,
   FaPlus,
-  FaTimes,
   FaPencilAlt,
   FaTrash,
 } from "react-icons/fa";
@@ -126,6 +125,7 @@ const ToDo = () => {
   const [dragOverSection, setDragOverSection] = useState(null);
   const [recentlyDropped, setRecentlyDropped] = useState(null);
   const [taskStage, setTaskStage] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
 
   const fetchTasks = async () => {
@@ -173,26 +173,26 @@ const ToDo = () => {
     if (title.trim() && taskStage) {
       try {
         const statusData = await todoStatusService.getStatusData(taskStage);
-        console.log('taskStage in add task', taskStage)
         const newTask = await taskSave({
           title: title.trim(),
           priority: taskPriority,
           status: statusData._id,
         });
+        // Ensure the new task has the correct structure
+        const formattedNewTask = {
+          ...newTask,
+          status: { name: taskStage, _id: statusData._id }
+        };
         setTasks((prevTasks) => ({
           ...prevTasks,
-          [taskStage]: [...(prevTasks[taskStage] || []), newTask],
+          [taskStage]: [...(prevTasks[taskStage] || []), formattedNewTask],
         }));
         setTitle("");
         setTaskPriority("Medium");
         setTaskStage(null);
       } catch (error) {
         console.error("Failed to save task:", error);
-        alert(
-          `Failed to save task: ${
-            error.response?.data?.message || error.message
-          }`
-        );
+        alert(`Failed to save task: ${error.response?.data?.message || error.message}`);
       }
     } else {
       alert("Please enter a task title and select a status");
@@ -200,36 +200,86 @@ const ToDo = () => {
   };
 
   const moveTask = async (task, from, to) => {
-    from=from.name;
-    let dataOfStatus= await todoStatusService.getStatusData(to);
+    const fromStatusName = from.name || from;
+    const toStatusName = to.name || to;
 
-    if (from === to) return;
-    console.log('statuses in move task', from, dataOfStatus)
-  
+    if (fromStatusName === toStatusName) return;
 
-    setTasks((prevTasks) => {
-      const fromTasks = prevTasks[from].filter((t) => t._id !== task._id);
-      const updatedTask = { ...task, status: dataOfStatus };
-      const toTasks = [...(prevTasks[to] || []), updatedTask];
-      return {
-        ...prevTasks,
-        [from]: fromTasks,
-        [to]: toTasks,
-      };
-    });
+    console.log('Attempting to move task:', { task, fromStatusName, toStatusName });
+
+    setIsUpdating(true);
 
     try {
-      await updateTask(task._id, { ...task, status: dataOfStatus._id });
+      const toStatusData = await todoStatusService.getStatusData(toStatusName);
+      console.log('Target status data:', toStatusData);
+    console.log('task in move funcion', task )
+      // Prepare the update data
+      task.status=toStatusData;
+      // const updateData = { status: toStatusData._id };
+      console.log('Sending update to server:', { taskId: task._id, task });
+
+      // Update on the server first
+      const updatedTask = await updateTask(task._id, task);
+      console.log('Task updated successfully on server:', updatedTask);
+
+      // If server update is successful, update local state
+      setTasks((prevTasks) => {
+        const fromTasks = prevTasks[fromStatusName].filter((t) => t._id !== task._id);
+        const updatedTaskForState = { 
+          ...task, 
+          status: { name: toStatusName, _id: toStatusData._id }
+        };
+        const toTasks = [...(prevTasks[toStatusName] || []), updatedTaskForState];
+        return {
+          ...prevTasks,
+          [fromStatusName]: fromTasks,
+          [toStatusName]: toTasks,
+        };
+      });
+
     } catch (error) {
-      console.error("Failed to update task:", error);
-      // Revert the state if the API call fails
-      setTasks((prevTasks) => ({
-        ...prevTasks,
-        [from]: [...prevTasks[from], task],
-        [to]: prevTasks[to].filter((t) => t._id !== task._id),
-      }));
+      console.error("Failed to move task:", error);
+
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error("Error response data:", error.response.data);
+          console.error("Error response status:", error.response.status);
+          console.error("Error response headers:", error.response.headers);
+          console.error("Request method:", error.config.method);
+          console.error("Request URL:", error.config.url);
+          console.error("Request data:", error.config.data);
+        } else if (error.request) {
+          console.error("No response received:", error.request);
+        } else {
+          console.error("Error setting up the request:", error.message);
+        }
+      } else {
+        console.error("Non-Axios error:", error);
+      }
+
+      // Show error message to the user
+      alert(`Failed to move task. Please try again. If the issue persists, contact support.`);
+    } finally {
+      setIsUpdating(false);
     }
   };
+
+  // const refreshTasks = async () => {
+  //   try {
+  //     const fetchedTasks = await getAllTasks();
+  //     const fetchedStatuses = await todoStatusService.getTodoStatuses();
+      
+  //     const groupedTasks = fetchedStatuses.reduce((acc, status) => {
+  //       acc[status] = fetchedTasks.filter((task) => task.status.name === status);
+  //       return acc;
+  //     }, {});
+
+  //     setTasks(groupedTasks);
+  //   } catch (error) {
+  //     console.error("Error refreshing tasks:", error);
+  //     alert("Failed to refresh tasks. Please try again later.");
+  //   }
+  // };
 
 
   const handleDragStart = (e, task) => {
@@ -263,8 +313,8 @@ const ToDo = () => {
 
   const handleDrop = async (e, section) => {
     e.preventDefault();
-    if (draggedTask && draggedTask.status !== section) {
-      await moveTask(draggedTask, draggedTask.status, section);
+    if (draggedTask && draggedTask.status.name !== section) {
+      await moveTask(draggedTask, draggedTask.status.name, section);
       setRecentlyDropped(draggedTask._id);
       setTimeout(() => setRecentlyDropped(null), 500);
     }
@@ -398,7 +448,16 @@ const ToDo = () => {
 
   
   return (
+    <>
+
     <div className="min-h-screen overflow-auto ">
+    {isUpdating && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-4 rounded-lg">
+            <p>Updating task...</p>
+          </div>
+        </div>
+      )}
       {/* Add Task Section */}
       <div className="p-6 bg-white border-b border-gray-200">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -561,6 +620,7 @@ const ToDo = () => {
         ))}
       </div>
     </div>
+    </>
   );
 };
 
