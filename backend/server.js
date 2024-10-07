@@ -41,4 +41,3 @@ app.listen(PORT, () => {
     connectDB(URL);
   console.log(`Server running on Post- ${PORT}`.bgBlue.black);
 });
-

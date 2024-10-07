@@ -21,7 +21,7 @@ const LeadFormModal = ({
         <form
           onSubmit={(e) => {
             handleSubmit(e);
-            resetForm();
+            resetForm(); // Optional reset of form after submission
           }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

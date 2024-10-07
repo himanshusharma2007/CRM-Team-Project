@@ -9,7 +9,7 @@ const Layout = ({ children }) => {
       </div>
 
       {/* Main Content Section */}
-      <div className="w-full md:w-[80vw] bg-gray-100 p-4 overflow-auto">{children}</div>
+      <div className="w-full md:w-[80vw] bg-gray-100 p-4">{children}</div>
     </div>
   );
 };

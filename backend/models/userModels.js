@@ -17,21 +17,16 @@ const userSchema = new mongoose.Schema(
     },
     otp: String,
     otpExpiry: Date,
-    department: {
+    team: {
       type: String,
-      enum: ["developer", "marketing", "other", "sales"],
-      default: "other",
+      enum: ["developer", "marketing", "noVerify"],
+      default: "noVerify",
     },
-    leadId: [
+    deal: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "lead",
       },
     ],
-    teamId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "team",
-    },
     role: {
       type: String,
       enum: ["admin", "subAdmin", "emp"],
