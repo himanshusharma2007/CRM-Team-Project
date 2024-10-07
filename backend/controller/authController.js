@@ -71,7 +71,6 @@ exports.registerUser = async (req, res) => {
 // "/login"
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-  console.log('req.body :>> ', req.body);
   try {
     if (!email || !password) {
       return res.status(400).send({

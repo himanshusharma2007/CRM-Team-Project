@@ -36,7 +36,7 @@ exports.updateTodo = async (req,res) =>{
   const { title, description, priority, status } = req.body;
   console.log("req.body in updateTodo", req.body)
     try {
-        if(!title && !priority && !currentStatus){
+        if(!title || !priority || !status){
           return res.status(400).send({
             success: false,
             message: "please fill any fields for update"
