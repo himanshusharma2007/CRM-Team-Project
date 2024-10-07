@@ -1,70 +1,8 @@
-export const dummyUser = [
-  {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    password: "hashed_password_123",
-    otp: "123456",
-    otpExpiry: "2024-09-30T18:30:00Z",
-    team: "developer",
-    role: "admin",
-    verify: true,
-    createdAt: "2024-09-01T10:30:00Z",
-    updatedAt: "2024-09-10T12:45:00Z",
-  },
-  {
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    password: "hashed_password_456",
-    otp: "789012",
-    otpExpiry: "2024-09-29T17:45:00Z",
-    team: "marketing",
-    role: "subAdmin",
-    verify: false,
-    createdAt: "2024-09-15T09:20:00Z",
-    updatedAt: "2024-09-25T11:30:00Z",
-  },
-  {
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com",
-    password: "hashed_password_789",
-    otp: "345678",
-    otpExpiry: "2024-10-01T09:00:00Z",
-    team: "noVerify",
-    role: "",
-    verify: false,
-    createdAt: "2024-09-20T14:15:00Z",
-    updatedAt: "2024-09-20T14:15:00Z",
-  },
-  {
-    name: "Bob Brown",
-    email: "bob.brown@example.com",
-    password: "hashed_password_987",
-    otp: null,
-    otpExpiry: null,
-    team: "developer",
-    role: "subAdmin",
-    verify: true,
-    createdAt: "2024-08-25T08:00:00Z",
-    updatedAt: "2024-09-05T10:10:00Z",
-  },
-  {
-    name: "Charlie Davis",
-    email: "charlie.davis@example.com",
-    password: "hashed_password_654",
-    otp: "654321",
-    otpExpiry: "2024-09-28T13:30:00Z",
-    team: "marketing",
-    role: "emp",
-    verify: false,
-    createdAt: "2024-09-18T16:40:00Z",
-    updatedAt: "2024-09-25T16:50:00Z",
-  },
-];
-
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/Context"; // Import the useAuth hook
 
 const UserVerificationList = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
   // console.log(user);
 
@@ -100,72 +38,105 @@ const UserVerificationList = () => {
     setUsers(users.filter((u) => u.id !== id));
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">
-        User Verification Requests
-      </h1>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
+        <h2 className="text-2xl font-bold mb-4">Verification Panel</h2>
 
-      <div className="space-y-4">
-        {users.map((user) => (
-          <div
-            key={user.id}
-            className="bg-white p-6 shadow-lg rounded-md border border-gray-200"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold">{user.name}</h3>
-                <p className="text-sm text-gray-600">{user.email}</p>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <label className="text-gray-700 font-semibold mr-2">Sort by:</label>
+            <button className="px-3 py-1 bg-blue-500 text-white rounded-l-md hover:bg-blue-600">
+              Latest
+            </button>
+            <button className="px-3 py-1 bg-gray-300 text-gray-700 rounded-r-md hover:bg-gray-400">
+              Oldest
+            </button>
+          </div>
+          <div>
+            <label className="text-gray-700 font-semibold">Filter:</label>
+            <span className="ml-2 text-gray-500">not verified</span>
+          </div>
+        </div>
 
-                {/* Dropdown for Role Selection */}
-                <div className="mt-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Assign Role
-                  </label>
-                  <select
-                    value={user.role}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                    className="w-full px-4 py-2 mt-1 border rounded-md focus:ring focus:ring-indigo-200 focus:border-indigo-300"
-                  >
-                    <option value="Admin">Admin</option>
-                    <option value="Developer Admin">Developer Admin</option>
-                    <option value="Marketing Admin">Marketing Admin</option>
-                    <option value="Employee">Employee</option>
-                  </select>
-                </div>
-                {/* Dropdown for Team Selection */}
-                <div className="mt-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Assign Team
-                  </label>
-                  <select
-                    value={user.team}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                    className="w-full px-4 py-2 mt-1 border rounded-md focus:ring focus:ring-indigo-200 focus:border-indigo-300"
-                  >
-                    <option value="Developer Admin">Developer Team</option>
-                    <option value="Marketing Admin">Marketing Team</option>
-                  </select>
+        {/* Requests List */}
+        <div className="space-y-4">
+          {/* Single Request */}
+          {[1, 2, 3].map((request) => (
+            <div
+              key={request}
+              className="flex justify-between items-center bg-gray-50 p-4 rounded-md shadow-sm"
+            >
+              <div className="flex items-center space-x-4">
+                <span className="text-lg font-bold">{request}</span>
+                <div>
+                  <p className="text-gray-800 font-semibold">Himanshu Sharma</p>
+                  <p className="text-gray-600 text-sm">himanshu@gmail.com</p>
                 </div>
               </div>
-              <div className="space-x-2">
-                <button
-                  onClick={() => handleVerify(user.id)}
-                  className="px-4 py-2 font-bold text-white bg-green-500 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-200"
-                >
-                  Verify
-                </button>
-                <button
-                  onClick={() => handleCancel(user.id)}
-                  className="px-4 py-2 font-bold text-white bg-red-500 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-200"
-                >
-                  Cancel
+              <button
+                onClick={openModal}
+                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+              >
+                Verify
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h2 className="text-xl font-bold mb-4">Verify User</h2>
+
+            <div className="mb-4">
+              <label htmlFor="team" className="block text-gray-700">
+                Select Team
+              </label>
+              <div className="flex items-center">
+                <input
+                  id="team"
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Select team"
+                />
+                <button className="ml-2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+                  +
                 </button>
               </div>
             </div>
+
+            <div className="mb-4">
+              <label htmlFor="role" className="block text-gray-700">
+                Select Role
+              </label>
+              <input
+                id="role"
+                type="text"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Select role"
+              />
+            </div>
+
+            <button
+              onClick={closeModal}
+              className="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+            >
+              Verify
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

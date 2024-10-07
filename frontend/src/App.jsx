@@ -20,6 +20,7 @@ import MainLayout from "./view/components/Layout/MainLayout";
 import QueryPage from "./view/components/Query";
 import Lead from "./view/components/Lead";
 import LeadDetails from "./view/components/LeadDetails";
+import Teams from "./view/components/Teams";
 
 function App() {
   return (
@@ -116,6 +117,14 @@ function App() {
             element={
               <Layout>
                 <UserVerification />
+              </Layout>
+            }
+          />
+          <Route
+            path="/teams"
+            element={
+              <Layout>
+                <Teams />
               </Layout>
             }
           />
