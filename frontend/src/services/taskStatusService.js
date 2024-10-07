@@ -1,9 +1,15 @@
 import api from "./api";
 
 export const todoStatusService = {
-  getTodoStatuses: async () => {
+  _getTodoStatuses: async () => {
     const response = await api.get("/todoStatus");
     return response.data.map((status) => status.name);
+  },
+  get getTodoStatuses() {
+    return this._getTodoStatuses;
+  },
+  set getTodoStatuses(value) {
+    this._getTodoStatuses = value;
   },
   getStatusData: async (status) => {
     console.log("get status called in services", status);
