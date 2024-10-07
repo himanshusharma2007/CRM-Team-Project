@@ -72,6 +72,7 @@ exports.deleteTodoStatus= async (req, res) => {
 
 exports.updateTodoStatus= async (req, res) => {
   try {
+    console.log('res.body in updatetodostatus ', req.body)
     const { status, newStatusName} = req.body;
     if (!status || !newStatusName) {
       return res.status(400).send({
@@ -79,12 +80,12 @@ exports.updateTodoStatus= async (req, res) => {
         message: "status and newStatusName are required",
       });
     }
-    const statusData = await Status.findOneAndUpdate({name: status}, {name: newStatusName}, {new: true});
-    return res.status(200).send({
-      success: true,
-      message: "status updated successfully",
-      status: statusData.name
-    });
+    
+  const statusData = await Status.findOneAndUpdate({userId:req.user._id,name: status}, {name: newStatusName});
+  // const allStatus = await Status.find({});
+  console.log('statusData status updated successfully', statusData)
+  // console.log('allStatus', allStatus)
+    return res.status(200).send(statusData);
   } catch (err) {
     console.log("err", err)
     return res.status(500).send({
