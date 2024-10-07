@@ -563,9 +563,9 @@ const ToDo = () => {
                         value={editStatusName}
                         onChange={(e) => setEditStatusName(e.target.value)}
                         onBlur={() => saveEditedStatus(section)}
-                        className="flex-grow mr-2 p-1 border rounded"
+                        className="flex-grow mr-2 p-1 border rounded max-w-[70%]"
                       />
-                      <div>
+                      <div className="flex space-x-2 ">
                         <button
                           onClick={() => saveEditedStatus(section)}
                           className="text-green-500 p-1 hover:text-green-700 mr-2"
