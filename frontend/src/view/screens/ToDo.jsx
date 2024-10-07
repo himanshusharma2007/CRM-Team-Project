@@ -437,7 +437,7 @@ const ToDo = () => {
             <h3 className="text-3xl font-semibold mb-2 text-[#111827]">Task Manager</h3>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 mb-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+              className="flex items-center justify-center gap-2 mb-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300"
             >
               <FaPlus /> <div>Add New Status</div>
             </button>
