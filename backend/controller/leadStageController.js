@@ -88,12 +88,12 @@ exports.updateStage = async (req, res) => {
             message: "stageName does not exist",
           });
     }
-    if (await stages.findOne({stageName: newStageName})) {
-      return res.status(400).send({
-        success: false,
-        message: "newStageName already exists",
-      });
-    }
+    // if (await stages.findOne({stageName: newStageName})) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     message: "newStageName already exists",
+    //   });
+    // }
     const stage = await stages.findOneAndUpdate({stageName}, {stageName: newStageName}, {new: true});
     return res.status(200).send(stage);
   } catch (err) {

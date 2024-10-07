@@ -94,10 +94,8 @@ exports.updateStage = async (req, res) => {
       });
     }
     if(leadData.currentStage === stageName){
-      return res.status(400).send({
-        success: false,
-        message: "lead already in this stage",
-      });
+      console.log("check",leadData)
+      return res.status(200).send(leadData);
     }
     const stageData = await stages.findOne({stageName});
     if(!stageData){

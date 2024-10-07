@@ -200,6 +200,7 @@ const Lead = () => {
       const updatedPipeline = { ...pipeline };
       updatedPipeline[tempTitle] = updatedPipeline[oldStageName];
       delete updatedPipeline[oldStageName];
+      fetchStagesAndLeads();
       setPipeline(updatedPipeline);
     } catch (err) {
       console.error("Error updating stage name:", err);
