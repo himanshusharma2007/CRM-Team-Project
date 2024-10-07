@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAllTasks, taskSave, updateTask } from "../../services/taskService";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { todoStatusService } from "../../services/taskStatusService";
 import "../styles/animation.css";
 import axios from "axios";
@@ -30,7 +31,6 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-
 const ToDo = () => {
   const [tasks, setTasks] = useState({});
   const [statuses, setStatuses] = useState([]);
@@ -48,8 +48,12 @@ const ToDo = () => {
   const [editStatusName, setEditStatusName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStatus, setNewStatus] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [isUpdatingTask, setIsUpdatingTask] = useState(false);
+  const [isManagingStatus, setIsManagingStatus] = useState(false);
   const fetchTasks = async () => {
+    setIsLoading(true);
     try {
       console.log("fetchTasks called");
       const fetchedTasks = await getAllTasks();
@@ -74,6 +78,8 @@ const ToDo = () => {
           error.response?.data?.message || error.message
         }`
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -94,6 +100,7 @@ const ToDo = () => {
 
   const addTask = async () => {
     if (title.trim() && taskStage) {
+      setIsAddingTask(true);
       try {
         const statusData = await todoStatusService.getStatusData(taskStage);
         const newTask = await taskSave({
@@ -101,7 +108,6 @@ const ToDo = () => {
           priority: taskPriority,
           status: statusData._id,
         });
-        // Ensure the new task has the correct structure
         const formattedNewTask = {
           ...newTask,
           status: { name: taskStage, _id: statusData._id },
@@ -120,6 +126,8 @@ const ToDo = () => {
             error.response?.data?.message || error.message
           }`
         );
+      } finally {
+        setIsAddingTask(false);
       }
     } else {
       alert("Please enter a task title and select a status");
@@ -144,16 +152,12 @@ const ToDo = () => {
       const toStatusData = await todoStatusService.getStatusData(toStatusName);
       console.log("Target status data:", toStatusData);
       console.log("task in move funcion", task);
-      // Prepare the update data
       task.status = toStatusData;
-      // const updateData = { status: toStatusData._id };
       console.log("Sending update to server:", { taskId: task._id, task });
 
-      // Update on the server first
       const updatedTask = await updateTask(task._id, task);
       console.log("Task updated successfully on server:", updatedTask);
 
-      // If server update is successful, update local state
       setTasks((prevTasks) => {
         const fromTasks = prevTasks[fromStatusName].filter(
           (t) => t._id !== task._id
@@ -192,7 +196,6 @@ const ToDo = () => {
         console.error("Non-Axios error:", error);
       }
 
-      // Show error message to the user
       alert(
         `Failed to move task. Please try again. If the issue persists, contact support.`
       );
@@ -261,6 +264,7 @@ const ToDo = () => {
 
   const saveEdit = async () => {
     if (editInput.trim()) {
+      setIsUpdatingTask(true);
       const updatedTask = {
         ...editTask,
         title: editInput,
@@ -287,6 +291,8 @@ const ToDo = () => {
             error.response?.data?.message || error.message
           }`
         );
+      } finally {
+        setIsUpdatingTask(false);
       }
     }
   };
@@ -298,6 +304,7 @@ const ToDo = () => {
   };
 
   const handleStatusAdd = async (newStatus) => {
+    setIsManagingStatus(true);
     try {
       await todoStatusService.addTodoStatus(newStatus);
       setStatuses([...statuses, newStatus]);
@@ -309,10 +316,13 @@ const ToDo = () => {
           error.response?.data?.message || error.message
         }`
       );
+    } finally {
+      setIsManagingStatus(false);
     }
   };
 
   const handleStatusEdit = async (oldStatus, newStatus) => {
+    setIsManagingStatus(true);
     try {
       await todoStatusService.updateTodoStatus(oldStatus, newStatus);
       setStatuses(statuses.map((s) => (s === oldStatus ? newStatus : s)));
@@ -331,6 +341,8 @@ const ToDo = () => {
           error.response?.data?.message || error.message
         }`
       );
+    } finally {
+      setIsManagingStatus(false);
     }
   };
 
@@ -340,8 +352,8 @@ const ToDo = () => {
       alert("Cannot delete the last remaining status.");
       return;
     }
+    setIsManagingStatus(true);
     try {
-      // Find the status object with the matching name
       let statusObj = await todoStatusService.getStatusData(statusToDelete);
       if (!statusObj) {
         throw new Error("Status not found");
@@ -360,9 +372,10 @@ const ToDo = () => {
           error.response?.data?.message || error.message
         }`
       );
+    } finally {
+      setIsManagingStatus(false);
     }
   };
-
   const startEditingStatus = (status) => {
     setEditingStatus(status);
     setEditStatusName(status);
@@ -389,6 +402,7 @@ const ToDo = () => {
       return;
     }
 
+    setIsManagingStatus(true);
     try {
       await handleStatusEdit(oldStatus, editStatusName.trim());
       setStatuses((prevStatuses) =>
@@ -410,6 +424,8 @@ const ToDo = () => {
           error.response?.data?.message || error.message
         }`
       );
+    } finally {
+      setIsManagingStatus(false);
     }
   };
 
@@ -420,7 +436,6 @@ const ToDo = () => {
       setIsModalOpen(false);
     }
   };
-
   return (
     <>
       <div className="min-h-screen overflow-auto ">
@@ -428,13 +443,16 @@ const ToDo = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-4 rounded-lg">
               <p>Updating task...</p>
+              <LoadingSpinner />
             </div>
           </div>
         )}
         {/* Add Task Section */}
         <div className="p-6 bg-white border-b border-gray-200">
           <div className="wraper flex justify-between">
-            <h3 className="text-3xl font-semibold mb-2 text-[#111827]">Task Manager</h3>
+            <h3 className="text-3xl font-semibold mb-2 text-[#111827]">
+              Task Manager
+            </h3>
             <button
               onClick={() => setIsModalOpen(true)}
               className="flex items-center justify-center gap-2 mb-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300"
@@ -497,7 +515,6 @@ const ToDo = () => {
           </div>
         </div>
 
-        {/* Edit Task Section */}
         {editTask && (
           <div className="p-6 bg-gray-50 border-b border-gray-200">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">
@@ -522,13 +539,15 @@ const ToDo = () => {
               <div className="flex gap-2">
                 <button
                   onClick={saveEdit}
-                  className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+                  className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300 flex items-center justify-center"
+                  disabled={isUpdatingTask}
                 >
-                  Save
+                  {isUpdatingTask ? <LoadingSpinner /> : "Save"}
                 </button>
                 <button
                   onClick={cancelEdit}
                   className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-300"
+                  disabled={isUpdatingTask}
                 >
                   Cancel
                 </button>
@@ -537,24 +556,23 @@ const ToDo = () => {
           </div>
         )}
 
-        {/* Task Sections */}
-
-        <div className="flex flex-col lg:flex-row p-6 gap-6 overflow-auto mb-10">
-          {statuses.map((section) => (
-            <div
-              key={section}
-              onDrop={(e) => handleDrop(e, section)}
-              onDragOver={allowDrop}
-              onDragEnter={(e) => handleDragEnter(e, section)}
-              onDragLeave={handleDragLeave}
-              className={`flex-1 bg-white rounded-lg shadow-md transition-all duration-300 min-w-64 ${
-                dragOverSection === section ? "ring-2 ring-blue-500" : ""
-              }`}
-            >
-              <h2 className="text-xl font-bold p-4 bg-gray-200 text-gray-800 rounded-t-lg capitalize">
-                {/* {section} */}
-
-                {console.log("section", section)}
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row p-6 gap-6 overflow-auto mb-10">
+            {statuses.map((section) => (
+              <div
+                key={section}
+                onDrop={(e) => handleDrop(e, section)}
+                onDragOver={allowDrop}
+                onDragEnter={(e) => handleDragEnter(e, section)}
+                onDragLeave={handleDragLeave}
+                className={`flex-1 bg-white rounded-lg shadow-md transition-all duration-300 min-w-64 ${
+                  dragOverSection === section ? "ring-2 ring-blue-500" : ""
+                }`}
+              >
                 <div className="text-xl font-bold p-4 bg-gray-200 text-gray-800 rounded-t-lg capitalize flex justify-between items-center">
                   {editingStatus === section ? (
                     <>
@@ -569,12 +587,14 @@ const ToDo = () => {
                         <button
                           onClick={() => saveEditedStatus(section)}
                           className="text-green-500 p-1 hover:text-green-700 mr-2"
+                          disabled={isManagingStatus}
                         >
-                          <FaSave />
+                          {isManagingStatus ? <LoadingSpinner /> : <FaSave />}
                         </button>
                         <button
                           onClick={cancelEditingStatus}
                           className="text-red-500 p-1 hover:text-red-700"
+                          disabled={isManagingStatus}
                         >
                           <FaTimes />
                         </button>
@@ -587,77 +607,79 @@ const ToDo = () => {
                         <button
                           onClick={() => startEditingStatus(section)}
                           className="text-blue-500 p-1 hover:text-blue-700 mr-2"
+                          disabled={isManagingStatus}
                         >
                           <FaPencilAlt />
                         </button>
                         <button
                           onClick={() => handleStatusDelete(section)}
                           className="text-red-500 p-1 hover:text-red-700"
+                          disabled={isManagingStatus}
                         >
-                          <FaTrash />
+                          {isManagingStatus ? <LoadingSpinner /> : <FaTrash />}
                         </button>
                       </div>
                     </>
                   )}
                 </div>
-              </h2>
 
-              <div className="p-4 space-y-4 h-96 overflow-y-auto">
-                {tasks[section] &&
-                  tasks[section].map((task) => (
-                    <div
-                      key={task._id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, task)}
-                      onDragEnd={handleDragEnd}
-                      className={`bg-white p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md border border-gray-200 ${
-                        recentlyDropped === task._id ? "explode" : ""
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-gray-800">
-                          {task.title}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            task.priority === "High"
-                              ? "bg-red-100 text-red-800"
-                              : task.priority === "Medium"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-green-100 text-green-800"
-                          }`}
-                        >
-                          {task.priority}
-                        </span>
-                      </div>
-                      <div className="mt-2 space-x-2">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => startEditing(task, section)}
-                              className="text-blue-500 hover:text-blue-700"
-                            >
-                              <FaEdit />
-                            </button>
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {new Date(task.createdAt).toLocaleDateString(
-                              undefined,
-                              { month: "short", day: "numeric" }
-                            )}{" "}
-                            {new Date(task.createdAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                <div className="p-4 space-y-4 h-96 overflow-y-auto">
+                  {tasks[section] &&
+                    tasks[section].map((task) => (
+                      <div
+                        key={task._id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, task)}
+                        onDragEnd={handleDragEnd}
+                        className={`bg-white p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md border border-gray-200 ${
+                          recentlyDropped === task._id ? "explode" : ""
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-gray-800">
+                            {task.title}
+                          </span>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              task.priority === "High"
+                                ? "bg-red-100 text-red-800"
+                                : task.priority === "Medium"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-green-100 text-green-800"
+                            }`}
+                          >
+                            {task.priority}
+                          </span>
+                        </div>
+                        <div className="mt-2 space-x-2">
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => startEditing(task, section)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <FaEdit />
+                              </button>
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {new Date(task.createdAt).toLocaleDateString(
+                                undefined,
+                                { month: "short", day: "numeric" }
+                              )}{" "}
+                              {new Date(task.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
