@@ -91,12 +91,6 @@ const AdminSidebar = ({ handleLogout, location }) => {
           location={location}
         />
         <SidebarItem
-          to="/resetpassword"
-          icon={<FaLock />}
-          text="Reset Password"
-          location={location}
-        />
-        <SidebarItem
           to="/query"
           icon={<MdQueryBuilder />}
           text="Query"
@@ -182,12 +176,6 @@ const SubAdminSidebar = ({ handleLogout, location }) => {
             text="User Verification"
             location={location}
           />
-          <SidebarItem
-            to="/resetpassword"
-            icon={<FaLock />}
-            text="Reset Password"
-            location={location}
-          />
         </ul>
       </nav>
 
@@ -231,12 +219,6 @@ const EmployeeSidebar = ({ handleLogout, location }) => {
             to="/todo"
             icon={<FaClipboardList />}
             text="To-Do"
-            location={location}
-          />
-          <SidebarItem
-            to="/resetpassword"
-            icon={<FaLock />}
-            text="Reset Password"
             location={location}
           />
         </ul>

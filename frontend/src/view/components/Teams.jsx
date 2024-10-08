@@ -1,31 +1,64 @@
-import { useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
-
-const teamsData = [
-  { id: 1, name: 'Team A', department: 'Marketing' },
-  { id: 2, name: 'Team B', department: 'Engineering' },
-  { id: 3, name: 'Team C', department: 'Sales' },
-];
+import { useEffect, useState } from "react";
+import { FaTimes } from "react-icons/fa";
+import {
+  createTeam,
+  getAllTeams,
+  getTeamById,
+} from "../../services/TeamService";
 
 const Teams = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [newTeamName, setNewTeamName] = useState('');
-  const [newTeamDepartment, setNewTeamDepartment] = useState('');
+  const [teamsData, setTeamsData] = useState([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
+  const [newTeamName, setNewTeamName] = useState("");
+  const [newTeamDepartment, setNewTeamDepartment] = useState("");
+  const [selectedTeamMembers, setSelectedTeamMembers] = useState([]);
+  // useEffect(() => {
+  //   console.log("selectedTeam", JSON.stringify(selectTeam, null, 2)); // This gives a pretty printed JSON
+  // }, [selectTeam]);
+  const fetchTeams = async () => {
+    try {
+      const teams = await getAllTeams();
+      console.log('teams', teams)
+      setTeamsData(teams);
+    } catch (error) {
+      console.log("Failed to fetch teams: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTeams();
+  }, []);
 
   const handleSort = (order) => {
-    console.log(`Sorting by ${order}`);
+    const sortedTeams = [...teamsData].sort((a, b) =>
+      order === 'latest' ? b.createdAt.localeCompare(a.createdAt) : a.createdAt.localeCompare(b.createdAt)
+    );
+    setTeamsData(sortedTeams);
   };
 
-  const handleViewTeam = (teamId) => {
-    console.log(`Viewing team ${teamId}`);
+  const handleViewTeam = async (teamId) => {
+    try {
+      console.log('teamId', teamId)
+      const team = await getTeamById(teamId);
+      console.log('team', team)
+      setSelectedTeamMembers(team.participants || []); // Assuming team.members contains the member data
+      setShowMembersModal(true); // Show members modal
+    } catch (error) {
+      console.error(`Error viewing team ${teamId}:`, error);
+    }
   };
 
-  const handleCreateTeam = () => {
-    // Handle team creation logic here
-    console.log('Team Name:', newTeamName);
-    console.log('Team Department:', newTeamDepartment);
-    // Close modal after team creation
-    setShowModal(false);
+  const handleCreateTeam = async () => {
+    try {
+      const newTeam = await createTeam(newTeamName, newTeamDepartment);
+      setTeamsData((prevTeams) => [...prevTeams, newTeam]);
+      setNewTeamName('');
+      setNewTeamDepartment('');
+      setShowCreateModal(false);
+    } catch (error) {
+      console.error('Error creating team:', error);
+    }
   };
 
   return (
@@ -35,7 +68,7 @@ const Teams = () => {
         <h1 className="text-2xl font-semibold">Teams</h1>
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowCreateModal(true)}
         >
           Create New Team
         </button>
@@ -60,21 +93,21 @@ const Teams = () => {
 
       {/* Team List */}
       <div className="space-y-4">
-        {teamsData.map((team) => (
+        {teamsData.map((team, index) => (
           <div
-            key={team.id}
+            key={team._id}
             className="flex justify-between items-center p-4 border border-gray-300 rounded hover:shadow-lg"
           >
             <div className="flex space-x-4">
-              <div className="text-[20px]">{team.id}</div>
+              <div className="text-[20px]">{index + 1}</div>
               <div>
-                <h2 className="text-lg font-semibold">{team.name}</h2>
+                <h2 className="text-lg font-semibold">{team.teamName}</h2>
                 <p className="text-gray-600">{team.department}</p>
               </div>
             </div>
             <button
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-              onClick={() => handleViewTeam(team.id)}
+              onClick={() => handleViewTeam(team._id)}
             >
               View
             </button>
@@ -82,14 +115,14 @@ const Teams = () => {
         ))}
       </div>
 
-      {/* Modal */}
-      {showModal && (
+      {/* Create Team Modal */}
+      {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-8 rounded shadow-lg w-[400px] relative">
             {/* Close Button */}
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={() => setShowModal(false)}
+              onClick={() => setShowCreateModal(false)}
             >
               <FaTimes />
             </button>
@@ -125,6 +158,33 @@ const Teams = () => {
             >
               Create Team
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Members Modal */}
+      {showMembersModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded shadow-lg w-[400px] relative">
+            {/* Close Button */}
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowMembersModal(false)}
+            >
+              <FaTimes />
+            </button>
+
+            {/* Modal Content */}
+            <h2 className="text-xl font-bold mb-4">Team Members</h2>
+
+            <ul className="space-y-2">
+              {selectedTeamMembers&&selectedTeamMembers.map((member) => (
+                <li key={member._id} className="flex justify-between">
+                  <span className="text-gray-800">{member.name}</span>
+                  <span className="text-gray-600">{member.role}</span> 
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
