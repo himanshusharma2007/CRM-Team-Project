@@ -51,7 +51,7 @@ exports.getUserById = async (req, res) => {
 
 exports.getUnVerifiedUser = async (req, res) => {
   try {
-    const users = await user.find({verify: false})
+    const users = await user.find({verify: false, role: {$ne: "admin"}})
     res.status(200).send(users);
   } catch (error) {
     console.log(error)

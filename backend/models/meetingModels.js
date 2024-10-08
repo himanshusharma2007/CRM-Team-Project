@@ -1,22 +1,27 @@
 const mongoose = require('mongoose');
 
 const meetingSchema = new mongoose.Schema({
-    link: {
-        type: String,
-        required: [true, "link is required"]
+    clientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "client",
+        required: [true, "Client id is required"]
     },
-    teamJoin: {
-        type: String,
-        enum: ["devaloper", "marketing", "both"],
-        required: [true, "teamJoin is required"],
+    projectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "project",
+        required: [true, "Project id is required"]
     },
-    dateTime: {
+    meetingDateTime: {
         type: Date,
-        required: [true, "meeting date is required"],
+        required: [true, "Meeting date is required"]
     },
-    status:{
+    meetingConclusion: {
         type: String,
-        enum: ['pending', "deley", "done"],
+        default: ""
+    },
+    meetingStatus: {
+        type: String,
+        enum: ["pending", "completed", "cancelled", "rescheduled"],
         default: "pending"
     },
 }, {timestamps:true});
@@ -24,3 +29,11 @@ const meetingSchema = new mongoose.Schema({
 
 const meeting = mongoose.model('meeting', meetingSchema);
 module.exports = meeting;
+
+
+/*
+
+
+
+
+*/
