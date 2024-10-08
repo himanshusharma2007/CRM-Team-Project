@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getUnVerifiedUsers, verifyUser } from "../../services/authService";
 import { getAllTeams } from "../../services/TeamService";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const UserVerificationList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,13 +12,15 @@ const UserVerificationList = () => {
   const [sortOrder, setSortOrder] = useState("latest");
   const [message, setMessage] = useState("");
   const [teams, setTeams] = useState([]);
+  const [loading, setLoading] = useState(true); // State to manage loading
 
   useEffect(() => {
-    console.log("selectedTeam", JSON.stringify(selectTeam, null, 2)); // This gives a pretty printed JSON
+    console.log("selectedTeam", JSON.stringify(selectTeam, null, 2)); // Debugging the selected team
   }, [selectTeam]);
 
   // Fetch unverified users on component mount
   const fetchUnverifiedUsers = async () => {
+    setLoading(true); // Set loading to true when fetching data
     try {
       const data = await getUnVerifiedUsers();
       const allTeams = await getAllTeams();
@@ -26,9 +29,11 @@ const UserVerificationList = () => {
     } catch (error) {
       console.error("Error fetching unverified users:", error);
       setMessage("Error fetching users");
+    } finally {
+      setLoading(false); // Set loading to false when data is fetched or if there's an error
     }
   };
-  
+
   useEffect(() => {
     fetchUnverifiedUsers();
   }, []);
@@ -59,7 +64,7 @@ const UserVerificationList = () => {
       await verifyUser(selectedUserId, selectTeam._id, role); // Verify the user
       setUsers(users.filter((u) => u._id !== selectedUserId)); // Remove the verified user from the list
       setMessage("User verified successfully");
-      fetchUnverifiedUsers();
+      fetchUnverifiedUsers(); // Fetch users again to refresh the list
       closeModal(); // Close modal and reset fields
     } catch (error) {
       console.error("Error verifying user:", error);
@@ -81,72 +86,58 @@ const UserVerificationList = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-200 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">Verification Panel</h2>
+    <div className="flex flex-col  min-h-screen bg-gray-100 p-8">
+      <div className="bg-white shadow-md rounded-lg w-full h-full p-8 overflow-y-auto">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">User Verification</h2>
 
-        {/* Alert Message */}
         {message && (
           <div className={`p-4 mb-4 text-white rounded-md ${message.includes("Error") ? 'bg-red-500' : 'bg-green-500'}`}>
             {message}
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center">
-            <label className="text-gray-700 font-semibold mr-2">Sort by:</label>
-            <button
-              onClick={() => handleSort("latest")}
-              className={`px-4 py-2 rounded-l-md ${
-                sortOrder === "latest"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-gray-700"
-              } hover:bg-blue-500`}
-            >
-              Latest
-            </button>
-            <button
-              onClick={() => handleSort("oldest")}
-              className={`px-4 py-2 rounded-r-md ${
-                sortOrder === "oldest"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-gray-700"
-              } hover:bg-blue-500`}
-            >
-              Oldest
-            </button>
-          </div>
-          {/* <div>
-            <span className="text-gray-500">Filter: Not verified</span>
-          </div> */}
-        </div>
-
-        {/* Requests List */}
-        <div className="space-y-4">
-          {users.map((user, index) => (
-            <div
-              key={user._id}
-              className="flex justify-between items-center bg-gray-50 p-4 rounded-md shadow-sm"
-            >
-              <div className="flex items-center space-x-4">
-                <span className="text-lg font-bold">{index + 1}</span>
-                <div>
-                  <p className="text-gray-800 font-semibold">{user.name}</p>
-                  <p className="text-gray-600 text-sm">{user.email}</p>
-                </div>
-              </div>
+        {loading ? (
+          <div className="flex justify-center"><LoadingSpinner /></div>
+        ) : (
+          <>
+            <div className="flex justify-between mb-4">
               <button
-                onClick={() => openModal(user._id)}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-500"
+                onClick={() => handleSort("latest")}
+                className={`py-2 px-4 rounded-lg ${sortOrder === "latest" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"} transition duration-200`}
               >
-                Verify
+                Latest
+              </button>
+              <button
+                onClick={() => handleSort("oldest")}
+                className={`py-2 px-4 rounded-lg ${sortOrder === "oldest" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"} transition duration-200`}
+              >
+                Oldest
               </button>
             </div>
-          ))}
-        </div>
+
+            <ul className="space-y-4">
+              {users.map((user, index) => (
+                <li key={user._id} className="flex justify-between items-center bg-gray-50 p-4 rounded-md shadow hover:shadow-lg transition duration-200">
+                  <div className="flex items-center space-x-4">
+                    <span className="text-lg font-semibold text-gray-800">{index + 1}.</span>
+                    <div>
+                      <p className="text-gray-800 font-semibold">{user.name}</p>
+                      <p className="text-gray-600 text-sm">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => openModal(user._id)}
+                    className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-500 transition duration-200"
+                  >
+                    Verify
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
@@ -185,13 +176,13 @@ const UserVerificationList = () => {
 
             <button
               onClick={handleVerify}
-              className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-500"
+              className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-500 transition duration-200"
             >
               Verify
             </button>
             <button
               onClick={closeModal}
-              className="w-full mt-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500"
+              className="w-full mt-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500 transition duration-200"
             >
               Cancel
             </button>

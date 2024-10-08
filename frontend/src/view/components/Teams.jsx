@@ -164,29 +164,34 @@ const Teams = () => {
 
       {/* Members Modal */}
       {showMembersModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded shadow-lg w-[400px] relative">
-            {/* Close Button */}
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={() => setShowMembersModal(false)}
-            >
-              <FaTimes />
-            </button>
-
-            {/* Modal Content */}
-            <h2 className="text-xl font-bold mb-4">Team Members</h2>
-
-            <ul className="space-y-2">
-              {selectedTeamMembers&&selectedTeamMembers.map((member) => (
-                <li key={member._id} className="flex justify-between">
-                  <span className="text-gray-800">{member.name}</span>
-                  <span className="text-gray-600">{member.role}</span> 
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-[400px] relative">
+          {/* Close Button */}
+          <button
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition duration-200"
+            onClick={() => setShowMembersModal(false)}
+          >
+            <FaTimes className="h-6 w-6" />
+          </button>
+      
+          {/* Modal Content */}
+          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Team Members</h2>
+      
+          <ul className="space-y-4">
+            {selectedTeamMembers && selectedTeamMembers.length > 0 ? (
+              selectedTeamMembers.map((member) => (
+                <li key={member._id} className="flex justify-between p-2 bg-gray-100 rounded-md hover:bg-gray-200 transition duration-200">
+                  <span className="text-gray-800 font-semibold">{member.name}</span>
+                  <span className="text-gray-600">{member.role}</span>
                 </li>
-              ))}
-            </ul>
-          </div>
+              ))
+            ) : (
+              <li className="text-center text-gray-600">No members found</li>
+            )}
+          </ul>
         </div>
+      </div>
+      
       )}
     </div>
   );
