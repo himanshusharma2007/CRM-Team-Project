@@ -64,6 +64,7 @@ exports.getUnVerifiedUser = async (req, res) => {
 
 exports.verifyUser = async (req, res) => {
   try{
+    console.log("Req.body", req.body)
     const {userId, teamId, role} = req.body;
     console.log("userId", "teamId", "role", userId, teamId, role)
     if(!userId || !teamId ){
