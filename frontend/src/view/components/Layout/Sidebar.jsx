@@ -1,10 +1,10 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { logout } from "../../services/authService";
+import { logout } from "../../../services/authService";
 import { FaHome, FaUser, FaClipboardList, FaHandshake, FaUsers, FaLock } from 'react-icons/fa';
 import { MdQueryBuilder, MdVerifiedUser } from 'react-icons/md';
 import { HiOutlineUserGroup } from 'react-icons/hi'
-import { useAuth } from "../../context/Context";
-import logo from "../../assets/logoDevPurple.png";
+import { useAuth } from "../../../context/Context";
+import logo from "../../../assets/images/logoDevPurple.png";
 
 const Sidebar = () => {
   const navigate = useNavigate();

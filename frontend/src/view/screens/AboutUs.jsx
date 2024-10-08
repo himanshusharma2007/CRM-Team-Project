@@ -1,6 +1,6 @@
-import nitesh from "../images/nitesh.jpeg";
-import dhairya from "../images/Dhairya.png";
-import ujjwal from "../images/ujjwal.jpeg";
+import nitesh from "../../assets/images/nitesh.jpeg";
+import dhairya from "../../assets/images/Dhairya.png";
+import ujjwal from "../../assets/images/ujjwal.jpeg";
 import { Link } from "react-router-dom";
 
 const AboutUs = () => {
