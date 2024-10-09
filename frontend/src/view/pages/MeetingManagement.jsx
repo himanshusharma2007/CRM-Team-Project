@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
@@ -12,13 +12,13 @@ import {
   getAllProjects,
   createProject,
   updateProject,
-} from "../services/projectService";
+} from "../../services/projectService";
 import {
   getUpcomingMeetings,
   createMeeting,
   updateMeeting,
-} from "../services/meetingService";
-import { getAllClients, createClient } from "../services/clientService";
+} from "../../services/meetingService";
+import { getAllClients, createClient } from "../../services/clientService";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
