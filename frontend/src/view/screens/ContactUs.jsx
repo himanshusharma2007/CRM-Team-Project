@@ -4,6 +4,7 @@ const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    subject: "",
     message: "",
   });
 
@@ -15,48 +16,72 @@ const ContactUs = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     addQuery(formData); // Call function to add query to the query page
-    setFormData({ name: "", email: "", message: "" }); // Reset form after submit
+    setFormData({ name: "", email: "", subject: "", message: "" }); // Reset form after submit
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md mt-10">
-      <h1 className="text-3xl font-bold mb-4 text-center">Contact Us</h1>
+    <div className="p-8 max-w-2xl mx-auto bg-gray-50 rounded-lg shadow-lg mt-10 border border-gray-200">
+      <h1 className="text-4xl font-bold mb-6 text-center text-blue-800">
+        Contact Us
+      </h1>
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700">Name</label>
+        <div className="mb-5">
+          <label className="block text-blue-700 font-semibold mb-2">Name</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            placeholder="Enter your name"
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Email</label>
+        <div className="mb-5">
+          <label className="block text-blue-700 font-semibold mb-2">
+            Email
+          </label>
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            placeholder="Enter your email"
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Message</label>
+        <div className="mb-5">
+          <label className="block text-blue-700 font-semibold mb-2">
+            Subject
+          </label>
+          <input
+            type="text"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            placeholder="Subject of your message"
+            required
+          />
+        </div>
+        <div className="mb-5">
+          <label className="block text-blue-700 font-semibold mb-2">
+            Message
+          </label>
           <textarea
             name="message"
             value={formData.message}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            placeholder="Enter your message"
+            rows="5"
             required
           />
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-center text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600"
+          className="w-full bg-blue-700 text-white text-lg font-semibold px-4 py-3 rounded-lg shadow-lg hover:bg-blue-800 transition-colors"
         >
           Submit
         </button>
