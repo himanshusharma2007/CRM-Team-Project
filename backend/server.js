@@ -14,6 +14,7 @@ const teamRoutes = require("./routes/teamRoutes");
 const clientRoutes = require("./routes/clientRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
+const contactRoutes = require("./routes/contactRoutes")
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
@@ -37,6 +38,7 @@ app.use("/api/profile", userRoutes);
 app.use("/api/lead", leadRouter);
 app.use("/api/stage", stageRoutes);
 app.use("/api/todoStatus", todoStatusRoutes);
+app.use("/api/contact", contactRoutes)
 app.use("/api/contactUs", contactUsRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/client", clientRoutes);

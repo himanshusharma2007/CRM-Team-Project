@@ -26,6 +26,10 @@ const leadSchema = new mongoose.Schema(
       type: String,
       required: [true, "currentStage is required"],
     },
+    location: {
+      type: String,
+      required: [true, "location is required"],
+    },
     team: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "team",

@@ -11,8 +11,9 @@ exports.createMeeting = async (req, res) => {
         if(!(await client.findById(clientId)) || !(await project.findById(projectId))){
             return res.status(404).json({ error: "Client or project not found" });
         }
-        const meeting = await meeting.create({ clientId, projectId, meetingDateTime });
-        res.status(201).json(meeting);
+        const meetingData = await meeting.create({ clientId, projectId, meetingDateTime });
+        const projectData = await project.findByIdAndUpdate(projectId, {lastMeetingId: meetingData._id});
+        res.status(201).json(meetingData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -21,11 +22,11 @@ exports.createMeeting = async (req, res) => {
 
 exports.getMeetingById = async (req, res) => {
     try {
-        const meeting = await meeting.findById(req.params.id);
-        if(!meeting){
+        const meetingData = await meeting.findById(req.params.id).populate("clientId projectId");
+        if(!meetingData){
             return res.status(404).json({ error: "Meeting not found" });
         }
-        res.status(200).json(meeting);
+        res.status(200).json(meetingData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -34,8 +35,8 @@ exports.getMeetingById = async (req, res) => {
 
 exports.getUpcomingMeetings = async (req, res) => {
     try {
-        const meetings = await meeting.find({ meetingDateTime: { $gte: new Date() } });
-        res.status(200).json(meetings);
+        const meetingsData = await meeting.find({ meetingDateTime: { $gte: Date.now() } });
+        res.status(200).json(meetingsData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -44,8 +45,9 @@ exports.getUpcomingMeetings = async (req, res) => {
 
 exports.getAllMeetingsByStatus = async (req, res) => {
     try {
-        const meetings = await meeting.find({ meetingStatus: "pending" });
-        res.status(200).json(meetings);
+        const {status} = req.params;
+        const meetingsData = await meeting.find({ meetingStatus: status });
+        res.status(200).json(meetingsData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -57,8 +59,8 @@ exports.getAllMeetingsByProjectId = async (req, res) => {
         if(!(await project.findById(req.params.id))){
             return res.status(404).json({ error: "Project not found" });
         }
-        const meetings = await meeting.find({ projectId: req.params.id });
-        res.status(200).json(meetings);
+        const meetingsData = await meeting.find({ projectId: req.params.id });
+        res.status(200).json(meetingsData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -68,15 +70,15 @@ exports.getAllMeetingsByProjectId = async (req, res) => {
 exports.updateMeeting = async (req, res) => {
     try {
         const { meetingConclusion, meetingStatus, meetingDateTime } = req.body;
-        const meeting = await meeting.findById(req.params.id);
-        if(!meeting){
+        const meetingData = await meeting.findById(req.params.id);
+        if(!meetingData){
             return res.status(404).json({ error: "Meeting not found" });
         }
-        meeting.meetingConclusion = meetingConclusion || meeting.meetingConclusion;
-        meeting.meetingStatus = meetingStatus || meeting.meetingStatus;
-        meeting.meetingDateTime = meetingDateTime || meeting.meetingDateTime;
-        await meeting.save();
-        res.status(200).json(meeting);
+        meetingData.meetingConclusion = meetingConclusion || meetingData.meetingConclusion;
+        meetingData.meetingStatus = meetingStatus || meetingData.meetingStatus;
+        meetingData.meetingDateTime = meetingDateTime || meetingData.meetingDateTime;
+        await meetingData.save();
+        res.status(200).json(meetingData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });

@@ -8,7 +8,7 @@ const routers = express.Router()
 routers.get("/", jwtToken, getUser)
 routers.get("/allUsers", jwtToken, checkAdmin, getAllUser)
 routers.get("/unverified", jwtToken, checkAdmin, getUnVerifiedUser)
-routers.get("/:id", jwtToken, checkSubAdmin, getUserById)
 routers.post("/verifyUser", jwtToken, checkAdmin, verifyUser)
+routers.get("/:id", jwtToken, checkSubAdmin, getUserById)
 
 module.exports = routers
