@@ -1,29 +1,41 @@
+// AddProjectModal.jsx
 import React, { useState } from "react";
 
-const AddClientModal = ({ isOpen, toggleModal, onAddClient }) => {
+const AddProjectModal = ({ isOpen, toggleModal, teams, onAddProject }) => {
   const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [location, setLocation] = useState("");
-  const [error, setError] = useState("");
+  const [serviceType, setServiceType] = useState("");
+  const [projectStatus, setProjectStatus] = useState("");
+  const [teamIds, setTeamIds] = useState([]);
+  const [hashtags, setHashtags] = useState("");
+  const [description, setDescription] = useState("");
+  const [clientId, setClientId] = useState(""); // This should be populated with actual client data
 
   const resetForm = () => {
     setName("");
-    setCompany("");
-    setPhone("");
-    setEmail("");
-    setLocation("");
-    setError("");
+    setServiceType("");
+    setProjectStatus("");
+    setTeamIds([]);
+    setHashtags("");
+    setDescription("");
+    setClientId("");
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !email) {
-      setError("Name and email are required.");
-      return;
-    }
-    onAddClient({ name, company, phone, email, location });
+    onAddProject({
+      name,
+      description,
+      serviceType,
+      projectStatus,
+      clientId,
+      hashtags: hashtags.split(","),
+      teamIds,
+    });
+    resetForm();
+    toggleModal();
+  };
+
+  const handleCancel = () => {
     resetForm();
     toggleModal();
   };
@@ -31,86 +43,126 @@ const AddClientModal = ({ isOpen, toggleModal, onAddClient }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Add New Client</h2>
-          <button
-            onClick={toggleModal}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
-        </div>
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg p-6 w-1/2">
+        <h2 className="text-lg font-bold mb-4">Add New Project</h2>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
+          <div className="flex mb-4 space-x-4">
+            <div className="w-1/2">
+              <label className="block text-sm font-semibold mb-1">Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="border border-gray-300 p-2 w-full rounded-lg"
+                required
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="block text-sm font-semibold mb-1">
+                Service Type
+              </label>
+              <input
+                type="text"
+                value={serviceType}
+                onChange={(e) => setServiceType(e.target.value)}
+                className="border border-gray-300 p-2 w-full rounded-lg"
+                required
+              />
+            </div>
+          </div>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+          <div className="flex mb-4 space-x-4">
+            <div className="w-1/2">
+              <label className="block text-sm font-semibold mb-1">Status</label>
+              <input
+                type="text"
+                value={projectStatus}
+                onChange={(e) => setProjectStatus(e.target.value)}
+                className="border border-gray-300 p-2 w-full rounded-lg"
+                required
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="block text-sm font-semibold mb-1">Team</label>
+              <select
+                multiple
+                value={teamIds}
+                onChange={(e) =>
+                  setTeamIds(
+                    Array.from(
+                      e.target.selectedOptions,
+                      (option) => option.value
+                    )
+                  )
+                }
+                className="border border-gray-300 p-2 w-full rounded-lg"
+                required
+              >
+                {teams.map((t, index) => (
+                  <option key={index} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex mb-4 space-x-4">
+            <div className="w-1/2">
+              <label className="block text-sm font-semibold mb-1">
+                Hashtags (optional)
+              </label>
+              <input
+                type="text"
+                value={hashtags}
+                onChange={(e) => setHashtags(e.target.value)}
+                className="border border-gray-300 p-2 w-full rounded-lg"
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="block text-sm font-semibold mb-1">
+                Description (optional)
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="border border-gray-300 p-2 w-full rounded-lg resize-none"
+                rows="1"
+              />
+            </div>
+          </div>
+
+          <div className="w-full">
+            <label className="block text-sm font-semibold mb-1">Client</label>
             <input
               type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="border border-gray-300 p-2 rounded-lg"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              className="border border-gray-300 p-2 w-full rounded-lg"
               required
             />
-            <input
-              type="text"
-              placeholder="Company"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              className="border border-gray-300 p-2 rounded-lg"
-            />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="tel"
-              placeholder="Phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="border border-gray-300 p-2 rounded-lg"
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="border border-gray-300 p-2 rounded-lg"
-              required
-            />
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="mr-2 bg-gray-200 px-4 py-2 rounded-lg"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+            >
+              Add Project
+            </button>
           </div>
-          <div>
-            <input
-              type="text"
-              placeholder="Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="border border-gray-300 p-2 rounded-lg w-full"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full"
-          >
-            Save Client
-          </button>
         </form>
-
-        <div className="flex justify-center mt-4">
-          <button
-            className="text-red-500 hover:underline"
-            onClick={() => {
-              resetForm();
-              toggleModal();
-            }}
-          >
-            Cancel
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
-export default AddClientModal;
+export default AddProjectModal;
