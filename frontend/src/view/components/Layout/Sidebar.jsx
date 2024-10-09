@@ -1,6 +1,6 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { logout } from "../../../services/authService";
-import { FaHome, FaUser, FaClipboardList, FaHandshake, FaUsers, FaLock } from 'react-icons/fa';
+import { FaHome, FaUser, FaClipboardList, FaHandshake, FaUsers, FaCalendarAlt } from 'react-icons/fa';
 import { MdQueryBuilder, MdVerifiedUser } from 'react-icons/md';
 import { HiOutlineUserGroup } from 'react-icons/hi'
 import { useAuth } from "../../../context/Context";
@@ -94,6 +94,12 @@ const AdminSidebar = ({ handleLogout, location }) => {
           to="/query"
           icon={<MdQueryBuilder />}
           text="Query"
+          location={location}
+        />
+        <SidebarItem
+          to="/meetingmanagement"
+          icon={<FaCalendarAlt />}
+          text="Meetings"
           location={location}
         />
       </ul>

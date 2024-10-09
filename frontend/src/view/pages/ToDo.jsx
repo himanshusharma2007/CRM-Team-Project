@@ -464,7 +464,7 @@ const ToDo = () => {
   };
   return (
     <>
-      <div className="min-h-screen overflow-auto ">
+      <div className="relative min-h-screen overflow-auto ">
         {isUpdating && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-4 rounded-lg">
