@@ -8,9 +8,10 @@ import {
   AiFillCheckCircle,
   AiFillCloseCircle,
 } from "react-icons/ai";
-import { FaTrashCan } from "react-icons/fa6";
+import { FaTrashCan, FaPlus } from "react-icons/fa6";
 import leadService from "../../services/leadServices";
 import leadStageService from "../../services/leadStageService";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const Lead = () => {
   const [pipeline, setPipeline] = useState({});
@@ -106,41 +107,36 @@ const Lead = () => {
       const updatedPipeline = { ...pipeline };
       const lead = payload;
 
-      // Find the current stage of the lead
       const currentStage = Object.keys(updatedPipeline).find((stage) =>
         updatedPipeline[stage].some((item) => item._id === lead._id)
       );
 
-      // Only proceed if the lead is moving to a new stage
       if (currentStage !== newStage) {
-        // Remove from source column
         Object.keys(updatedPipeline).forEach((stage) => {
           updatedPipeline[stage] = updatedPipeline[stage].filter(
             (item) => item._id !== lead._id
           );
         });
 
-        // Add to destination column
         updatedPipeline[newStage] = [
           ...updatedPipeline[newStage].slice(0, addedIndex),
           { ...lead, currentStage: newStage },
           ...updatedPipeline[newStage].slice(addedIndex),
         ];
 
-        // Optimistically update the UI
         setPipeline(updatedPipeline);
 
         try {
-          // Only call updateStage when the stage has actually changed
           await leadService.updateStage(lead._id, newStage);
         } catch (err) {
           console.error("Error updating lead stage:", err);
           setError("Failed to update lead stage. Please try again.");
-          fetchStagesAndLeads(); // Revert change in case of error
+          fetchStagesAndLeads();
         }
       }
     }
   };
+
   const handleViewDetails = (lead) => {
     navigate(`/lead-details/${lead._id}`);
   };
@@ -173,7 +169,6 @@ const Lead = () => {
       setShowAddStageModal(false);
       setNewStageName("");
 
-      // Auto-scroll to the newly added stage
       setTimeout(() => {
         if (pipelineRef.current) {
           pipelineRef.current.scrollLeft = pipelineRef.current.scrollWidth;
@@ -196,7 +191,6 @@ const Lead = () => {
       setStages(updatedStages);
       setEditingStage(null);
 
-      // Update pipeline keys
       const updatedPipeline = { ...pipeline };
       updatedPipeline[tempTitle] = updatedPipeline[oldStageName];
       delete updatedPipeline[oldStageName];
@@ -216,16 +210,8 @@ const Lead = () => {
     setTempTitle(stage.stageName);
   };
 
-  if (loading) {
-    return <div className="text-center mt-8">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center mt-8 text-red-500">{error}</div>;
-  }
-
   return (
-    <div className="p-6 mx-auto bg-white rounded-lg shadow-lg">
+    <div className="relative p-6 mx-auto bg-white rounded-lg shadow-lg">
       <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
         CRM Pipeline
       </h1>
@@ -233,105 +219,111 @@ const Lead = () => {
         <div className="text-center mb-6">
           <button
             onClick={() => setShowModal(true)}
-            className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition duration-300"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition duration-300 mr-4"
           >
-            Add New Lead
+            <FaPlus className="inline mr-2" /> Add New Lead
           </button>
           <button
             onClick={handleAddStage}
-            className="bg-green-500 text-white px-6 py-2 rounded-lg shadow hover:bg-green-600 transition duration-300 ml-4"
+            className="bg-green-500 text-white px-6 py-3 rounded-lg shadow hover:bg-green-600 transition duration-300"
           >
-            Add Stage
+            <FaPlus className="inline mr-2" /> Add Stage
           </button>
         </div>
       )}
 
-      <div
-        className="flex space-x-4 overflow-x-auto pb-4"
-        style={{ height: "calc(100vh - 200px)" }}
-      >
-        {stages.map((stage) => (
-          <div
-            key={stage.stageName}
-            className="w-64 bg-gray-50 p-4 rounded-lg shadow-md flex-shrink-0 flex flex-col"
-            style={{ maxHeight: "100%" }}
-          >
-            {editingStage === stage.stageName && user?.role === "admin" ? (
-              <div className="flex items-center justify-center space-x-1">
-                <input
-                  type="text"
-                  value={tempTitle}
-                  onChange={(e) => setTempTitle(e.target.value)}
-                  className="text-lg font-semibold text-gray-800 w-40 h-10 outline-none p-2 border border-gray-300 rounded flex-1"
-                />
-                <span
-                  className="text-green-600 cursor-pointer flex items-center justify-center "
-                  onClick={() => handleSaveStageName(stage.stageName)}
-                >
-                  <AiFillCheckCircle size={20} />
-                </span>
-                <span
-                  className="text-red-500 cursor-pointer flex items-center justify-center "
-                  onClick={handleCancelEdit}
-                >
-                  <AiFillCloseCircle size={20} />
-                </span>
-              </div>
-            ) : (
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  {stage.stageName}
-                </h2>
-                {user?.role === "admin" && (
-                  <div className="flex space-x-2">
-                    <span
-                      className="text-blue-600 cursor-pointer"
-                      onClick={() => handleStartEditingStage(stage)}
-                    >
-                      <AiFillEdit size={20} />
-                    </span>
-                    <span
-                      className="text-red-500 cursor-pointer"
-                      onClick={() => handleDeleteStage(stage.stageName)}
-                    >
-                      <FaTrashCan />
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <Container
-              groupName="columns"
-              onDrop={(dropResult) => onColumnDrop(dropResult, stage.stageName)}
-              getChildPayload={(index) => pipeline[stage.stageName][index]}
-              dragClass="shadow-lg"
-              dropClass="bg-blue-100"
-              style={{ flex: 1, overflowY: "auto" }}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <div
+          ref={pipelineRef}
+          className="flex space-x-4 overflow-x-auto pb-4"
+          style={{ height: "calc(100vh - 200px)" }}
+        >
+          {stages.map((stage) => (
+            <div
+              key={stage.stageName}
+              className="w-64 bg-gray-50 p-4 rounded-lg shadow-md flex-shrink-0 flex flex-col"
+              style={{ maxHeight: "100%" }}
             >
-              {pipeline[stage.stageName]?.map((lead) => (
-                <Draggable key={lead._id}>
-                  <div className="p-4 bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg mb-2 cursor-grab">
-                    <p className="font-bold text-lg text-gray-700">
-                      {lead.title}
-                    </p>
-                    <p className="text-gray-500">Company: {lead.companyName}</p>
-                    <p className="text-gray-500">Contact: {lead.contactName}</p>
-                    <p className="text-gray-500">Team: {lead.team}</p>
-                    <button
-                      onClick={() => handleViewDetails(lead)}
-                      className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
-                    >
-                      View Details
-                    </button>
-                 
-                  </div>
-                </Draggable>
-              ))}
-            </Container>
-          </div>
-        ))}
-      </div>
+              {editingStage === stage.stageName && user?.role === "admin" ? (
+                <div className="flex items-center justify-center space-x-1 mb-4">
+                  <input
+                    type="text"
+                    value={tempTitle}
+                    onChange={(e) => setTempTitle(e.target.value)}
+                    className="text-lg font-semibold text-gray-800 w-40 h-10 outline-none p-2 border border-gray-300 rounded flex-1"
+                  />
+                  <span
+                    className="text-green-600 cursor-pointer flex items-center justify-center"
+                    onClick={() => handleSaveStageName(stage.stageName)}
+                  >
+                    <AiFillCheckCircle size={20} />
+                  </span>
+                  <span
+                    className="text-red-500 cursor-pointer flex items-center justify-center"
+                    onClick={handleCancelEdit}
+                  >
+                    <AiFillCloseCircle size={20} />
+                  </span>
+                </div>
+              ) : (
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    {stage.stageName}
+                  </h2>
+                  {user?.role === "admin" && (
+                    <div className="flex space-x-2">
+                      <span
+                        className="text-blue-600 cursor-pointer"
+                        onClick={() => handleStartEditingStage(stage)}
+                      >
+                        <AiFillEdit size={20} />
+                      </span>
+                      <span
+                        className="text-red-500 cursor-pointer"
+                        onClick={() => handleDeleteStage(stage.stageName)}
+                      >
+                        <FaTrashCan />
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <Container
+                groupName="columns"
+                onDrop={(dropResult) => onColumnDrop(dropResult, stage.stageName)}
+                getChildPayload={(index) => pipeline[stage.stageName][index]}
+                dragClass="shadow-lg"
+                dropClass="bg-blue-100"
+                style={{ flex: 1, overflowY: "auto" }}
+              >
+                {pipeline[stage.stageName]?.map((lead) => (
+                  <Draggable key={lead._id}>
+                    <div className="p-4 bg-white rounded-lg shadow-sm transition-all duration-300 hover:shadow-md border border-gray-200 mb-2">
+                      <p className="font-bold text-lg text-gray-700">
+                        {lead.title}
+                      </p>
+                      <p className="text-gray-500">Company: {lead.companyName}</p>
+                      <p className="text-gray-500">Contact: {lead.contactName}</p>
+                      <p className="text-gray-500">Team: {lead.team}</p>
+                      <button
+                        onClick={() => handleViewDetails(lead)}
+                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </Draggable>
+                ))}
+              </Container>
+            </div>
+          ))}
+        </div>
+      )}
 
       <LeadFormModal
         showModal={showModal}
@@ -342,6 +334,7 @@ const Lead = () => {
         resetForm={resetForm}
         stages={stages}
       />
+
       {showAddStageModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
@@ -361,13 +354,13 @@ const Lead = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddStageModal(false)}
-                  className="mr-2 px-4 py-2 bg-gray-300 text-gray-800 rounded"
+                  className="mr-2 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
                 >
                   Add Stage
                 </button>
