@@ -3,13 +3,20 @@ import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
 import {
-  FaEdit,
   FaPlus,
   FaPencilAlt,
   FaTrash,
   FaSave,
-  FaTimes,
 } from "react-icons/fa";
+
+import {
+  createMeeting,
+  getMeetingById,
+  getUpcomingMeetings,
+  getAllMeetingsByProjectId,
+  getAllMeetingsByStatus,
+  updateMeeting,
+} from "../../services/meetingService";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -34,10 +41,34 @@ const MeetingManagement = () => {
         },
       ],
     },
+    {
+      id: 1,
+      name: "Client A",
+      services: [
+        {
+          id: 1,
+          serviceName: "Web App",
+          date: "12-03-2024",
+          category: "E-Com",
+        },
+        {
+          id: 2,
+          serviceName: "Mobile App",
+          date: "10-04-2024",
+          category: "Retail",
+        },
+      ],
+    },
   ]);
 
   const teams = ["Team A", "Team B", "Team C"];
-
+const [meetingData,setMeetingData]=useState({
+  clientId: "",
+  projectId: "",
+  meetingDateTime: "",
+  clientNotification:false,
+  leaderNotification:false
+})
   const toggleClientModal = () => setIsClientModalOpen(!isClientModalOpen);
   const toggleMeetingModal = () => setIsMeetingModalOpen(!isMeetingModalOpen);
   const toggleProjectModal = () => setIsProjectModalOpen(!isProjectModalOpen);
@@ -199,6 +230,8 @@ const MeetingManagement = () => {
       <NewMeetingModal
         isOpen={isMeetingModalOpen}
         toggleModal={toggleMeetingModal}
+        setMeetingData={setMeetingData}
+        meetingData={meetingData}
       />
       <AddProjectModal
         isOpen={isProjectModalOpen}
