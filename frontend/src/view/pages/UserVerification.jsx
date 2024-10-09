@@ -100,7 +100,7 @@ const UserVerificationList = () => {
           <div className="flex justify-center relative"><LoadingSpinner /></div>
         ) : (
           <>
-            <div className="flex justify-between mb-4">
+            <div className="flex gap-3 mb-4">
               <button
                 onClick={() => handleSort("latest")}
                 className={`py-2 px-4 rounded-lg ${sortOrder === "latest" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"} transition duration-200`}

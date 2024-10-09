@@ -16,7 +16,7 @@ import logo from "../../../assets/images/logoDevPurple.png";
 const Sidebar = () => {
   const navigate = useNavigate();
   const { saveUser, user } = useAuth();
-  const location = useLocation(); // Get current location
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
