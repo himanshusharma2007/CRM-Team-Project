@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
@@ -10,99 +10,117 @@ import {
   FaSave,
   FaTimes,
 } from "react-icons/fa";
+import {
+  getAllProjects,
+  createProject,
+  updateProject,
+} from "../services/projectService";
+import {
+  getUpcomingMeetings,
+  createMeeting,
+  updateMeeting,
+} from "../services/meetingService";
+import { getAllClients, createClient } from "../services/clientService";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [clients, setClients] = useState([
-    {
-      id: 1,
-      name: "Client A",
-      services: [
-        {
-          id: 1,
-          serviceName: "Web App",
-          date: "12-03-2024",
-          category: "E-Com",
-        },
-        {
-          id: 2,
-          serviceName: "Mobile App",
-          date: "10-04-2024",
-          category: "Retail",
-        },
-      ],
-    },
-  ]);
+  const [clients, setClients] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [meetings, setMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
-  const teams = ["Team A", "Team B", "Team C"];
+  const teams = ["Team A", "Team B", "Team C"]; // This should ideally come from the backend
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [projectsData, meetingsData, clientsData] = await Promise.all([
+        getAllProjects(),
+        getUpcomingMeetings(),
+        getAllClients(),
+      ]);
+      setProjects(projectsData);
+      setMeetings(meetingsData);
+      setClients(clientsData);
+    } catch (error) {
+      setError("Error fetching data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleClientModal = () => setIsClientModalOpen(!isClientModalOpen);
   const toggleMeetingModal = () => setIsMeetingModalOpen(!isMeetingModalOpen);
   const toggleProjectModal = () => setIsProjectModalOpen(!isProjectModalOpen);
 
-  const handleNameChange = (id, newName, type) => {
-    if (type === "client") {
-      setClients((prevClients) =>
-        prevClients.map((client) =>
-          client.id === id ? { ...client, name: newName } : client
-        )
-      );
+  const handleAddProject = async (projectData) => {
+    try {
+      const newProject = await createProject(projectData);
+      setProjects([...projects, newProject]);
+    } catch (error) {
+      setError("Error creating project. Please try again.");
     }
   };
 
-  const handleDelete = (id, type) => {
-    if (type === "client") {
-      setClients((prevClients) =>
-        prevClients.filter((client) => client.id !== id)
-      );
+  const handleUpdateProject = async (id, projectData) => {
+    try {
+      const updatedProject = await updateProject(id, projectData);
+      setProjects(projects.map((p) => (p.id === id ? updatedProject : p)));
+    } catch (error) {
+      setError("Error updating project. Please try again.");
     }
   };
 
-  const EditableClientName = ({ client }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [newName, setNewName] = useState(client.name);
+  const handleAddMeeting = async (meetingData) => {
+    try {
+      const newMeeting = await createMeeting(meetingData);
+      setMeetings([...meetings, newMeeting]);
+    } catch (error) {
+      setError("Error creating meeting. Please try again.");
+    }
+  };
 
-    const toggleEdit = () => {
-      setIsEditing(!isEditing);
-      if (isEditing && newName !== client.name) {
-        handleNameChange(client.id, newName, "client");
-      }
-    };
+  const handleUpdateMeeting = async (id, meetingData) => {
+    try {
+      const updatedMeeting = await updateMeeting(id, meetingData);
+      setMeetings(meetings.map((m) => (m.id === id ? updatedMeeting : m)));
+    } catch (error) {
+      setError("Error updating meeting. Please try again.");
+    }
+  };
 
-    return (
-      <div className="flex justify-between items-center mb-4 p-2 bg-gray-50 rounded-lg shadow">
-        {isEditing ? (
-          <input
-            type="text"
-            className="text-lg font-semibold border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-full"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            placeholder="Edit Client Name"
-          />
-        ) : (
-          <span className="text-lg font-semibold">{client.name}</span>
-        )}
+  const handleAddClient = async (clientData) => {
+    try {
+      const newClient = await createClient(clientData);
+      setClients([...clients, newClient]);
+    } catch (error) {
+      setError("Error creating client. Please try again.");
+    }
+  };
 
-        <div className="flex items-center">
-          <button
-            className="text-blue-500 hover:text-blue-700 ml-4"
-            onClick={toggleEdit}
-          >
-            {isEditing ? <FaSave /> : <FaPencilAlt />}
-          </button>
-
-          <button
-            className="text-red-500 hover:text-red-700 ml-4"
-            onClick={() => handleDelete(client.id, "client")}
-          >
-            <FaTrash />
-          </button>
-        </div>
-      </div>
+  const filteredProjects = projects
+    .filter(
+      (project) =>
+        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.serviceType.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((project) =>
+      filterStatus === "all" ? true : project.projectStatus === filterStatus
     );
-  };
+
+  if (loading) return <div className="text-center mt-8">Loading...</div>;
+  if (error)
+    return <div className="text-center mt-8 text-red-500">{error}</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -121,14 +139,22 @@ const MeetingManagement = () => {
       <div className="flex justify-between mb-4 gap-3">
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="Search projects..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
         />
         <div className="flex gap-3">
-          <button className="w-36 bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-300">
-            Filter
-          </button>
-          {/* Add Client Button */}
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="w-36 bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-300"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="on-hold">On Hold</option>
+          </select>
           <button
             onClick={toggleClientModal}
             className="bg-blue-600 text-nowrap text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center"
@@ -138,54 +164,48 @@ const MeetingManagement = () => {
         </div>
       </div>
 
-      {/* Sort Section */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <p className="mr-2 text-gray-700">Sort by:</p>
-          <button className="mr-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300">
-            Latest
-          </button>
-          <button className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300">
-            Oldest
-          </button>
-        </div>
-      </div>
-
-      {/* Client and Service Section */}
+      {/* Projects and Meetings Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {clients.map((client) => (
-          <div key={client.id} className="bg-white p-6 rounded-lg shadow-md">
-            {/* Editable Client Name */}
-            <EditableClientName client={client} />
+        {filteredProjects.map((project) => (
+          <div key={project.id} className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-2">{project.name}</h3>
+            <p className="text-sm text-gray-600 mb-2">
+              Type: {project.serviceType}
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              Status: {project.projectStatus}
+            </p>
+            <p className="text-sm text-gray-600 mb-4">
+              Client:{" "}
+              {clients.find((c) => c.id === project.clientId)?.name || "N/A"}
+            </p>
 
-            {/* Button to Add Service */}
             <button
-              onClick={toggleProjectModal}
+              onClick={toggleMeetingModal}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 mb-4 w-full flex items-center justify-center gap-2"
             >
-              <FaPlus /> Add New Project
+              <FaPlus /> Add New Meeting
             </button>
 
-            {/* Services */}
             <div className="space-y-4 max-h-96 overflow-y-auto">
-              {client.services.map((service) => (
-                <div
-                  key={service.id}
-                  className="p-4 border rounded-lg mb-2 hover:shadow-md transition duration-300"
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-gray-800">
-                      {service.serviceName}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      {service.date}
-                    </span>
+              {meetings
+                .filter((meeting) => meeting.projectId === project.id)
+                .map((meeting) => (
+                  <div
+                    key={meeting.id}
+                    className="p-4 border rounded-lg mb-2 hover:shadow-md transition duration-300"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium text-gray-800">Meeting</span>
+                      <span className="text-sm text-gray-500">
+                        {new Date(meeting.meetingDateTime).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Status: {meeting.meetingStatus}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-600">
-                    Category: {service.category}
-                  </p>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         ))}
@@ -195,15 +215,21 @@ const MeetingManagement = () => {
       <AddClientModal
         isOpen={isClientModalOpen}
         toggleModal={toggleClientModal}
+        onAddClient={handleAddClient}
       />
       <NewMeetingModal
         isOpen={isMeetingModalOpen}
         toggleModal={toggleMeetingModal}
+        projects={projects}
+        clients={clients}
+        onAddMeeting={handleAddMeeting}
       />
       <AddProjectModal
         isOpen={isProjectModalOpen}
         toggleModal={toggleProjectModal}
         teams={teams}
+        clients={clients}
+        onAddProject={handleAddProject}
       />
     </div>
   );
