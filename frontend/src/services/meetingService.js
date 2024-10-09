@@ -4,21 +4,21 @@ import api from "./api";
 // Service to get a meeting by ID
 export const getMeetingById = async (id) => {
   try {
-    const response = await api.get(`/meetings/${id}`);
+    const response = await api.get(`/meeting/${id}`);
     return response.data;
   } catch (error) {
     throw new Error(error.response.data.message || "Error fetching meeting");
   }
 };
 
-// Service to get upcoming meetings
-export const getUpcomingMeetings = async () => {
+// Service to get upcoming meeting
+export const getUpcomingMeetings = async (id) => {
   try {
-    const response = await api.get("/meetings/upcoming");
+    const response = await api.get(`/meeting/upcoming/${id}`);
     return response.data;
   } catch (error) {
     throw new Error(
-      error.response.data.message || "Error fetching upcoming meetings"
+      error.response.data.message || "Error fetching upcoming meeting"
     );
   }
 };
@@ -26,7 +26,7 @@ export const getUpcomingMeetings = async () => {
 // Service to create a new meeting
 export const createMeeting = async (meetingData) => {
   try {
-    const response = await api.post("/meetings/create", meetingData);
+    const response = await api.post("/meeting/create", meetingData);
     return response.data;
   } catch (error) {
     throw new Error(error.response.data.message || "Error creating meeting");
@@ -36,33 +36,33 @@ export const createMeeting = async (meetingData) => {
 // Service to update a meeting
 export const updateMeeting = async (id, meetingData) => {
   try {
-    const response = await api.put(`/meetings/update/${id}`, meetingData);
+    const response = await api.put(`/meeting/update/${id}`, meetingData);
     return response.data;
   } catch (error) {
     throw new Error(error.response.data.message || "Error updating meeting");
   }
 };
 
-// Service to get meetings by project ID
+// Service to get meeting by project ID
 export const getAllMeetingsByProjectId = async (projectId) => {
   try {
-    const response = await api.get(`/meetings/project/${projectId}`);
+    const response = await api.get(`/meeting/project/${projectId}`);
     return response.data;
   } catch (error) {
     throw new Error(
-      error.response.data.message || "Error fetching meetings by project"
+      error.response.data.message || "Error fetching meeting by project"
     );
   }
 };
 
-// Service to get meetings by status
+// Service to get meeting by status
 export const getAllMeetingsByStatus = async (status) => {
   try {
-    const response = await api.get(`/meetings/status/${status}`);
+    const response = await api.get(`/meeting/status/${status}`);
     return response.data;
   } catch (error) {
     throw new Error(
-      error.response.data.message || "Error fetching meetings by status"
+      error.response.data.message || "Error fetching meeting by status"
     );
   }
 };

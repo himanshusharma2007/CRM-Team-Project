@@ -18,7 +18,7 @@ import {
   createMeeting,
   updateMeeting,
 } from "../../services/meetingService";
-import { getAllClients, createClient } from "../../services/clientService";
+import { getAllClients, createClient } from "../../services/clientServices";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -44,7 +44,7 @@ const MeetingManagement = () => {
     try {
       const [projectsData, meetingsData, clientsData] = await Promise.all([
         getAllProjects(),
-        getUpcomingMeetings(),
+        // getUpcomingMeetings(),
         getAllClients(),
       ]);
       setProjects(projectsData);
@@ -175,7 +175,7 @@ const MeetingManagement = () => {
             </p>
             <p className="text-sm text-gray-600 mb-4">
               Client:{" "}
-              {clients.find((c) => c.id === project.clientId)?.name || "N/A"}
+              {clients?.find((c) => c.id === project.clientId)?.name || "N/A"}
             </p>
 
             <button
