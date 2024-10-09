@@ -101,3 +101,29 @@ export const verifyOTP = async (email, otp, password) => {
     throw error;
   }
 };
+
+export const verifyUser = async (userId, teamId, role) => {
+  try {
+    const response = await api.post('/profile/verifyUser', {
+      userId,
+      teamId,
+      role,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying user:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getUnVerifiedUsers = async () => {
+  try {
+    console.log("un verified called")
+    const response = await api.get('/profile/unverified');
+    console.log("unverified res", response)
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching unverified users:", error.response?.data || error.message);
+    throw error;
+  }
+};

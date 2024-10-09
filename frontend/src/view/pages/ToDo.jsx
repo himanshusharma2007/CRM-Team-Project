@@ -464,7 +464,7 @@ const ToDo = () => {
   };
   return (
     <>
-      <div className="min-h-screen overflow-auto ">
+      <div className="relative min-h-screen overflow-auto ">
         {isUpdating && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-4 rounded-lg">
@@ -481,7 +481,7 @@ const ToDo = () => {
             </h3>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 mb-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+              className="flex items-center justify-center gap-2 mb-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300"
             >
               <FaPlus /> <div>Add New Status</div>
             </button>

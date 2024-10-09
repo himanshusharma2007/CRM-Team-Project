@@ -21,6 +21,7 @@ import QueryPage from "./view/pages/Query";
 import Lead from "./view/pages/Lead";
 import LeadDetails from "./view/pages/LeadDetails";
 import Teams from "./view/pages/Teams";
+import MeetingManagement from "./view/pages/MeetingManagement";
 
 function App() {
   return (
@@ -133,6 +134,14 @@ function App() {
             element={
               <Layout>
                 <QueryPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/meetingmanagement"
+            element={
+              <Layout>
+                <MeetingManagement />
               </Layout>
             }
           />
