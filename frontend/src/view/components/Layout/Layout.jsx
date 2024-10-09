@@ -4,7 +4,7 @@ const Layout = ({ children }) => {
   return (
     <div className="flex overflow-hidden max-h-screen">
       {/* Sidebar Section */}
-      <div className="bg-red-500 w-[20vw] h-[100dvh] text-white overflow-hidden max-h-screen hidden md:block">
+      <div className=" w-[20vw] h-[100dvh] text-white overflow-hidden max-h-screen hidden md:block">
         <Sidebar />
       </div>
 

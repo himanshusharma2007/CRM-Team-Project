@@ -97,7 +97,7 @@ const UserVerificationList = () => {
         )}
 
         {loading ? (
-          <div className="flex justify-center"><LoadingSpinner /></div>
+          <div className="flex justify-center relative"><LoadingSpinner /></div>
         ) : (
           <>
             <div className="flex justify-between mb-4">

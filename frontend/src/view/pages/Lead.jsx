@@ -229,21 +229,22 @@ const Lead = () => {
       <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
         CRM Pipeline
       </h1>
-
-      <div className="text-center mb-6">
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition duration-300"
-        >
-          Add New Lead
-        </button>
-        <button
-          onClick={handleAddStage}
-          className="bg-green-500 text-white px-6 py-2 rounded-lg shadow hover:bg-green-600 transition duration-300 ml-4"
-        >
-          Add Stage
-        </button>
-      </div>
+      {user?.role === "admin" && (
+        <div className="text-center mb-6">
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition duration-300"
+          >
+            Add New Lead
+          </button>
+          <button
+            onClick={handleAddStage}
+            className="bg-green-500 text-white px-6 py-2 rounded-lg shadow hover:bg-green-600 transition duration-300 ml-4"
+          >
+            Add Stage
+          </button>
+        </div>
+      )}
 
       <div
         className="flex space-x-4 overflow-x-auto pb-4"
@@ -255,7 +256,7 @@ const Lead = () => {
             className="w-64 bg-gray-50 p-4 rounded-lg shadow-md flex-shrink-0 flex flex-col"
             style={{ maxHeight: "100%" }}
           >
-            {editingStage === stage.stageName ? (
+            {editingStage === stage.stageName && user?.role === "admin" ? (
               <div className="flex items-center justify-center space-x-1">
                 <input
                   type="text"
@@ -281,20 +282,22 @@ const Lead = () => {
                 <h2 className="text-xl font-semibold text-gray-800">
                   {stage.stageName}
                 </h2>
-                <div className="flex space-x-2">
-                  <span
-                    className="text-blue-600 cursor-pointer"
-                    onClick={() => handleStartEditingStage(stage)}
-                  >
-                    <AiFillEdit size={20} />
-                  </span>
-                  <span
-                    className="text-red-500 cursor-pointer"
-                    onClick={() => handleDeleteStage(stage.stageName)}
-                  >
-                    <FaTrashCan />
-                  </span>
-                </div>
+                {user?.role === "admin" && (
+                  <div className="flex space-x-2">
+                    <span
+                      className="text-blue-600 cursor-pointer"
+                      onClick={() => handleStartEditingStage(stage)}
+                    >
+                      <AiFillEdit size={20} />
+                    </span>
+                    <span
+                      className="text-red-500 cursor-pointer"
+                      onClick={() => handleDeleteStage(stage.stageName)}
+                    >
+                      <FaTrashCan />
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -308,7 +311,7 @@ const Lead = () => {
             >
               {pipeline[stage.stageName]?.map((lead) => (
                 <Draggable key={lead._id}>
-                  <div className="p-4 bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg mb-2">
+                  <div className="p-4 bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg mb-2 cursor-grab">
                     <p className="font-bold text-lg text-gray-700">
                       {lead.title}
                     </p>
@@ -321,16 +324,7 @@ const Lead = () => {
                     >
                       View Details
                     </button>
-                    {(user.role === "marAdmin" || user.role === "devAdmin") && (
-                      <button
-                        onClick={() => {
-                          /* Implement assign functionality */
-                        }}
-                        className="mt-2 ml-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
-                      >
-                        Assign To Member
-                      </button>
-                    )}
+                 
                   </div>
                 </Draggable>
               ))}

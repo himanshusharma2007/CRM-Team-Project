@@ -1,6 +1,13 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { logout } from "../../../services/authService";
-import { FaHome, FaUser, FaClipboardList, FaHandshake, FaUsers, FaCalendarAlt } from 'react-icons/fa';
+import {
+  FaHome,
+  FaUser,
+  FaClipboardList,
+  FaHandshake,
+  FaUsers,
+} from "react-icons/fa";
+import { FaCalendar } from "react-icons/fa6";
 import { MdQueryBuilder, MdVerifiedUser } from 'react-icons/md';
 import { HiOutlineUserGroup } from 'react-icons/hi'
 import { useAuth } from "../../../context/Context";
@@ -22,12 +29,10 @@ const Sidebar = () => {
       {user?.role === "admin" && (
         <AdminSidebar handleLogout={handleLogout} location={location} />
       )}
-      {user?.role === "marAdmin" && (
+      {user?.role === "subAdmin" && (
         <SubAdminSidebar handleLogout={handleLogout} location={location} />
       )}
-      {user?.role === "devAdmin" && (
-        <SubAdminSidebar handleLogout={handleLogout} location={location} />
-      )}
+   
       {user?.role === "emp" && (
         <EmployeeSidebar handleLogout={handleLogout} location={location} />
       )}
@@ -98,7 +103,7 @@ const AdminSidebar = ({ handleLogout, location }) => {
         />
         <SidebarItem
           to="/meetingmanagement"
-          icon={<FaCalendarAlt />}
+          icon={<FaCalendar />}
           text="Meetings"
           location={location}
         />
@@ -143,7 +148,7 @@ const SidebarItem = ({ to, icon, text, location }) => {
 
 const SubAdminSidebar = ({ handleLogout, location }) => {
   return (
-    <div className="flex flex-col h-screen w-64 bg-gray-900 text-gray-100 shadow-lg">
+    <div className="flex flex-col h-[100dvh] max-h-screen w-full bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
       <div className="p-5 text-center text-2xl font-semibold bg-gray-800">
         <span className="text-purple-400">CRM</span> Dashboard
@@ -176,12 +181,7 @@ const SubAdminSidebar = ({ handleLogout, location }) => {
             text="Leads"
             location={location}
           />
-          <SidebarItem
-            to="/userverification"
-            icon={<FaPersonCircleCheck />}
-            text="User Verification"
-            location={location}
-          />
+         
         </ul>
       </nav>
 
