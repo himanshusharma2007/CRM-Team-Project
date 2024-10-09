@@ -3,11 +3,11 @@ const stages = require("../models/leadStagesModels");
 
 exports.createLead = async (req, res) => {
   console.log('req.body in create lead', req.body)
-  const { title, companyName, contactName, phone, description, stage } =
+  const { title, companyName, contactName, phone, description, stage, location } =
     req.body;
 
   try {
-    if (!title || !companyName || !contactName || !phone || !description ) {
+    if (!title || !companyName || !contactName || !phone || !description || !location) {
       return res.status(400).send({
         success: false,
         message: "please fill all fields",

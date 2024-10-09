@@ -15,7 +15,7 @@ const sendEmail = async (userEmail, sub, msg) => {
             from: '"CODEDEV"<codedevservices@gmail.com>',
             to: userEmail,
             subject: sub,
-            text: msg
+            html: msg
         })
         console.log("Msg send: ", info.messageId)
         return true
