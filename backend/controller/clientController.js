@@ -1,10 +1,12 @@
 const client = require("../models/clientModels");
 const contact = require("../models/contactModels");
 const lead = require("../models/leadModels");
+const project = require("../models/projectModels");
+const meeting = require("../models/meetingModels");
 
 exports.createClient = async (req, res) => {
     try {
-        const { name, company, phone, email, location} = req.body;
+        const { name, company, phone, email, location, timeZone} = req.body;
         if(!name || !company || !phone || !email || !location){
             return res.status(400).json({ message: "All fields are required" });
         }
@@ -18,8 +20,8 @@ exports.createClient = async (req, res) => {
         if(!clientContact){
             await contact.create({contactName: name, companyName: company, phoneNo: phone, email});
         }
-        console.log({ name, company, phone, email, location})
-        const newClient = await client.create({name, company, phone, email, location});
+        console.log({ name, company, phone, email, location, timeZone})
+        const newClient = await client.create({name, company, phone, email, location, timeZone});
         res.status(201).json(newClient);
     } catch (error) {
         console.log(error);
@@ -101,25 +103,3 @@ exports.updateClient = async (req, res) => {
     }
 };
 
-
-
-
-
-// not completed
-exports.getAllDataOfClient = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const clientData = await client.findById(id);
-        if(!clientData){
-            return res.status(404).json({ error: "Client not found" });
-        }
-        clientData.projects = await project.find({clientId: id}).populate("teamIds lastMeetingId");
-        clientData.projects.forEach(async (project) => {
-            project.meetings = await meeting.find({projectId: project._id, clientId: clientData._id});
-        });
-        res.status(200).json({clientData});
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-};

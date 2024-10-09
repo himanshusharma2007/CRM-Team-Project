@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createClient, getAllClients, getClientById, updateClient, deleteClient } = require("../controller/clientController");
+const { createClient, getAllClients, getClientById, updateClient } = require("../controller/clientController");
 const { jwtToken, checkAdmin } = require("../middleware/auth");
 
 router.get("/",jwtToken, checkAdmin,  getAllClients);

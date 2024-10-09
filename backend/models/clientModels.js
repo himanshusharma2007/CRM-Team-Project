@@ -19,6 +19,10 @@ const clientSchema = new mongoose.Schema({
         required: [true, "email is required"],
         unique: [true, "email already exists"]
     },
+    timeZone: {
+        type: String,
+        default: "Asia/Kolkata"
+    },
     location: {
         type: String
     }
