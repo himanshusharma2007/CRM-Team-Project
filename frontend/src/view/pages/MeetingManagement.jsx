@@ -2,12 +2,8 @@ import { useState, useEffect } from "react";
 import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
-import {
-  FaPlus,
-  FaPencilAlt,
-  FaTrash,
-  FaSave,
-} from "react-icons/fa";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
+import { FaPencilAlt, FaPlus, FaTrash } from "react-icons/fa";
 import {
   getAllProjects,
   createProject,
@@ -31,6 +27,54 @@ const MeetingManagement = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+
+  const clientsData = [
+    {
+      name: "Client A",
+      services: [
+        {
+          title: "E-Com",
+          description: "Service: Web App",
+          lastMeeting: "8:00 AM 22/7/11",
+          startFrom: "9:00 AM 22/7/11",
+        },
+        {
+          title: "E-Com",
+          description: "Service: Web App",
+          lastMeeting: "8:00 AM 22/7/11",
+          startFrom: "9:00 AM 22/7/11",
+        },
+      ],
+    },
+    {
+      name: "Client B",
+      services: [
+        {
+          title: "E-Com",
+          description: "Service: Web App",
+          lastMeeting: "8:00 AM 22/7/11",
+          startFrom: "9:00 AM 22/7/11",
+        },
+      ],
+    },
+    {
+      name: "Client C",
+      services: [
+        {
+          title: "E-Com",
+          description: "Service: Web App",
+          lastMeeting: "8:00 AM 22/7/11",
+          startFrom: "9:00 AM 22/7/11",
+        },
+        {
+          title: "E-Com",
+          description: "Service: Web App",
+          lastMeeting: "8:00 AM 22/7/11",
+          startFrom: "9:00 AM 22/7/11",
+        },
+      ],
+    },
+  ];
 
   const teams = ["Team A", "Team B", "Team C"]; // This should ideally come from the backend
 
@@ -83,6 +127,7 @@ const MeetingManagement = () => {
     try {
       const newMeeting = await createMeeting(meetingData);
       setMeetings([...meetings, newMeeting]);
+      alert("Meeting created successfully");
     } catch (error) {
       setError("Error creating meeting. Please try again.");
     }
@@ -116,7 +161,12 @@ const MeetingManagement = () => {
       filterStatus === "all" ? true : project.projectStatus === filterStatus
     );
 
-  if (loading) return <div className="text-center mt-8">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-center top-1/2 relative">
+        <LoadingSpinner />
+      </div>
+    );
   if (error)
     return <div className="text-center mt-8 text-red-500">{error}</div>;
 
@@ -163,7 +213,7 @@ const MeetingManagement = () => {
       </div>
 
       {/* Projects and Meetings Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProjects.map((project) => (
           <div key={project.id} className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold mb-2">{project.name}</h3>
@@ -188,9 +238,9 @@ const MeetingManagement = () => {
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {meetings
                 .filter((meeting) => meeting.projectId === project.id)
-                .map((meeting) => (
+                .map((meeting, index) => (
                   <div
-                    key={meeting.id}
+                    key={index}
                     className="p-4 border rounded-lg mb-2 hover:shadow-md transition duration-300"
                   >
                     <div className="flex justify-between items-center mb-2">
@@ -204,6 +254,107 @@ const MeetingManagement = () => {
                     </p>
                   </div>
                 ))}
+            </div>
+          </div>
+        ))}
+      </div> */}
+      <div className="flex gap-3 px-6 py-4">
+        <div className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm">
+          {/* Card Header */}
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-bold text-gray-800">as</h3>
+            <span className="bg-gray-200 text-xs text-gray-600 px-2 py-1 rounded-full">
+              In Progress
+            </span>
+          </div>
+
+          {/* Card Content */}
+          <p className="text-sm text-gray-600">asdfp</p>
+
+          <div className="text-sm mt-3">
+            <p className="text-gray-500">Last Meeting: asdf</p>
+            <p className="text-gray-500">Start From: asd</p>
+          </div>
+        </div>
+        <div className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm">
+          {/* Card Header */}
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-bold text-gray-800">as</h3>
+            <span className="bg-gray-200 text-xs text-gray-600 px-2 py-1 rounded-full">
+              In Progress
+            </span>
+          </div>
+
+          {/* Card Content */}
+          <p className="text-sm text-gray-600">asdfp</p>
+
+          <div className="text-sm mt-3">
+            <p className="text-gray-500">Last Meeting: asdf</p>
+            <p className="text-gray-500">Start From: asd</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between px-6 py-4 bg-gray-50 min-h-screen">
+        {clientsData.map((client, index) => (
+          <div
+            key={index}
+            className="w-1/3 p-4 bg-white shadow-md rounded-lg border border-gray-200"
+          >
+            {/* Client Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-800">{client.name}</h2>
+              <div className="flex gap-2">
+                <button>
+                  <FaPencilAlt />
+                </button>
+                <button>
+                  <FaTrash />
+                </button>
+              </div>
+            </div>
+
+            {/* Filter Input */}
+            <input
+              type="text"
+              placeholder="Filter"
+              className="border border-gray-300 p-2 w-full rounded-md text-sm text-gray-600 mb-4"
+            />
+            <div className="flex justify-between items-center mb-4">
+              <button className="text-sm text-gray-600 hover:text-gray-800 focus:outline-none focus:underline">
+                + Add New Service
+              </button>
+              <button className="text-sm text-gray-600 hover:text-gray-800 focus:outline-none focus:underline">
+                View in Graph
+              </button>
+            </div>
+            {/* Services List */}
+            <div className="space-y-4">
+              {client.services.map((service, idx) => (
+                <div
+                  key={idx}
+                  className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-white transition duration-200 ease-in-out"
+                >
+                  {/* Service Header */}
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-md font-semibold text-gray-700">
+                      {service.title}
+                    </h3>
+                    <span className="bg-gray-300 text-xs text-gray-600 px-2 py-1 rounded-full">
+                      In Progress
+                    </span>
+                  </div>
+
+                  {/* Service Details */}
+                  <p className="text-sm text-gray-600">{service.description}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Last Meeting: {service.lastMeeting}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Start From: {service.startFrom}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         ))}
