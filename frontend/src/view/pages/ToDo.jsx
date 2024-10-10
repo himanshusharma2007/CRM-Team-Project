@@ -467,10 +467,7 @@ const ToDo = () => {
       <div className="relative min-h-screen overflow-auto ">
         {isUpdating && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-4 rounded-lg">
-              <p>Updating task...</p>
               <LoadingSpinner />
-            </div>
           </div>
         )}
         {/* Add Task Section */}
@@ -657,7 +654,7 @@ const ToDo = () => {
                         draggable
                         onDragStart={(e) => handleDragStart(e, task)}
                         onDragEnd={handleDragEnd}
-                        className={`bg-white p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md border border-gray-200 ${
+                        className={`bg-white cursor-grab p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md border border-gray-200 ${
                           recentlyDropped === task._id ? "explode" : ""
                         }`}
                       >

@@ -1,26 +1,24 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
 import {
-  FaEdit,
   FaPlus,
   FaPencilAlt,
   FaTrash,
   FaSave,
-  FaTimes,
 } from "react-icons/fa";
 import {
   getAllProjects,
   createProject,
   updateProject,
-} from "../services/projectService";
+} from "../../services/projectService";
 import {
   getUpcomingMeetings,
   createMeeting,
   updateMeeting,
-} from "../services/meetingService";
-import { getAllClients, createClient } from "../services/clientService";
+} from "../../services/meetingService";
+import { getAllClients, createClient } from "../../services/clientServices";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -46,7 +44,7 @@ const MeetingManagement = () => {
     try {
       const [projectsData, meetingsData, clientsData] = await Promise.all([
         getAllProjects(),
-        getUpcomingMeetings(),
+        // getUpcomingMeetings(),
         getAllClients(),
       ]);
       setProjects(projectsData);
@@ -177,7 +175,7 @@ const MeetingManagement = () => {
             </p>
             <p className="text-sm text-gray-600 mb-4">
               Client:{" "}
-              {clients.find((c) => c.id === project.clientId)?.name || "N/A"}
+              {clients?.find((c) => c.id === project.clientId)?.name || "N/A"}
             </p>
 
             <button

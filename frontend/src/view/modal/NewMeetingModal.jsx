@@ -1,4 +1,4 @@
-const NewMeetingModal = ({ isOpen, toggleModal }) => {
+const NewMeetingModal = ({ isOpen, toggleModal,setMeetingData }) => {
   if (!isOpen) return null;
 
   return (
