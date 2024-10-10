@@ -28,7 +28,7 @@ exports.createProject = async (req, res) => {
 
 exports.getAllProjects = async (req, res) => {
     try {
-        const projects = await project.find();
+        const projects = await project.find().populate("clientId teamIds lastMeetingId");
         res.status(200).json(projects);
     } catch (error) {
         console.log(error);
@@ -38,7 +38,7 @@ exports.getAllProjects = async (req, res) => {
 
 exports.getProjectById = async (req, res) => {
     try {
-        const projectData = await project.findById(req.params.id).populate("clientId teamIds");
+        const projectData = await project.findById(req.params.id).populate("clientId teamIds lastMeetingId");
         if(!projectData){
             return res.status(404).json({ error: "Project not found" });
         }
@@ -54,7 +54,7 @@ exports.getProjectByClientId = async (req, res) => {
         if(!(await client.findById(req.params.id))){
             return res.status(404).json({ error: "Client not found" });
         }
-        const projectData = await project.find({ clientId: req.params.id });
+        const projectData = await project.find({ clientId: req.params.id }).populate("clientId teamIds leaderId lastMeetingId");
         res.status(200).json(projectData);
     } catch (error) {
         console.log(error);
