@@ -25,7 +25,11 @@ const clientSchema = new mongoose.Schema({
     },
     location: {
         type: String
-    }
+    },
+    projectId: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "project"
+    }]
 }, {timestamps:true});
 
 

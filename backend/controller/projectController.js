@@ -11,8 +11,14 @@ exports.createProject = async (req, res) => {
         if(await project.findOne({name})){
             return res.status(400).json({ error: "Project name already exists" });
         }
+        const clientData = await client.findById(clientId);
+        if(!clientData){
+            return res.status(404).json({ error: "Client not found" });
+        }
         hashtages = hashtages ? hashtages.split(",") : [];
         const newProject = await project.create({ name, description, serviceType, projectStatus, clientId, hashtages, teamIds });
+        clientData.projectId.push(newProject._id);
+        await clientData.save();
         res.status(201).json(newProject);
     } catch (error) {
         console.log(error);

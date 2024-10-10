@@ -1,8 +1,6 @@
 const client = require("../models/clientModels");
 const contact = require("../models/contactModels");
 const lead = require("../models/leadModels");
-const project = require("../models/projectModels");
-const meeting = require("../models/meetingModels");
 
 exports.createClient = async (req, res) => {
     try {
@@ -46,7 +44,7 @@ exports.createClientByLead = async (req, res) => {
 
 exports.getAllClients = async (req, res) => {
     try {
-        const clients = await client.find();
+        const clients = await client.find().populate("projectId");
         res.status(200).json(clients);
     } catch (error) {
         console.log(error);
@@ -57,7 +55,7 @@ exports.getAllClients = async (req, res) => {
 exports.getClientById = async (req, res) => {
     try {
         const { id } = req.params;
-        const clientData = await client.findById(id);
+        const clientData = await client.findById(id).populate("projectId");
         if (!clientData) {
             return res.status(404).json({ error: "Client not found" });
         }
