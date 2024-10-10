@@ -14,13 +14,13 @@ import {
   getAllProjects,
   createProject,
   updateProject,
-} from "../services/projectService";
+} from "../../services/projectService";
 import {
   getUpcomingMeetings,
   createMeeting,
   updateMeeting,
-} from "../services/meetingService";
-import { getAllClients, createClient } from "../services/clientService";
+} from "../../services/meetingService";
+import { getAllClients, createClient } from "../../services/clientServices";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
