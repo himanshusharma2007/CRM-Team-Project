@@ -21,11 +21,11 @@ exports.createMeeting = async (req, res) => {
 
 exports.getMeetingById = async (req, res) => {
     try {
-        const meeting = await meeting.findById(req.params.id);
-        if(!meeting){
+        const meetingData = await meeting.findById(req.params.id);
+        if(!meetingData){
             return res.status(404).json({ error: "Meeting not found" });
         }
-        res.status(200).json(meeting);
+        res.status(200).json(meetingData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
