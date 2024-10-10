@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const AddClientModal = ({ isOpen, toggleModal, onAddClient }) => {
+const AddProjectModal = ({ isOpen, toggleModal, onAddClient }) => {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
@@ -113,4 +113,4 @@ const AddClientModal = ({ isOpen, toggleModal, onAddClient }) => {
   );
 };
 
-export default AddClientModal;
+export default AddProjectModal;
