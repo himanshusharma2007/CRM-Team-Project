@@ -144,7 +144,7 @@ const LeadFormModal = ({
           </div>
 
           {/* Buttons */}
-          <div className=" space-x-4 text-right mt-6">
+          <div clas  sName=" space-x-4 text-right mt-6">
             <button
               type="button"
               onClick={() => {
