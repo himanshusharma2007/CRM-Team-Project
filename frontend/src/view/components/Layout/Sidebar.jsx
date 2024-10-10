@@ -1,22 +1,22 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { logout } from "../../services/authService";
+import { logout } from "../../../services/authService";
 import {
   FaHome,
   FaUser,
   FaClipboardList,
   FaHandshake,
   FaUsers,
-  FaLock,
 } from "react-icons/fa";
-import { FaPersonCircleCheck } from "react-icons/fa6";
-import { MdQueryBuilder } from "react-icons/md";
-import { useAuth } from "../../context/Context";
-import logo from "../../assets/logoDevPurple.png";
+import { FaCalendar } from "react-icons/fa6";
+import { MdQueryBuilder, MdVerifiedUser } from 'react-icons/md';
+import { HiOutlineUserGroup } from 'react-icons/hi'
+import { useAuth } from "../../../context/Context";
+import logo from "../../../assets/images/logoDevPurple.png";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const { saveUser, user } = useAuth();
-  const location = useLocation(); // Get current location
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -29,12 +29,10 @@ const Sidebar = () => {
       {user?.role === "admin" && (
         <AdminSidebar handleLogout={handleLogout} location={location} />
       )}
-      {user?.role === "marAdmin" && (
+      {user?.role === "subAdmin" && (
         <SubAdminSidebar handleLogout={handleLogout} location={location} />
       )}
-      {user?.role === "devAdmin" && (
-        <SubAdminSidebar handleLogout={handleLogout} location={location} />
-      )}
+   
       {user?.role === "emp" && (
         <EmployeeSidebar handleLogout={handleLogout} location={location} />
       )}
@@ -47,75 +45,83 @@ export default Sidebar;
 const AdminSidebar = ({ handleLogout, location }) => {
   return (
     <div className="flex flex-col h-[100dvh] max-h-screen w-full bg-gray-900 text-gray-100 shadow-lg">
-      {/* Sidebar Header */}
-      <div className="font-semibold bg-gray-900 flex justify-center">
-        <img src={logo} alt="Logo Image" className="w-[200px]" />
-      </div>
-
-      {/* Sidebar Navigation */}
-      <nav className="flex-grow p-4">
-        <ul className="space-y-2">
-          <SidebarItem
-            to="/dashboard"
-            icon={<FaHome />}
-            text="Dashboard"
-            location={location}
-          />
-          <SidebarItem
-            to="/profile"
-            icon={<FaUser />}
-            text="Profile"
-            location={location}
-          />
-          <SidebarItem
-            to="/todo"
-            icon={<FaClipboardList />}
-            text="To-Do"
-            location={location}
-          />
-          <SidebarItem
-            to="/lead"
-            icon={<FaHandshake />}
-            text="Leads"
-            location={location}
-          />
-          <SidebarItem
-            to="/connection"
-            icon={<FaUsers />}
-            text="Connection"
-            location={location}
-          />
-          <SidebarItem
-            to="/userverification"
-            icon={<FaPersonCircleCheck />}
-            text="User Verification"
-            location={location}
-          />
-          <SidebarItem
-            to="/resetpassword"
-            icon={<FaLock />}
-            text="Reset Password"
-            location={location}
-          />
-          <SidebarItem
-            to="/query"
-            icon={<MdQueryBuilder />}
-            text="Query"
-            location={location}
-          />
-        </ul>
-      </nav>
-
-      {/* Logout Button */}
-      <div className="p-4">
-        <button
-          className="flex items-center justify-center w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
-      </div>
+    {/* Sidebar Header */}
+    <div className="flex-shrink-0 p-4 bg-gray-900 flex justify-center">
+      <img src={logo} alt="Logo Image" className="w-[150px] object-contain" />
     </div>
+  
+    {/* Sidebar Navigation */}
+    <nav className="flex-grow overflow-y-auto p-4">
+      <ul className="space-y-2">
+        <SidebarItem
+          to="/dashboard"
+          icon={<FaHome />}
+          text="Dashboard"
+          location={location}
+        />
+        <SidebarItem
+          to="/profile"
+          icon={<FaUser />}
+          text="Profile"
+          location={location}
+        />
+        <SidebarItem
+          to="/todo"
+          icon={<FaClipboardList />}
+          text="To-Do"
+          location={location}
+        />
+        <SidebarItem
+          to="/lead"
+          icon={<FaHandshake />}
+          text="Leads"
+          location={location}
+        />
+        <SidebarItem
+          to="/connection"
+          icon={<FaUsers />}
+          text="Connection"
+          location={location}
+        />
+        <SidebarItem
+          to="/userverification"
+          icon={<MdVerifiedUser />}
+          text="User Verification"
+          location={location}
+        />
+        <SidebarItem
+          to="/teams"
+          icon={<HiOutlineUserGroup />}
+          text="Teams"
+          location={location}
+        />
+        <SidebarItem
+          to="/query"
+          icon={<MdQueryBuilder />}
+          text="Query"
+          location={location}
+        />
+        <SidebarItem
+          to="/meetingmanagement"
+          icon={<FaCalendar />}
+          text="Meetings"
+          location={location}
+        />
+      </ul>
+    </nav>
+  
+    {/* Logout Button */}
+    <div className="flex-shrink-0 p-4">
+      <button
+        className="flex items-center justify-center w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
+        onClick={handleLogout}
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+  
+
   );
 };
 
@@ -142,7 +148,7 @@ const SidebarItem = ({ to, icon, text, location }) => {
 
 const SubAdminSidebar = ({ handleLogout, location }) => {
   return (
-    <div className="flex flex-col h-screen w-64 bg-gray-900 text-gray-100 shadow-lg">
+    <div className="flex flex-col h-[100dvh] max-h-screen w-full bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
       <div className="p-5 text-center text-2xl font-semibold bg-gray-800">
         <span className="text-purple-400">CRM</span> Dashboard
@@ -175,18 +181,7 @@ const SubAdminSidebar = ({ handleLogout, location }) => {
             text="Leads"
             location={location}
           />
-          <SidebarItem
-            to="/userverification"
-            icon={<FaPersonCircleCheck />}
-            text="User Verification"
-            location={location}
-          />
-          <SidebarItem
-            to="/resetpassword"
-            icon={<FaLock />}
-            text="Reset Password"
-            location={location}
-          />
+         
         </ul>
       </nav>
 
@@ -230,12 +225,6 @@ const EmployeeSidebar = ({ handleLogout, location }) => {
             to="/todo"
             icon={<FaClipboardList />}
             text="To-Do"
-            location={location}
-          />
-          <SidebarItem
-            to="/resetpassword"
-            icon={<FaLock />}
-            text="Reset Password"
             location={location}
           />
         </ul>

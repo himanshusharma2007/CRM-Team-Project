@@ -9,7 +9,11 @@ const leadRouter = require("./routes/leadRoutes");
 const todoRoutes = require("./routes/todoRoutes");
 const stageRoutes = require("./routes/leadStageRoutes");
 const todoStatusRoutes = require("./routes/todoStatusRoutes");
-
+const contactUsRoutes = require("./routes/contactUsRoutes");
+const teamRoutes = require("./routes/teamRoutes");
+const clientRoutes = require("./routes/clientRoutes");
+const projectRoutes = require("./routes/projectRoutes");
+const meetingRoutes = require("./routes/meetingRoutes");
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
@@ -33,9 +37,14 @@ app.use("/api/profile", userRoutes);
 app.use("/api/lead", leadRouter);
 app.use("/api/stage", stageRoutes);
 app.use("/api/todoStatus", todoStatusRoutes);
-
+app.use("/api/contactUs", contactUsRoutes);
+app.use("/api/team", teamRoutes);
+app.use("/api/client", clientRoutes);
+app.use("/api/project", projectRoutes);
+app.use("/api/meeting", meetingRoutes);
 
 app.listen(PORT, () => {
     connectDB(URL);
   console.log(`Server running on Post- ${PORT}`.bgBlue.black);
 });
+

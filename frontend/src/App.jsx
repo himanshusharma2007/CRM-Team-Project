@@ -2,24 +2,26 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Context } from "./context/Context";
 
-import LoginPage from "./view/components/Login";
-import Register from "./view/components/Register";
-import ToDo from "./view/screens/ToDo";
-import ResetPass from "./view/components/ResetPass";
-import Profile from "./view/screens/Profile";
+import LoginPage from "./view/screens/Login";
+import Register from "./view/screens/Register";
+import ToDo from "./view/pages/ToDo";
+import ResetPass from "./view/pages/ResetPass";
+import Profile from "./view/pages/Profile";
 import ContactUs from "./view/screens/ContactUs";
 import AboutUs from "./view/screens/AboutUs";
 import Layout from "./view/components/Layout/Layout";
-import Landing from "./view/components/Landing";
-import Dashboard from "./view/components/Dashboard";
-import Connection from "./view/components/Connection";
-import ForgetPassword from "./view/components/ForgetPassword";
-import UserVerification from "./view/components/UserVerification";
+import Landing from "./view/screens/Landing";
+import Dashboard from "./view/pages/Dashboard";
+import Connection from "./view/pages/Connection";
+import ForgetPassword from "./view/pages/ForgetPassword";
+import UserVerification from "./view/pages/UserVerification";
 import Home from "./view/screens/Home";
 import MainLayout from "./view/components/Layout/MainLayout";
-import QueryPage from "./view/components/Query";
-import Lead from "./view/components/Lead";
-import LeadDetails from "./view/components/LeadDetails";
+import QueryPage from "./view/pages/Query";
+import Lead from "./view/pages/Lead";
+import LeadDetails from "./view/pages/LeadDetails";
+import Teams from "./view/pages/Teams";
+import MeetingManagement from "./view/pages/MeetingManagement";
 
 function App() {
   return (
@@ -120,10 +122,26 @@ function App() {
             }
           />
           <Route
+            path="/teams"
+            element={
+              <Layout>
+                <Teams />
+              </Layout>
+            }
+          />
+          <Route
             path="/query"
             element={
               <Layout>
                 <QueryPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/meetingmanagement"
+            element={
+              <Layout>
+                <MeetingManagement />
               </Layout>
             }
           />

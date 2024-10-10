@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../../services/authService";
-import { useAuth } from "../../context/Context";
+import { logout } from "../../../services/authService";
+import { useAuth } from "../../../context/Context";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);

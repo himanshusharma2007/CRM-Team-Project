@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import image from "../images/crm-home-stay-informed.svg";
-import Navbar from "./NavBar";
+import image from "../../assets/images/crm-home-stay-informed.svg";
+import Navbar from "../components/Layout/NavBar";
 
 const Landing = () => {
   return (

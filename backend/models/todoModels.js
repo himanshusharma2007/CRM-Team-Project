@@ -1,35 +1,31 @@
 const mongoose = require("mongoose");
 
-const todoSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: [true, "user id required"],
-    },
-    title: {
-      type: String,
-      required: [true, "title is required"],
-    },
-    priority: {
-      type: String,
-      enum: ["Low", "Medium", "High"],
-      default: "Medium",
-    },
-    currentStatus: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: Array,
-      default: ["Todo", "Doing", "Done"] 
-    },
-    description: {
-      type: String,
-      default: "",
-    },
+const todoSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: [true, "Title is required"],
+    trim: true
   },
-  { timestamps: true }
-);
+  description: {
+    type: String,
+    trim: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: [true, "User ID is required"]
+  },
+  status: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Status",
+    required: [true, "Status is required"]
+  },
+  priority: {
+    type: String,
+    enum: ["Low", "Medium", "High"],
+    default: "Medium"
+  }
+}, { timestamps: true });
 
-const todo = mongoose.model("todo", todoSchema);
-module.exports = todo;
+const Todo = mongoose.model("Todo", todoSchema);
+module.exports = Todo;

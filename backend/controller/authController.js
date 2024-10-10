@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const user = require("../models/userModels");
+const Status = require("../models/todoStatusModels");
 const bcrypt = require("bcryptjs");
 const hashPassword = require("../utils/password");
 
@@ -42,6 +43,18 @@ exports.registerUser = async (req, res) => {
         message: "Error in User Creation",
       });
     }
+    await Status.create({
+      name: "Todo",
+      userId: userData._id
+    });
+    await Status.create({
+      name: "Doing",
+      userId: userData._id
+    });
+    await Status.create({
+      name: "Done",
+      userId: userData._id
+    });
     res.status(201).send({
       success: true,
       massage: "User Register successfully",
@@ -120,58 +133,6 @@ exports.logout = async (req, res) => {
   }
 };
 
-// "/verify/:id"
-exports.verify = async (req, res) => {
-  const { role, team } = req.body;
-  try {
-    console.log(req.user);
-    const userdata = await user.findById(req.params.id).select();
-    if (!userdata) {
-      return res.status(400).send({
-        success: false,
-        message: "user not found",
-      });
-    }
-    if (userdata.verify) {
-      return res.status(400).send({
-        success: false,
-        message: "user already verify",
-      });
-    }
-    // Check if the user is an admin
-    if (req.user.role === "admin") {
-      // Admin can set role and team
-      userdata.verify = true;
-      userdata.role = role;
-      userdata.team = team;
-    }
-    // Check if the user is a sub-admin
-    else if (req.user.role === "subAdmin" || req.user.role === "subAdmin") {
-      // Sub-admin can set team only
-      userdata.verify = true;
-      userdata.team = team;
-    } else {
-      return res.status(403).send({
-        success: false,
-        message: "Insufficient permissions",
-      });
-    }
-
-    await userdata.save();
-    userdata.password = "*****";
-    res.status(200).send({
-      success: true,
-      message: "verify successfully",
-      user: userdata,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({
-      success: false,
-      message: "Internel server error",
-    });
-  }
-};
 
 exports.updatePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
@@ -226,3 +187,4 @@ exports.updatePassword = async (req, res) => {
     });
   }
 };
+

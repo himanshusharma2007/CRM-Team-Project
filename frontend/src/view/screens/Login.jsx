@@ -21,7 +21,8 @@ const LoginPage = () => {
       alert("Login Successful");
       navigate("/dashboard");
     } catch (error) {
-        alert("Login Failed");
+      alert("Login Failed");
+      console.log('error', error)
     } finally {
       setLoading(false);
     }
