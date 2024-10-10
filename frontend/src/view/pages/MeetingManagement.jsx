@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
-import { FaPlus, FaPencilAlt, FaTrash, FaSave } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import {
   getAllProjects,
   createProject,
@@ -14,6 +14,7 @@ import {
   updateMeeting,
 } from "../../services/meetingService";
 import { getAllClients, createClient } from "../../services/clientServices";
+import { getAllTeams } from "../../services/TeamService";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -27,7 +28,7 @@ const MeetingManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const teams = ["Team A", "Team B", "Team C"]; // This should ideally come from the backend
+  const [teams, setTeams] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -42,9 +43,17 @@ const MeetingManagement = () => {
         // getUpcomingMeetings(),
         getAllClients(),
       ]);
+      const allTeams = await getAllTeams();
       setProjects(projectsData);
       setMeetings(meetingsData);
       setClients(clientsData);
+
+      setTeams(allTeams);
+      // Extract unique teams from projects
+      // const uniqueTeams = [
+      //   ...new Set(projectsData.flatMap((project) => project.teamIds)),
+      // ];
+      // setTeams(uniqueTeams);
     } catch (error) {
       setError("Error fetching data. Please try again.");
     } finally {
@@ -58,7 +67,9 @@ const MeetingManagement = () => {
 
   const handleAddProject = async (projectData) => {
     try {
+      console.log('projectDatain handle add project ', projectData)
       const newProject = await createProject(projectData);
+      console.log('newProject', newProject)
       setProjects([...projects, newProject]);
     } catch (error) {
       setError("Error creating project. Please try again.");
@@ -174,10 +185,10 @@ const MeetingManagement = () => {
             </p>
 
             <button
-              onClick={toggleMeetingModal}
+              onClick={toggleProjectModal}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 mb-4 w-full flex items-center justify-center gap-2"
             >
-              <FaPlus /> Add New Meeting
+              <FaPlus /> Add New Project
             </button>
 
             <div className="space-y-4 max-h-96 overflow-y-auto">

@@ -25,8 +25,10 @@ export const getProjectById = async (id) => {
 export const createProject = async (projectData) => {
   try {
     const response = await api.post('/project/create', projectData);
+    console.log('response in createProject', response)
     return response.data;
   } catch (error) {
+    console.log('error in create service', error)
     throw new Error(error.response.data.message || 'Error creating project');
   }
 };
