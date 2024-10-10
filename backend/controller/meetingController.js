@@ -158,7 +158,7 @@ const sendNotification = async (clientNotification, leaderNotification, clientDa
 
 exports.createMeeting = async (req, res) => {
     try {
-        const { clientId, projectId, meetingDateTime, clientNotification, leaderNotification } = req.body;
+        const { clientId, projectId, meetingDateTime,meetingStatus, clientNotification, leaderNotification } = req.body;
         if(!clientId || !projectId || !meetingDateTime){
             return res.status(400).json({ error: "All fields are required" });
         }
@@ -167,7 +167,7 @@ exports.createMeeting = async (req, res) => {
         if(!clientData || !projectData){
             return res.status(404).json({ error: "Client or project not found" });
         }
-        const meetingData = await meeting.create({ clientId, projectId, meetingDateTime });
+        const meetingData = await meeting.create({ clientId, projectId, meetingDateTime, meetingStatus });
         projectData.lastMeetingId = meetingData._id;
         await projectData.save();
         let notification = await sendNotification(clientNotification, leaderNotification, clientData, projectData, meetingDateTime);

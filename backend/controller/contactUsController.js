@@ -261,7 +261,7 @@ exports.createContactUs = async (req, res) => {
 
 exports.getContactUs = async (req, res) => {
   try {
-    const contactUsData = await contactUs.find({});
+    const contactUsData = await contactUs.find().sort({createdAt: -1});
     return res.status(200).send(contactUsData);
   } catch (err) {
     console.log("err", err);
@@ -294,3 +294,153 @@ exports.deleteContactUs = async (req, res) => {
     });
   }
 };
+
+
+const responedEmail = async (contactUsData, message) => {
+  try {
+    const msg = `
+    
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href='https://fonts.googleapis.com/css?family=Bad+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: lightgoldenrodyellow;
+        }
+
+        .paper {
+            position: absolute;
+            height: 90%;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.9);
+            margin: 5%;
+            box-shadow: 0px 0px 5px 0px #888;
+        }
+
+        .paper::before {
+            content: '';
+            position: absolute;
+            left: 45px;
+            height: 100%;
+            width: 2px;
+            background: rgba(255, 0, 0, 0.4);
+        }
+        .Lettertext {
+            position: absolute;
+            top: 65px;
+            left: 55px;
+            bottom: 10px;
+            right: 10px;
+            line-height: 25px;
+            font-weight: bold;
+            overflow: hidden;
+            outline: none;
+        }
+        .box {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-left: 4px solid #4CAF50;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="col-lg-12 col-md-12">
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="paper">
+                <div>
+                    <div class="Lettertext" spellcheck="false">
+                        <p>Dear <strong>${contactUsData.name}</strong>,</p>
+
+                        <p>Thank you for reaching out to us through our contact form. We have received your query and appreciate your interest in <strong>CODEDEV</strong>.</p>
+
+                        <p>Here's a copy of your query for reference:</p>
+
+                        <div class="box">
+                            <p><em>${contactUsData.message}</em></p>
+                        </div>
+                        
+                        <p>After reviewing your message, I would like to provide the following response:</p>
+                        
+                        <hr/>
+                        
+                        <p class="box"><em>${message}</em></p>
+                        
+                        <hr/>
+
+                        <p>If you have any further questions or need additional clarification, feel free to reply to this email or contact us at <strong>[Phone Number]</strong>. We're always happy to assist you!</p>
+
+                        <p>Thank you again for getting in touch, and we look forward to helping you further.</p>
+
+                        <p>Best regards,<br>
+                        [Your Name]<br>
+                        [Your Position]<br>
+                        [Company Name]<br>
+                        [Contact Information]</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+        <p>This is an automated message, please do not reply directly to this email.</p>
+    </div>
+        </div>
+    </div>
+</body>
+
+</html>
+    
+    `
+    await sendEmail(contactUsData.email, "Contact Us Responded", msg);
+    console.log("Email sent to client");
+  } catch (err) {
+    console.log("err", err);
+  }
+};
+
+exports.responedContactUs = async (req, res) => {
+  try{
+    const {message} = req.body;
+    if(!message){
+      return res.status(400).send({
+        success: false,
+        message: "please fill all fields",
+      });
+    }
+    const contactUsData = await contactUs.findByIdAndUpdate(req.params.id, {responed: message, status: "responded"}, {new: true});
+    if(!contactUsData){
+      return res.status(404).send({
+        success: false,
+        message: "Contact Us not found",
+      });
+    }
+    await responedEmail(contactUsData, message);
+    return res.status(200).send({
+      success: true,
+      message: "Contact Us responded successfully",
+    });
+  }catch(err){
+    console.log("err", err);
+    return res.status(500).send({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
