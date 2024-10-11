@@ -10,7 +10,7 @@ import {
   updateProject,
 } from "../../services/projectService";
 import {
-  getUpcomingMeetings,
+
   createMeeting,
   updateMeeting,
 } from "../../services/meetingService";
@@ -22,7 +22,7 @@ const MeetingManagement = () => {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [meetings, setMeetings] = useState([]);
+  // const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,10 +47,10 @@ const MeetingManagement = () => {
 
       setTeams(allTeams);
       // Extract unique teams from projects
-      // const uniqueTeams = [
-      //   ...new Set(projectsData.flatMap((project) => project.teamIds)),
-      // ];
-      // setTeams(uniqueTeams);
+      const uniqueTeams = [
+        ...new Set(projectsData.flatMap((project) => project.teamIds)),
+      ];
+      setTeams(uniqueTeams);
     } catch (error) {
       setError("Error fetching data. Please try again.");
     } finally {
