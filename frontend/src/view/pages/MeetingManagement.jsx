@@ -10,7 +10,7 @@ import {
   updateProject,
 } from "../../services/projectService";
 import {
-
+  getUpcomingMeetings,
   createMeeting,
   updateMeeting,
 } from "../../services/meetingService";
@@ -26,13 +26,13 @@ const MeetingManagement = () => {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
-  // const [meetings, setMeetings] = useState([]);
+  const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const [teams, setTeams] = useState([]);
+  const teams = ["Team A", "Team B", "Team C"]; // This should ideally come from the backend
 
   useEffect(() => {
     fetchData();
@@ -48,13 +48,6 @@ const MeetingManagement = () => {
       setProjects(projectsData);
       // setMeetings(meetingsData);
       setClients(clientsData);
-
-      setTeams(allTeams);
-      // Extract unique teams from projects
-      const uniqueTeams = [
-        ...new Set(projectsData.flatMap((project) => project.teamIds)),
-      ];
-      setTeams(uniqueTeams);
     } catch (error) {
       setError("Error fetching data. Please try again.");
     } finally {
@@ -68,7 +61,6 @@ const MeetingManagement = () => {
 
   const handleAddProject = async (projectData) => {
     try {
-      console.log('projectDatain handle add project ', projectData)
       const newProject = await createProject(projectData);
       setProjects((prevProjects) => [...prevProjects, newProject]);
     } catch (error) {

@@ -185,7 +185,9 @@ const sendMailToAdmin = async (email, name, message, subject, userData) => {
     <p>Subject: ${subject}</p>
     <p>Message: ${message}</p>
 
-    ${(userData !== null)? `
+    ${
+      userData !== null
+        ? `
       <hr/>
       <p>User are logged in on our website</p>
       <p>User ID: ${userData._id}</p>
@@ -194,7 +196,9 @@ const sendMailToAdmin = async (email, name, message, subject, userData) => {
       <p>User Role: ${userData.role}</p>
       <p>User Verify: ${userData.verify}</p>
 
-      ` : ""}
+      `
+        : ""
+    }
 
     </body>
     </html>
@@ -209,16 +213,16 @@ const sendMailToAdmin = async (email, name, message, subject, userData) => {
 const decodedToken = async (req) => {
   try {
     const token = req.cookies.token || null;
-    if(!token){
+    if (!token) {
       return null;
     }
     const decoded = jwt.verify(token, process.env.JWT_KEY);
     const userData = await user.findById(decoded.id).select("-password");
-    if(!userData){
+    if (!userData) {
       return res.status(404).send({
         success: false,
-        message: "user not found"
-      })
+        message: "user not found",
+      });
     }
     return userData;
   } catch (err) {
@@ -230,11 +234,11 @@ const decodedToken = async (req) => {
 exports.createContactUs = async (req, res) => {
   const { name, email, message, subject } = req.body;
   try {
-    if(!name || !email || !message || !subject){
+    if (!name || !email || !message || !subject) {
       return res.status(400).send({
         success: false,
-        message: "please fill all fields"
-      })
+        message: "please fill all fields",
+      });
     }
     const userData = await decodedToken(req);
     const contactUsData = await contactUs.create({
@@ -242,7 +246,7 @@ exports.createContactUs = async (req, res) => {
       email,
       message,
       subject,
-      userId: userData?._id
+      userId: userData?._id,
     });
     await sendMailToClient(email);
     await sendMailToAdmin(email, name, message, subject, userData);
@@ -261,7 +265,11 @@ exports.createContactUs = async (req, res) => {
 
 exports.getContactUs = async (req, res) => {
   try {
-    const contactUsData = await contactUs.find().sort({createdAt: -1}).populate("userId");
+    const contactUsData = await contactUs
+      .find()
+      .sort({ createdAt: -1 })
+      .populate("userId");
+      console.log('contactUsData', contactUsData)
     return res.status(200).send(contactUsData);
   } catch (err) {
     console.log("err", err);
@@ -272,11 +280,10 @@ exports.getContactUs = async (req, res) => {
   }
 };
 
-
 exports.deleteContactUs = async (req, res) => {
   try {
     const contactUsData = await contactUs.findByIdAndDelete(req.params.id);
-    if(!contactUsData){
+    if (!contactUsData) {
       return res.status(404).send({
         success: false,
         message: "Contact Us not found",
@@ -294,7 +301,6 @@ exports.deleteContactUs = async (req, res) => {
     });
   }
 };
-
 
 const responedEmail = async (contactUsData, message) => {
   try {
@@ -407,7 +413,7 @@ const responedEmail = async (contactUsData, message) => {
 
 </html>
     
-    `
+    `;
     await sendEmail(contactUsData.email, "Contact Us Responded", msg);
     console.log("Email sent to client");
   } catch (err) {
@@ -416,19 +422,24 @@ const responedEmail = async (contactUsData, message) => {
 };
 
 exports.responedContactUs = async (req, res) => {
-  try{
-    console.log('req.body in respond function', req.body)
-    console.log('req.params', req.params)
-    const {message} = req.body.response;
-    if(!message){
-      console.log('check', message)
+  try {
+    console.log("req.body in respond function", req.body);
+    console.log("req.params", req.params);
+    const message = req.body.response;
+    if (!message) {
+      console.log("check", message);
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
       });
     }
-    const contactUsData = await contactUs.findByIdAndUpdate(req.params.id, {responed: message, status: "responded"}, {new: true});
-    if(!contactUsData){
+    const contactUsData = await contactUs.findByIdAndUpdate(
+      req.params.id,
+      { responed: message, status: "responded" },
+      { new: true }
+    );
+    console.log("contact us data in controller:", contactUsData);
+    if (!contactUsData) {
       return res.status(404).send({
         success: false,
         message: "Contact Us not found",
@@ -439,11 +450,11 @@ exports.responedContactUs = async (req, res) => {
       success: true,
       message: "Contact Us responded successfully",
     });
-  }catch(err){
+  } catch (err) {
     console.log("err", err);
     return res.status(500).send({
       success: false,
       message: "Internal server error",
     });
   }
-}
+};

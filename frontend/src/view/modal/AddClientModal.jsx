@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { leadService } from "../../services/leadServices";
 import { createClient } from "../../services/clientServices";
 
-const AddClientModal = ({ isOpen, toggleModal }) => {
+const AddClientModal = ({ isOpen, onClose }) => {
   const [isAddClientView, setIsAddClientView] = useState(true);
   const [leads, setLeads] = useState([]);
   const [name, setName] = useState("");
@@ -136,7 +136,7 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
             >
               Save Client
             </button>
-          </form>
+          </form> 
         ) : (
           // Fetch from Lead Form (unchanged)
           <form className="space-y-6 bg-white p-6 rounded-lg shadow-md">
@@ -147,7 +147,7 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
         <div className="flex justify-center mt-4">
           <button
             className="text-red-500 hover:underline"
-            onClick={toggleModal}
+            onClick={onClose}
           >
             Close
           </button>

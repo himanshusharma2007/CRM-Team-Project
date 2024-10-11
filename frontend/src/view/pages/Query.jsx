@@ -19,6 +19,7 @@ const UserQueriesPage = () => {
   const fetchData = async () => {
     try {
       const data = await fetchContactUs();
+      console.log("Data in Query Page:", data);
       setQueries(data);
       handleSort("pending"); // Apply initial sorting
     } catch (error) {
@@ -49,6 +50,7 @@ const UserQueriesPage = () => {
     });
   };
   const handleQueryClick = (query) => {
+    // console.log("Query in Query Page:", query);
     setSelectedQuery(query);
     setShowModal(true);
     setResponse(query.response || "");
@@ -133,12 +135,12 @@ const UserQueriesPage = () => {
                   <div className="flex items-center">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        query.response
+                        query.responed
                           ? "bg-green-100 text-green-800"
                           : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {query.response ? "Responded" : "Pending"}
+                      {query.responed ? "Responded" : "Pending"}
                     </span>
                   </div>
                 </div>
@@ -204,7 +206,7 @@ const UserQueriesPage = () => {
                       </p>
                       <p>
                         <span className="font-medium">Query:</span>{" "}
-                        {selectedQuery.query}
+                        {selectedQuery.message}
                       </p>
                     </div>
                     <div className="mt-4">
@@ -212,25 +214,26 @@ const UserQueriesPage = () => {
                         htmlFor="response"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        {selectedQuery.response
+                        {selectedQuery.responed
                           ? "Response:"
                           : "Your Response:"}
                       </label>
+
                       <textarea
                         id="response"
                         rows="4"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-lg p-2 border border-gray-300 rounded-md resize-none outline-none"
                         placeholder="Enter your response..."
-                        value={response}
+                        value={selectedQuery.responed?selectedQuery.responed:response}
                         onChange={(e) => setResponse(e.target.value)}
-                        readOnly={selectedQuery.response}
+                        readOnly={selectedQuery.responed}
                       ></textarea>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                {!selectedQuery.response && (
+                {!selectedQuery.responed && (
                   <button
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
@@ -238,7 +241,7 @@ const UserQueriesPage = () => {
                   >
                     {isSubmitting ? (
                       <>
-                        <LoadingSpinner className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                        {/* <LoadingSpinner className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" /> */}
                         Submitting...
                       </>
                     ) : (
