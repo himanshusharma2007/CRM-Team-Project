@@ -12,7 +12,7 @@ const jwtToken = async (req, res, next) => {
         success: false,
       });
     }
-    req.user = await user.findById(decoded.id).select("-password");
+    req.user = await user.findById(decoded.id);
     if(!req.user){
       return res.status(404).send({
         success: false,

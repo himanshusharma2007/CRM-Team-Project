@@ -18,6 +18,10 @@ const leadSchema = new mongoose.Schema(
       type: String,
       required: [true, "phone no. is required"],
     },
+    email: {
+      type: String,
+      required: [true, "email is required"],
+    },
     description: {
       type: String,
       required: [true, "description is required"],

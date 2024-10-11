@@ -19,6 +19,10 @@ const projectSchema = new mongoose.Schema({
         type: String,
         required: [true, "Service type is required"]
     },
+    projectImage: {
+        type: String,
+        default: null
+    },
     projectStatus: {
         type: String,
         enum: ["pending", "ongoing", "completed", "cancelled"],
