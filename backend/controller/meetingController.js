@@ -197,7 +197,7 @@ exports.getMeetingById = async (req, res) => {
 
 exports.getUpcomingMeetings = async (req, res) => {
     try {
-        const meetingsData = await meeting.find({ meetingDateTime: { $gte: Date.now() } });
+        const meetingsData = await meeting.find({ meetingDateTime: { $gte: Date.now() } }).populate("clientId projectId");
         res.status(200).json(meetingsData);
     } catch (error) {
         console.log(error);
@@ -208,7 +208,7 @@ exports.getUpcomingMeetings = async (req, res) => {
 exports.getAllMeetingsByStatus = async (req, res) => {
     try {
         const {status} = req.params;
-        const meetingsData = await meeting.find({ meetingStatus: status });
+        const meetingsData = await meeting.find({ meetingStatus: status }).populate("clientId projectId");
         res.status(200).json(meetingsData);
     } catch (error) {
         console.log(error);
@@ -221,7 +221,7 @@ exports.getAllMeetingsByProjectId = async (req, res) => {
         if(!(await project.findById(req.params.id))){
             return res.status(404).json({ error: "Project not found" });
         }
-        const meetingsData = await meeting.find({ projectId: req.params.id });
+        const meetingsData = await meeting.find({ projectId: req.params.id }).populate("clientId projectId");
         res.status(200).json(meetingsData);
     } catch (error) {
         console.log(error);
