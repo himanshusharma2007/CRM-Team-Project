@@ -261,7 +261,7 @@ exports.createContactUs = async (req, res) => {
 
 exports.getContactUs = async (req, res) => {
   try {
-    const contactUsData = await contactUs.find().sort({createdAt: -1});
+    const contactUsData = await contactUs.find().sort({createdAt: -1}).populate("userId");
     return res.status(200).send(contactUsData);
   } catch (err) {
     console.log("err", err);
