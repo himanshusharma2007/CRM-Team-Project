@@ -417,8 +417,11 @@ const responedEmail = async (contactUsData, message) => {
 
 exports.responedContactUs = async (req, res) => {
   try{
-    const {message} = req.body;
+    console.log('req.body in respond function', req.body)
+    console.log('req.params', req.params)
+    const {message} = req.body.response;
     if(!message){
+      console.log('check', message)
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
