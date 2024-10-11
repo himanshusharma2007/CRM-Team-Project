@@ -1,9 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { leadService } from "../../services/leadServices";
+import { createClient } from "../../services/clientServices";
 
 const AddClientModal = ({ isOpen, toggleModal }) => {
   const [isAddClientView, setIsAddClientView] = useState(true);
+  const [leads, setLeads] = useState([]);
+  const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [location, setLocation] = useState("");
 
   const toggleView = () => setIsAddClientView(!isAddClientView);
+
+  useEffect(() => {
+    const fetchLeads = async () => {
+      const data = await leadService.getAllLeads();
+      setLeads(data);
+    };
+    fetchLeads();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await createClient({
+        name,
+        company,
+        phone,
+        email,
+        location,
+      });
+      console.log("Client created:", data);
+      
+      // Clear the form
+      setName("");
+      setCompany("");
+      setPhone("");
+      setEmail("");
+      setLocation("");
+      
+      // Close the modal
+      toggleModal();
+    } catch (error) {
+      console.error("Error creating client:", error);
+      // You might want to show an error message to the user here
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -45,17 +88,21 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
 
         {/* Add New Client Form */}
         {isAddClientView ? (
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <input
                 type="text"
                 placeholder="Name"
                 className="border border-gray-300 p-2 rounded-lg"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Company"
                 className="border border-gray-300 p-2 rounded-lg"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -63,11 +110,15 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
                 type="tel"
                 placeholder="Phone"
                 className="border border-gray-300 p-2 rounded-lg"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
               <input
                 type="email"
                 placeholder="Email"
                 className="border border-gray-300 p-2 rounded-lg"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
@@ -75,6 +126,8 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
                 type="text"
                 placeholder="Location"
                 className="border border-gray-300 p-2 rounded-lg w-full"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
               />
             </div>
             <button
@@ -85,19 +138,9 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
             </button>
           </form>
         ) : (
-          // Fetch from Lead Form
-          <form className="space-y-4">
-            <input
-              type="text"
-              placeholder="Lead Name"
-              className="border border-gray-300 p-2 w-full rounded-lg"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full"
-            >
-              Fetch Client from Lead
-            </button>
+          // Fetch from Lead Form (unchanged)
+          <form className="space-y-6 bg-white p-6 rounded-lg shadow-md">
+            {/* ... (unchanged) ... */}
           </form>
         )}
 

@@ -28,7 +28,7 @@ exports.addStage = async (req, res) => {
 
 exports.getStages = async (req, res) => {
   try {
-    const stagesData = await stages.find();
+    const stagesData = await stages.find().populate("leads");
     return res.status(200).send(stagesData);
   } catch (err) {
     return res.status(500).send({

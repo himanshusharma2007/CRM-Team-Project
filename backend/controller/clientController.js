@@ -1,10 +1,11 @@
 const client = require("../models/clientModels");
 const contact = require("../models/contactModels");
+const lead = require("../models/leadModels");
 
 exports.createClient = async (req, res) => {
     try {
-        const { name, company, phone, email, location } = req.body;
-        if(!name || !company || !phone || !email){
+        const { name, company, phone, email, location, timeZone} = req.body;
+        if(!name || !company || !phone || !email || !location){
             return res.status(400).json({ message: "All fields are required" });
         }
         if(await client.findOne({email})){
@@ -13,11 +14,27 @@ exports.createClient = async (req, res) => {
         if(await client.findOne({phone})){
             return res.status(400).json({ message: "Client phone no. already exists" });
         }
-        const clientContact = await contact.findOne({phone, email});
+        const clientContact = await contact.findOne({phoneNo : phone, email});
         if(!clientContact){
-            await contact.create({contactName: name, companyName: company, phone, email});
+            await contact.create({contactName: name, companyName: company, phoneNo: phone, email});
         }
-        const newClient = await client.create({name, company, phone, email, location});
+        console.log({ name, company, phone, email, location, timeZone})
+        const newClient = await client.create({name, company, phone, email, location, timeZone});
+        res.status(201).json(newClient);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+exports.createClientByLead = async (req, res) => {
+    try {
+        const {leadId} = req.params;
+        const leadData = await lead.findById(leadId);
+        if(!leadData){
+            return res.status(404).json({ error: "Lead not found" });
+        }
+        const newClient = await client.create({name: leadData.contactName, company: leadData.companyName, phone: leadData.phone, email: leadData.email, location: leadData.location});
         res.status(201).json(newClient);
     } catch (error) {
         console.log(error);
@@ -27,7 +44,7 @@ exports.createClient = async (req, res) => {
 
 exports.getAllClients = async (req, res) => {
     try {
-        const clients = await client.find();
+        const clients = await client.find().populate("projectId");
         res.status(200).json(clients);
     } catch (error) {
         console.log(error);
@@ -38,11 +55,11 @@ exports.getAllClients = async (req, res) => {
 exports.getClientById = async (req, res) => {
     try {
         const { id } = req.params;
-        const client = await client.findById(id);
-        if (!client) {
+        const clientData = await client.findById(id).populate("projectId");
+        if (!clientData) {
             return res.status(404).json({ error: "Client not found" });
         }
-        res.status(200).json(client);
+        res.status(200).json(clientData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -84,6 +101,18 @@ exports.updateClient = async (req, res) => {
     }
 };
 
-
-
+exports.deleteClient = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const clientData = await client.findById(id);
+        if (!clientData) {
+            return res.status(404).json({ error: "Client not found" });
+        }
+        await clientData.deleteOne(); // Use deleteOne instead of delete
+        res.status(200).json({ message: "Client deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting client:", error); // More detailed logging
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
 

@@ -4,7 +4,6 @@ const user = require("../models/userModels");
 const jwtToken = async (req, res, next) => {
   let token = req.cookies.token;
   console.log(token);
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_KEY);
     if (!decoded) {

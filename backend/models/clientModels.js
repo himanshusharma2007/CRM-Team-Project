@@ -19,9 +19,17 @@ const clientSchema = new mongoose.Schema({
         required: [true, "email is required"],
         unique: [true, "email already exists"]
     },
+    timeZone: {
+        type: String,
+        default: "Asia/Kolkata"
+    },
     location: {
         type: String
-    }
+    },
+    projectId: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "project"
+    }]
 }, {timestamps:true});
 
 

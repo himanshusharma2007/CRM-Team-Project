@@ -21,6 +21,15 @@ const contactUsShcema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
         default: null
+    },
+    responed: {
+        type: String,
+        default: ""
+    },
+    status: {
+        type: String,
+        enum: ["pending", "responded"],
+        default: "pending"
     }
 }, {timestamps:true})
 

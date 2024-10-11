@@ -1,16 +1,24 @@
 const project = require("../models/projectModels");
+const client = require("../models/clientModels");
 
 exports.createProject = async (req, res) => {
     try {
-        const { name, description, serviceType, projectStatus, clientId, hashtages, teamIds} = req.body;
+        const { name, description, serviceType, projectStatus, clientId, teamIds} = req.body;
+        let hashtages = req.body.hashtages;
         if(!name || !description || !serviceType || !clientId){
             return res.status(400).json({ error: "All fields are required" });
         }
         if(await project.findOne({name})){
             return res.status(400).json({ error: "Project name already exists" });
         }
-        hashtages = (hashtages) ? hashtages.split(",") : [];
+        const clientData = await client.findById(clientId);
+        if(!clientData){
+            return res.status(404).json({ error: "Client not found" });
+        }
+        hashtages = hashtages ? hashtages.split(",") : [];
         const newProject = await project.create({ name, description, serviceType, projectStatus, clientId, hashtages, teamIds });
+        clientData.projectId.push(newProject._id);
+        await clientData.save();
         res.status(201).json(newProject);
     } catch (error) {
         console.log(error);
@@ -20,7 +28,7 @@ exports.createProject = async (req, res) => {
 
 exports.getAllProjects = async (req, res) => {
     try {
-        const projects = await project.find();
+        const projects = await project.find().populate("clientId teamIds lastMeetingId");
         res.status(200).json(projects);
     } catch (error) {
         console.log(error);
@@ -30,11 +38,24 @@ exports.getAllProjects = async (req, res) => {
 
 exports.getProjectById = async (req, res) => {
     try {
-        const project = await project.findById(req.params.id);
-        if(!project){
+        const projectData = await project.findById(req.params.id).populate("clientId teamIds lastMeetingId");
+        if(!projectData){
             return res.status(404).json({ error: "Project not found" });
         }
-        res.status(200).json(project);
+        res.status(200).json(projectData);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+exports.getProjectByClientId = async (req, res) => {
+    try {
+        if(!(await client.findById(req.params.id))){
+            return res.status(404).json({ error: "Client not found" });
+        }
+        const projectData = await project.find({ clientId: req.params.id }).populate("clientId teamIds leaderId lastMeetingId");
+        res.status(200).json(projectData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -43,7 +64,8 @@ exports.getProjectById = async (req, res) => {
 
 exports.updateProject = async (req, res) => {
     try {
-        const { name, description, serviceType, projectStatus, hashtages, teamIds } = req.body;
+        const { name, description, serviceType, projectStatus, teamIds } = req.body;
+        let hashtages = req.body.hashtages;
         const projectData = await project.findById(req.params.id);
         if(!projectData){
             return res.status(404).json({ error: "Project not found" });
@@ -52,14 +74,23 @@ exports.updateProject = async (req, res) => {
         if(existingProject){
             return res.status(400).json({ error: "Project name already exists" });
         }
+        hashtages = hashtages ? hashtages.split(",") : [];
+        await hashtages.map(async (item) => {
+            if(!(projectData.hashtages.includes(item))){
+                projectData.hashtages.push(item);
+            }
+        });
+        await teamIds.map(async (item) => {
+            if(!(projectData.teamIds.includes(item))){
+                projectData.teamIds.push(item);
+            }
+        });
         projectData.name = name || projectData.name;
         projectData.description = description || projectData.description;
         projectData.serviceType = serviceType || projectData.serviceType;
         projectData.projectStatus = projectStatus || projectData.projectStatus;
-        projectData.hashtages = hashtages.split(",") || projectData.hashtages;
-        projectData.teamIds = teamIds || projectData.teamIds;
         await projectData.save();
-        res.status(200).json(updatedProject);
+        res.status(200).json(projectData);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });

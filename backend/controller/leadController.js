@@ -3,11 +3,11 @@ const stages = require("../models/leadStagesModels");
 
 exports.createLead = async (req, res) => {
   console.log('req.body in create lead', req.body)
-  const { title, companyName, contactName, phone, description, stage } =
+  const { title, companyName, contactName, phone, description, stage, location } =
     req.body;
 
   try {
-    if (!title || !companyName || !contactName || !phone || !description ) {
+    if (!title || !companyName || !contactName || !phone || !description || !location) {
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
@@ -43,7 +43,7 @@ exports.createLead = async (req, res) => {
 
 exports.getLeads = async (req, res) => {
   try {
-    const leads = await lead.find().populate("assignedTo", "team");
+    const leads = await lead.find().populate("assignedTo team").select("-password");
     res.status(200).send(leads);
   } catch (error) {
     res
@@ -152,7 +152,7 @@ exports.getLeadById = async (req, res) => {
     console.log("get lead by id called", id);
     const leadData = await lead
       .findOne({ _id: id })
-      .populate("assignedTo", "-password");
+      .populate("assignedTo team").select("-password");
     console.log("lead in get lead by id:>> ", leadData);
     res.status(200).json(leadData);
   } catch (error) {

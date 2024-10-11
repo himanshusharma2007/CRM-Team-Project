@@ -14,7 +14,7 @@ import {
   createMeeting,
   updateMeeting,
 } from "../../services/meetingService";
-import { getAllClients, createClient } from "../../services/clientServices";
+import { getAllClients, createClient, deleteClient } from "../../services/clientServices";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -28,54 +28,6 @@ const MeetingManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const clientsData = [
-    {
-      name: "Client A",
-      services: [
-        {
-          title: "E-Com",
-          description: "Service: Web App",
-          lastMeeting: "8:00 AM 22/7/11",
-          startFrom: "9:00 AM 22/7/11",
-        },
-        {
-          title: "E-Com",
-          description: "Service: Web App",
-          lastMeeting: "8:00 AM 22/7/11",
-          startFrom: "9:00 AM 22/7/11",
-        },
-      ],
-    },
-    {
-      name: "Client B",
-      services: [
-        {
-          title: "E-Com",
-          description: "Service: Web App",
-          lastMeeting: "8:00 AM 22/7/11",
-          startFrom: "9:00 AM 22/7/11",
-        },
-      ],
-    },
-    {
-      name: "Client C",
-      services: [
-        {
-          title: "E-Com",
-          description: "Service: Web App",
-          lastMeeting: "8:00 AM 22/7/11",
-          startFrom: "9:00 AM 22/7/11",
-        },
-        {
-          title: "E-Com",
-          description: "Service: Web App",
-          lastMeeting: "8:00 AM 22/7/11",
-          startFrom: "9:00 AM 22/7/11",
-        },
-      ],
-    },
-  ];
-
   const teams = ["Team A", "Team B", "Team C"]; // This should ideally come from the backend
 
   useEffect(() => {
@@ -86,13 +38,11 @@ const MeetingManagement = () => {
     setLoading(true);
     setError(null);
     try {
-      const [projectsData, meetingsData, clientsData] = await Promise.all([
-        getAllProjects(),
-        // getUpcomingMeetings(),
-        getAllClients(),
-      ]);
+      const projectsData = await getAllProjects();
+      // const meetingsData = await getUpcomingMeetings();
+      const clientsData = await getAllClients();
       setProjects(projectsData);
-      setMeetings(meetingsData);
+      // setMeetings(meetingsData);
       setClients(clientsData);
     } catch (error) {
       setError("Error fetching data. Please try again.");
@@ -108,7 +58,7 @@ const MeetingManagement = () => {
   const handleAddProject = async (projectData) => {
     try {
       const newProject = await createProject(projectData);
-      setProjects([...projects, newProject]);
+      setProjects((prevProjects) => [...prevProjects, newProject]);
     } catch (error) {
       setError("Error creating project. Please try again.");
     }
@@ -117,7 +67,9 @@ const MeetingManagement = () => {
   const handleUpdateProject = async (id, projectData) => {
     try {
       const updatedProject = await updateProject(id, projectData);
-      setProjects(projects.map((p) => (p.id === id ? updatedProject : p)));
+      setProjects((prevProjects) =>
+        prevProjects.map((p) => (p.id === id ? updatedProject : p))
+      );
     } catch (error) {
       setError("Error updating project. Please try again.");
     }
@@ -126,7 +78,7 @@ const MeetingManagement = () => {
   const handleAddMeeting = async (meetingData) => {
     try {
       const newMeeting = await createMeeting(meetingData);
-      setMeetings([...meetings, newMeeting]);
+      setMeetings((prevMeetings) => [...prevMeetings, newMeeting]);
       alert("Meeting created successfully");
     } catch (error) {
       setError("Error creating meeting. Please try again.");
@@ -136,16 +88,31 @@ const MeetingManagement = () => {
   const handleUpdateMeeting = async (id, meetingData) => {
     try {
       const updatedMeeting = await updateMeeting(id, meetingData);
-      setMeetings(meetings.map((m) => (m.id === id ? updatedMeeting : m)));
+      setMeetings((prevMeetings) =>
+        prevMeetings.map((m) => (m.id === id ? updatedMeeting : m))
+      );
     } catch (error) {
       setError("Error updating meeting. Please try again.");
     }
   };
 
-  const handleAddClient = async (clientData) => {
+  const handleDeleteClient = async (clientId) => {
+    if (window.confirm("Are you sure you want to delete this client?")) {
+      try {
+        await deleteClient(clientId);
+        setClients((prevClients) =>
+          prevClients.filter((client) => client._id !== clientId)
+        );
+        alert("Client deleted successfully.");
+      } catch (error) {
+        setError("Error deleting client. Please try again.");
+      }
+    }
+  };
+
+  const handleAddClient = async (newClient) => {
     try {
-      const newClient = await createClient(clientData);
-      setClients([...clients, newClient]);
+      setClients((prevClients) => [...prevClients, newClient]);
     } catch (error) {
       setError("Error creating client. Please try again.");
     }
@@ -213,171 +180,92 @@ const MeetingManagement = () => {
       </div>
 
       {/* Projects and Meetings Section */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProjects.map((project) => (
-          <div key={project.id} className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-2">{project.name}</h3>
-            <p className="text-sm text-gray-600 mb-2">
-              Type: {project.serviceType}
-            </p>
-            <p className="text-sm text-gray-600 mb-2">
-              Status: {project.projectStatus}
-            </p>
-            <p className="text-sm text-gray-600 mb-4">
-              Client:{" "}
-              {clients?.find((c) => c.id === project.clientId)?.name || "N/A"}
-            </p>
-
-            <button
-              onClick={toggleMeetingModal}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 mb-4 w-full flex items-center justify-center gap-2"
+      <div className="flex gap-6 px-6 py-4">
+        {searchTerm && filteredProjects.length > 0 ? (
+          filteredProjects.map((project, index) => (
+            <div
+              key={index}
+              className="border border-gray-200 rounded-lg p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out"
             >
-              <FaPlus /> Add New Meeting
-            </button>
+              {/* Card Header */}
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-gray-800">
+                  {project.name}
+                </h3>
+                <span
+                  className={`text-xs px-3 py-1 rounded-full ${
+                    project.projectStatus === "Completed"
+                      ? "bg-green-100 text-green-600"
+                      : "bg-yellow-100 text-yellow-600"
+                  }`}
+                >
+                  {project.projectStatus}
+                </span>
+              </div>
 
-            <div className="space-y-4 max-h-96 overflow-y-auto">
-              {meetings
-                .filter((meeting) => meeting.projectId === project.id)
-                .map((meeting, index) => (
-                  <div
-                    key={index}
-                    className="p-4 border rounded-lg mb-2 hover:shadow-md transition duration-300"
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-gray-800">Meeting</span>
-                      <span className="text-sm text-gray-500">
-                        {new Date(meeting.meetingDateTime).toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Status: {meeting.meetingStatus}
-                    </p>
-                  </div>
-                ))}
-            </div>
-          </div>
-        ))}
-      </div> */}
-      <div className="flex gap-3 px-6 py-4">
-        <div className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm">
-          {/* Card Header */}
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-bold text-gray-800">as</h3>
-            <span className="bg-gray-200 text-xs text-gray-600 px-2 py-1 rounded-full">
-              In Progress
-            </span>
-          </div>
+              {/* Card Content */}
+              <p className="text-sm text-gray-600 mb-4">{project.description}</p>
 
-          {/* Card Content */}
-          <p className="text-sm text-gray-600">asdfp</p>
-
-          <div className="text-sm mt-3">
-            <p className="text-gray-500">Last Meeting: asdf</p>
-            <p className="text-gray-500">Start From: asd</p>
-          </div>
-        </div>
-        <div className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm">
-          {/* Card Header */}
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-bold text-gray-800">as</h3>
-            <span className="bg-gray-200 text-xs text-gray-600 px-2 py-1 rounded-full">
-              In Progress
-            </span>
-          </div>
-
-          {/* Card Content */}
-          <p className="text-sm text-gray-600">asdfp</p>
-
-          <div className="text-sm mt-3">
-            <p className="text-gray-500">Last Meeting: asdf</p>
-            <p className="text-gray-500">Start From: asd</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-between px-6 py-4 bg-gray-50 min-h-screen">
-        {clientsData.map((client, index) => (
-          <div
-            key={index}
-            className="w-1/3 p-4 bg-white shadow-md rounded-lg border border-gray-200"
-          >
-            {/* Client Header */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-800">{client.name}</h2>
-              <div className="flex gap-2">
-                <button>
-                  <FaPencilAlt />
-                </button>
-                <button>
-                  <FaTrash />
-                </button>
+              <div className="text-sm space-y-2">
+                <p className="text-gray-500">
+                  <span className="font-medium text-gray-700">Start From: </span>
+                  {project.startFrom}
+                </p>
               </div>
             </div>
+          ))
+        ) : (
+          searchTerm && <div className="text-center text-gray-500">No projects found.</div>
+        )}
+      </div>
 
-            {/* Filter Input */}
-            <input
-              type="text"
-              placeholder="Filter"
-              className="border border-gray-300 p-2 w-full rounded-md text-sm text-gray-600 mb-4"
-            />
-            <div className="flex justify-between items-center mb-4">
-              <button className="text-sm text-gray-600 hover:text-gray-800 focus:outline-none focus:underline">
-                + Add New Service
-              </button>
-              <button className="text-sm text-gray-600 hover:text-gray-800 focus:outline-none focus:underline">
-                View in Graph
-              </button>
-            </div>
-            {/* Services List */}
-            <div className="space-y-4">
-              {client.services.map((service, idx) => (
-                <div
-                  key={idx}
-                  className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-white transition duration-200 ease-in-out"
-                >
-                  {/* Service Header */}
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-md font-semibold text-gray-700">
-                      {service.title}
-                    </h3>
-                    <span className="bg-gray-300 text-xs text-gray-600 px-2 py-1 rounded-full">
-                      In Progress
-                    </span>
-                  </div>
-
-                  {/* Service Details */}
-                  <p className="text-sm text-gray-600">{service.description}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Last Meeting: {service.lastMeeting}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Start From: {service.startFrom}
-                  </p>
+      <div className="flex justify-between gap-6 bg-gray-50 w-full overflow-x-auto">
+        {clients &&
+          clients.map((client, index) => (
+            <div
+              key={index}
+              className="w-96 p-4 bg-white shadow-md rounded-lg border border-gray-200 flex-shrink-0"
+            >
+              {/* Client Header */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold text-gray-800">{client.name}</h2>
+                <div className="flex gap-2">
+                  <button>
+                    <FaPencilAlt />
+                  </button>
+                  <button onClick={() => handleDeleteClient(client._id)}>
+                    <FaTrash />
+                  </button>
                 </div>
-              ))}
+              </div>
+
+              {/* Filter Input */}
+              <input
+                type="text"
+                placeholder="Filter"
+                className="border border-gray-300 p-2 rounded-lg w-full"
+              />
+              {/* Add More Client Details as needed */}
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* Modals */}
       <AddClientModal
         isOpen={isClientModalOpen}
-        toggleModal={toggleClientModal}
+        onClose={toggleClientModal}
         onAddClient={handleAddClient}
+        teams={teams}
       />
       <NewMeetingModal
         isOpen={isMeetingModalOpen}
-        toggleModal={toggleMeetingModal}
-        projects={projects}
-        clients={clients}
+        onClose={toggleMeetingModal}
         onAddMeeting={handleAddMeeting}
+        projects={projects}
       />
       <AddProjectModal
         isOpen={isProjectModalOpen}
-        toggleModal={toggleProjectModal}
-        teams={teams}
-        clients={clients}
+        onClose={toggleProjectModal}
         onAddProject={handleAddProject}
       />
     </div>
