@@ -26,7 +26,7 @@ exports.createTeam = async (req, res) => {
 
 exports.getAllTeam = async (req, res) => {
   try {
-    const team = await Team.find();
+    const team = await Team.find().populate("participants leaderId");
     return res.status(200).send(team);
   } catch (err) {
     console.log("err", err)

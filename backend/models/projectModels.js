@@ -24,6 +24,10 @@ const projectSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    projectImage: {
+        type: String,
+        default: null
+    },
     projectStatus: {
       type: String,
       enum: ["pending", "ongoing", "completed", "cancelled"],
