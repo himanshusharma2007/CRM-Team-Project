@@ -3,7 +3,7 @@ import { forgotPassword, verifyOTP } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 
 const ForgetPassword = () => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(2);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
