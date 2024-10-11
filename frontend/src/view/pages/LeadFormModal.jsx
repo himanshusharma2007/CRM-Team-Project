@@ -76,7 +76,7 @@ const LeadFormModal = ({
                 Phone Number
               </label>
               <input
-                type="number"
+                type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
@@ -86,7 +86,23 @@ const LeadFormModal = ({
               />
             </div>
 
-            {/* Location (New Field) */}
+            {/* Email (New Field) */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 text-sm font-medium mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter email address"
+                required
+              />
+            </div>
+
+            {/* Location */}
             <div className="flex flex-col">
               <label className="text-gray-700 text-sm font-medium mb-1">
                 Location
@@ -118,7 +134,7 @@ const LeadFormModal = ({
                 {stages.map((stage) => (
                   <option
                     key={stage._id}
-                    value={stage._id}
+                    value={stage.stageName}
                     className="text-black"
                   >
                     {stage.stageName}

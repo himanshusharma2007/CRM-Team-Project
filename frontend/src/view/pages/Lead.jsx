@@ -22,7 +22,8 @@ const Lead = () => {
     companyName: "",
     contactName: "",
     phone: "",
-    stageName: "",
+    email: "",
+    stage: "", // Changed from stageName to stage
     description: "",
     team: "",
     location: "",
@@ -95,9 +96,11 @@ const Lead = () => {
       companyName: "",
       contactName: "",
       phone: "",
+      email: "", // Reset email field
       stageName: "",
       description: "",
       team: "",
+      location: "",
     });
   };
 
@@ -310,6 +313,7 @@ const Lead = () => {
                     </p>
                     <p className="text-gray-500">Company: {lead.companyName}</p>
                     <p className="text-gray-500">Contact: {lead.contactName}</p>
+                    <p className="text-gray-500">Email: {lead.email}</p>
                     <p className="text-gray-500">Team: {lead.team}</p>
                     <button
                       onClick={() => handleViewDetails(lead)}
