@@ -1,32 +1,50 @@
 const lead = require("../models/leadModels");
 const stages = require("../models/leadStagesModels");
+const contact = require("../models/contactModels");
 
 exports.createLead = async (req, res) => {
   console.log('req.body in create lead', req.body)
-  const { title, companyName, contactName, phone, description, stage, location } =
+  const { title, companyName, contactName, phone, email, description, stage, location } =
     req.body;
 
   try {
-    if (!title || !companyName || !contactName || !phone || !description || !location) {
+    if (!title || !companyName || !contactName || !phone || !email || !description || !location) {
+      console.log("please fill all fields");
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
       });
     }
-    const stageData = await stages.findOne({_id:stage});
+    const stageData = await stages.findOne({"stageName": stage});
     console.log('stageData', stageData)
     if(!stageData){
+      console.log("stageName does not exist");
       return res.status(400).send({
         success: false,
         message: "stageName does not exist",
       });
     }
+    if(await contact.findOne({email}) || await lead.findOne({phoneNo: phone})){
+      console.log("email or phoneNo already exists");
+      return res.status(400).send({
+        success: false,
+        message: "email or phoneNo already exists",
+      });
+    }
+    const contactData = await contact.create({
+      contactName,
+      companyName,
+      email,
+      phoneNo: phone,
+    });
     const leaddata = await lead.create({
       title,
       companyName,
       contactName,
       phone,
+      email,
       description,
+      location,
       currentStage: stageData.stageName,
     });
     stageData.leads.push(leaddata._id);
