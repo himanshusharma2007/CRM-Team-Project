@@ -229,12 +229,12 @@ const MeetingManagement = () => {
             )}
       </div>
 
-      <div className="flex justify-between gap-6 bg-gray-50 w-full overflow-x-auto">
+      <div className="flex gap-3 bg-gray-50 w-full overflow-x-auto">
         {clients &&
           clients.map((client, index) => (
             <div
               key={index}
-              className="w-96 p-4 bg-white shadow-md rounded-lg border border-gray-200 flex-shrink-0"
+              className="w-[20vw] p-4 h-[60vh] bg-white shadow-md rounded-lg border border-gray-200 flex-shrink-0"
             >
               {/* Client Header */}
               <div className="flex justify-between items-center mb-4">

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { leadService } from "../../services/leadServices";
 import { createClient } from "../../services/clientServices";
 
-const AddClientModal = ({ isOpen, toggleModal }) => {
+const AddClientModal = ({ isOpen, onClose }) => {
   const [isAddClientView, setIsAddClientView] = useState(true);
   const [leads, setLeads] = useState([]);
+  const [clientData, setClientData] = useState({});
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
@@ -19,35 +20,21 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
       setLeads(data);
     };
     fetchLeads();
+    console.log("leads", leads);
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const data = await createClient({
-        name,
-        company,
-        phone,
-        email,
-        location,
-      });
-      console.log("Client created:", data);
-      
-      // Clear the form
-      setName("");
-      setCompany("");
-      setPhone("");
-      setEmail("");
-      setLocation("");
-      
-      // Close the modal
-      toggleModal();
-    } catch (error) {
-      console.error("Error creating client:", error);
-      // You might want to show an error message to the user here
-    }
-  };
+    const data = await createClient({
+      name,
+      company,
+      phone,
+      email,
+      location,
+    });
+    console.log("data", data);
 
+  };
   if (!isOpen) return null;
 
   return (
@@ -59,7 +46,7 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
             {isAddClientView ? "Add New Client" : "Fetch from Lead"}
           </h2>
           <button
-            onClick={toggleModal}
+            onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
           >
             ✕
@@ -138,16 +125,43 @@ const AddClientModal = ({ isOpen, toggleModal }) => {
             </button>
           </form>
         ) : (
-          // Fetch from Lead Form (unchanged)
+          // Fetch from Lead Form
           <form className="space-y-6 bg-white p-6 rounded-lg shadow-md">
-            {/* ... (unchanged) ... */}
+            {/* Select Lead Dropdown */}
+            <div>
+              <label
+                htmlFor="lead"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Select Lead
+              </label>
+              <select
+                id="lead"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select Lead</option>
+                {leads.map((lead, index) => (
+                  <option key={index} value={lead.id}>
+                    {lead.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full hover:bg-blue-700 transition duration-300"
+            >
+              Fetch Client from Lead
+            </button>
           </form>
         )}
 
         <div className="flex justify-center mt-4">
           <button
             className="text-red-500 hover:underline"
-            onClick={toggleModal}
+            onClick={onClose}
           >
             Close
           </button>
