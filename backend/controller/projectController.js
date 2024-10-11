@@ -1,5 +1,34 @@
 const project = require("../models/projectModels");
 const client = require("../models/clientModels");
+const team = require("../models/teamModels");
+const uploadOnCloudinary = require("../utils/cloudinary");
+
+
+const uploadProjectImage = async (req, res, projectId) => {
+    try {
+        const {path} = req.file;
+        const projectData = await project.findById(projectId);
+        if(!projectData){
+            return res.status(404).json({ error: "Project not found" });
+        }
+        console.log("file upload started ......................");
+        const uploadResponse = await uploadOnCloudinary(path);
+        console.log("uploadResponse", uploadResponse);
+        if(!uploadResponse){
+            throw new Error("Failed to upload image on cloudinary");
+        }
+        projectData.projectImage = uploadResponse.url;
+        await projectData.save();
+        console.log("file uploaded successfully ......................");
+        return uploadResponse.url;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+}
 
 exports.createProject = async (req, res) => {
     try {
@@ -17,6 +46,11 @@ exports.createProject = async (req, res) => {
         }
         hashtages = hashtages ? hashtages.split(",") : [];
         const newProject = await project.create({ name, description, serviceType, projectStatus, clientId, hashtages, teamIds });
+        if(req.file){
+            const imageUrl = await uploadProjectImage(req, res, newProject._id);
+            newProject.projectImage = imageUrl;
+            await newProject.save();
+        }
         clientData.projectId.push(newProject._id);
         await clientData.save();
         res.status(201).json(newProject);
@@ -96,3 +130,38 @@ exports.updateProject = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+
+
+exports.updateProjectImage = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const projectData = await project.findById(id);
+        if(!projectData){
+            return res.status(404).json({ error: "Project not found" });
+        }
+        const imageUrl = await uploadProjectImage(req, res, projectData._id);
+        res.status(200).json({
+            success: true,
+            message: "Image uploaded successfully",
+            imageUrl: imageUrl,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+
+exports.getProjectByLogedInUser = async (req, res) => {
+    try {
+        const teamData = await team.findOne({participants: {$in: [req.user.id]}});
+        console.log("teamData", teamData._id);
+        const projectData = await project.find({teamIds: {$in: [teamData._id]}}).populate("clientId");
+        console.log("projectData", projectData);
+        res.status(200).json(projectData);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
