@@ -14,7 +14,11 @@ import {
   createMeeting,
   updateMeeting,
 } from "../../services/meetingService";
-import { getAllClients, createClient, deleteClient } from "../../services/clientServices";
+import {
+  getAllClients,
+  createClient,
+  deleteClient,
+} from "../../services/clientServices";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -181,42 +185,48 @@ const MeetingManagement = () => {
 
       {/* Projects and Meetings Section */}
       <div className="flex gap-6 px-6 py-4">
-        {searchTerm && filteredProjects.length > 0 ? (
-          filteredProjects.map((project, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-lg p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out"
-            >
-              {/* Card Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-gray-800">
-                  {project.name}
-                </h3>
-                <span
-                  className={`text-xs px-3 py-1 rounded-full ${
-                    project.projectStatus === "Completed"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-yellow-100 text-yellow-600"
-                  }`}
-                >
-                  {project.projectStatus}
-                </span>
-              </div>
+        {searchTerm && filteredProjects.length > 0
+          ? filteredProjects.map((project, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out"
+              >
+                {/* Card Header */}
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    {project.name}
+                  </h3>
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full ${
+                      project.projectStatus === "Completed"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-yellow-100 text-yellow-600"
+                    }`}
+                  >
+                    {project.projectStatus}
+                  </span>
+                </div>
 
-              {/* Card Content */}
-              <p className="text-sm text-gray-600 mb-4">{project.description}</p>
-
-              <div className="text-sm space-y-2">
-                <p className="text-gray-500">
-                  <span className="font-medium text-gray-700">Start From: </span>
-                  {project.startFrom}
+                {/* Card Content */}
+                <p className="text-sm text-gray-600 mb-4">
+                  {project.description}
                 </p>
+
+                <div className="text-sm space-y-2">
+                  <p className="text-gray-500">
+                    <span className="font-medium text-gray-700">
+                      Start From:{" "}
+                    </span>
+                    {project.startFrom}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          searchTerm && <div className="text-center text-gray-500">No projects found.</div>
-        )}
+            ))
+          : searchTerm && (
+              <div className="text-center text-gray-500">
+                No projects found.
+              </div>
+            )}
       </div>
 
       <div className="flex justify-between gap-6 bg-gray-50 w-full overflow-x-auto">
@@ -228,7 +238,9 @@ const MeetingManagement = () => {
             >
               {/* Client Header */}
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-gray-800">{client.name}</h2>
+                <h2 className="text-lg font-bold text-gray-800">
+                  {client.name}
+                </h2>
                 <div className="flex gap-2">
                   <button>
                     <FaPencilAlt />
