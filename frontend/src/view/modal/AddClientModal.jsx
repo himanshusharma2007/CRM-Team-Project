@@ -5,14 +5,12 @@ import { createClient } from "../../services/clientServices";
 const AddClientModal = ({ isOpen, onClose }) => {
   const [isAddClientView, setIsAddClientView] = useState(true);
   const [leads, setLeads] = useState([]);
-  const [clientData, setClientData] = useState({});
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
 
-  const toggleView = () => setIsAddClientView(!isAddClientView);
 
   useEffect(() => {
     const fetchLeads = async () => {
@@ -24,7 +22,7 @@ const AddClientModal = ({ isOpen, onClose }) => {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const data = await createClient({
       name,
       company,

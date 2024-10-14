@@ -9,16 +9,8 @@ import {
   createProject,
   updateProject,
 } from "../../services/projectService";
-import {
-  getUpcomingMeetings,
-  createMeeting,
-  updateMeeting,
-} from "../../services/meetingService";
-import {
-  getAllClients,
-  createClient,
-  deleteClient,
-} from "../../services/clientServices";
+import { createMeeting, updateMeeting } from "../../services/meetingService";
+import { getAllClients, deleteClient } from "../../services/clientServices";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -35,6 +27,7 @@ const MeetingManagement = () => {
   const teams = ["Team A", "Team B", "Team C"]; // This should ideally come from the backend
 
   useEffect(() => {
+    console.log("clients in useEffect", clients);
     fetchData();
   }, []);
 
@@ -50,6 +43,7 @@ const MeetingManagement = () => {
       setClients(clientsData);
     } catch (error) {
       setError("Error fetching data. Please try again.");
+      console.log("error in fetchData", error);
     } finally {
       setLoading(false);
     }
@@ -76,6 +70,7 @@ const MeetingManagement = () => {
       );
     } catch (error) {
       setError("Error updating project. Please try again.");
+      console.log("error in handleUpdateProject", error);
     }
   };
 
@@ -119,6 +114,7 @@ const MeetingManagement = () => {
       setClients((prevClients) => [...prevClients, newClient]);
     } catch (error) {
       setError("Error creating client. Please try again.");
+      console.log("error in handleAddClient", error);
     }
   };
 
@@ -142,7 +138,7 @@ const MeetingManagement = () => {
     return <div className="text-center mt-8 text-red-500">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 p-8 ">
       {/* Meeting Management Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Meeting Management</h1>
@@ -229,38 +225,94 @@ const MeetingManagement = () => {
             )}
       </div>
 
-      <div className="flex gap-3 bg-gray-50 w-full overflow-x-auto">
-        {clients &&
-          clients.map((client, index) => (
-            <div
-              key={index}
-              className="w-[20vw] p-4 h-[60vh] bg-white shadow-md rounded-lg border border-gray-200 flex-shrink-0"
+      <div className="flex w-full gap-6 px-6 py-8 min-h-screen bg-gray-100 overflow-x-auto">
+  {clients &&
+    clients.map((client, index) => (
+      <div
+        key={index}
+        className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl transition-shadow duration-300 ease-in-out"
+      >
+        {/* Client Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-gray-900">{client.name}</h2>
+          <div className="flex gap-3">
+            <button className="text-gray-600 hover:text-blue-600" >
+              <FaPencilAlt />
+            </button>
+            <button
+              className="text-gray-600 hover:text-red-600"
+              onClick={() => handleDeleteClient(client._id)}
             >
-              {/* Client Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-gray-800">
-                  {client.name}
-                </h2>
-                <div className="flex gap-2">
-                  <button>
-                    <FaPencilAlt />
-                  </button>
-                  <button onClick={() => handleDeleteClient(client._id)}>
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
+              <FaTrash />
+            </button>
+          </div>
+        </div>
 
-              {/* Filter Input */}
-              <input
-                type="text"
-                placeholder="Filter"
-                className="border border-gray-300 p-2 rounded-lg w-full"
-              />
-              {/* Add More Client Details as needed */}
-            </div>
-          ))}
+        {/* Filter Input */}
+        <input
+          type="text"
+          placeholder="Filter projects"
+          className="border border-gray-300 p-2 w-full rounded-md text-sm text-gray-700 mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        />
+
+        {/* Add/View Buttons */}
+        <div className="flex justify-between items-center mb-6">
+          <button
+            className="text-blue-600 hover:underline focus:outline-none"
+            onClick={toggleProjectModal}
+          >
+            + Add New Project
+          </button>
+          <button className="text-blue-600 hover:underline focus:outline-none">
+            View in Graph
+          </button>
+        </div>
+
+        {/* Services List */}
+        <div className="space-y-4">
+          {client && Array.isArray(client.projectId) ? (
+            client.projectId.map((service, idx) => (
+              <div
+                key={idx}
+                className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition duration-200 ease-in-out"
+              >
+                {/* Service Header */}
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    {service.name}
+                  </h3>
+                  <span className="bg-green-200 text-xs text-green-800 px-2 py-1 rounded-full">
+                    {service.projectStatus}
+                  </span>
+                </div>
+
+                {/* Service Details */}
+                <p className="text-sm text-gray-700">{service.description}</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Service Type: {service.serviceType}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Company Name: {client.company}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Created On:{" "}
+                  {new Date(service.createdAt).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-600">No services available.</p>
+          )}
+        </div>
       </div>
+    ))}
+</div>
+
+
 
       {/* Modals */}
       <AddClientModal
@@ -279,6 +331,7 @@ const MeetingManagement = () => {
         isOpen={isProjectModalOpen}
         onClose={toggleProjectModal}
         onAddProject={handleAddProject}
+        teams={teams}
       />
     </div>
   );
