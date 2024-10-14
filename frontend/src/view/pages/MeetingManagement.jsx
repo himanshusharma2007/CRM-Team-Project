@@ -23,7 +23,6 @@ const MeetingManagement = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-
   const teams = ["Team A", "Team B", "Team C"]; // This should ideally come from the backend
 
   useEffect(() => {
