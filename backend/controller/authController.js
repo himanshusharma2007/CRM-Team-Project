@@ -306,6 +306,38 @@ exports.verifyOtp = async (req, res) => {
   }
 }
 
+
+const resetPasswordMsg = (name, email) => {
+  return `
+  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Change Successful</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <h2 style="text-align: center; color: #333;">Password Change Confirmation</h2>
+        <p>Dear <strong>${name}</strong>,</p>
+        <p>We wanted to let you know that your password was successfully updated. If you initiated this change, no further action is required.</p>
+        <p><strong>Account Details:</strong></p>
+        <p>- Email: ${email}</p>
+        <p>If you did not request this password change, please contact our support team immediately to secure your account.</p>
+        <p>For your security, we recommend regularly updating your password and ensuring that your password is strong and unique.</p>
+        <p>Thank you for using CODEDEV. If you have any questions, feel free to contact our support team.</p>
+        <p>Best regards,<br>CODEDEV Team</p>
+        <p style="font-size: 12px; color: #777; text-align: center;">If you need help, feel free to contact us at <a href="mailto:support@example.com">support@example.com</a>.</p>
+    </div>
+</body>
+</html>
+
+  
+  `;
+}
+
+
 exports.resetPassword = async (req, res) => {
   try {
     const {email, newPassword} = req.body;
@@ -347,6 +379,7 @@ exports.resetPassword = async (req, res) => {
     userData.otpExpiry = undefined;
     userData.otpVerify = false;
     await userData.save();
+    await sendMail(userData.email, "Password Reset Successfully", resetPasswordMsg(userData.name, userData.email));
     return res.status(200).json({
       success: true,
       message: "Password reset successfully",
