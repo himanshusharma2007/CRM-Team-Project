@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { submitContactUs } from "../../services/queryService";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -15,7 +16,9 @@ const ContactUs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addQuery(formData); // Call function to add query to the query page
+    const { name, email, message, subject } = formData;
+    console.log("FormData in Contactus:", formData);
+    submitContactUs(name, email, message, subject); // Call function to add query to the query page
     setFormData({ name: "", email: "", subject: "", message: "" }); // Reset form after submit
   };
 

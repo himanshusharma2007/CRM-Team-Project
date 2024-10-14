@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Container, Draggable } from "react-smooth-dnd";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context";
 import LeadFormModal from "./LeadFormModal";
@@ -23,9 +22,11 @@ const Lead = () => {
     companyName: "",
     contactName: "",
     phone: "",
-    stageName: "",
+    email: "",
+    stage: "", // Changed from stageName to stage
     description: "",
     team: "",
+    location: "",
   });
   const [stages, setStages] = useState([]);
   const [editingStage, setEditingStage] = useState(null);
@@ -95,44 +96,48 @@ const Lead = () => {
       companyName: "",
       contactName: "",
       phone: "",
+      email: "", // Reset email field
       stageName: "",
       description: "",
       team: "",
+      location: "",
     });
   };
 
-  const onColumnDrop = async (dropResult, newStage) => {
-    const { removedIndex, addedIndex, payload } = dropResult;
-    if (removedIndex !== null || addedIndex !== null) {
+  const handleDragStart = (e, lead) => {
+    e.dataTransfer.setData("application/json", JSON.stringify(lead));
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e, newStage) => {
+    e.preventDefault();
+    const leadData = JSON.parse(e.dataTransfer.getData("application/json"));
+
+    if (leadData.currentStage !== newStage) {
       const updatedPipeline = { ...pipeline };
-      const lead = payload;
 
-      const currentStage = Object.keys(updatedPipeline).find((stage) =>
-        updatedPipeline[stage].some((item) => item._id === lead._id)
-      );
+      // Remove lead from the old stage
+      updatedPipeline[leadData.currentStage] = updatedPipeline[
+        leadData.currentStage
+      ].filter((item) => item._id !== leadData._id);
 
-      if (currentStage !== newStage) {
-        Object.keys(updatedPipeline).forEach((stage) => {
-          updatedPipeline[stage] = updatedPipeline[stage].filter(
-            (item) => item._id !== lead._id
-          );
-        });
+      // Add lead to the new stage
+      updatedPipeline[newStage] = [
+        ...updatedPipeline[newStage],
+        { ...leadData, currentStage: newStage },
+      ];
 
-        updatedPipeline[newStage] = [
-          ...updatedPipeline[newStage].slice(0, addedIndex),
-          { ...lead, currentStage: newStage },
-          ...updatedPipeline[newStage].slice(addedIndex),
-        ];
+      setPipeline(updatedPipeline);
 
-        setPipeline(updatedPipeline);
-
-        try {
-          await leadService.updateStage(lead._id, newStage);
-        } catch (err) {
-          console.error("Error updating lead stage:", err);
-          setError("Failed to update lead stage. Please try again.");
-          fetchStagesAndLeads();
-        }
+      try {
+        await leadService.updateStage(leadData._id, newStage);
+      } catch (err) {
+        console.error("Error updating lead stage:", err);
+        setError("Failed to update lead stage. Please try again.");
+        fetchStagesAndLeads();
       }
     }
   };
@@ -247,6 +252,8 @@ const Lead = () => {
               key={stage.stageName}
               className="w-64 bg-gray-50 p-4 rounded-lg shadow-md flex-shrink-0 flex flex-col"
               style={{ maxHeight: "100%" }}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, stage.stageName)}
             >
               {editingStage === stage.stageName && user?.role === "admin" ? (
                 <div className="flex items-center justify-center space-x-1 mb-4">
@@ -293,33 +300,30 @@ const Lead = () => {
                 </div>
               )}
 
-              <Container
-                groupName="columns"
-                onDrop={(dropResult) => onColumnDrop(dropResult, stage.stageName)}
-                getChildPayload={(index) => pipeline[stage.stageName][index]}
-                dragClass="shadow-lg"
-                dropClass="bg-blue-100"
-                style={{ flex: 1, overflowY: "auto" }}
-              >
+              <div className="flex-1 overflow-y-auto">
                 {pipeline[stage.stageName]?.map((lead) => (
-                  <Draggable key={lead._id}>
-                    <div className="p-4 bg-white rounded-lg shadow-sm transition-all duration-300 hover:shadow-md border border-gray-200 mb-2">
-                      <p className="font-bold text-lg text-gray-700">
-                        {lead.title}
-                      </p>
-                      <p className="text-gray-500">Company: {lead.companyName}</p>
-                      <p className="text-gray-500">Contact: {lead.contactName}</p>
-                      <p className="text-gray-500">Team: {lead.team}</p>
-                      <button
-                        onClick={() => handleViewDetails(lead)}
-                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
-                      >
-                        View Details
-                      </button>
-                    </div>
-                  </Draggable>
+                  <div
+                    key={lead._id}
+                    className="p-4 bg-white rounded-lg shadow-sm transition-all duration-300 hover:shadow-md border border-gray-200 mb-2"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, lead)}
+                  >
+                    <p className="font-bold text-lg text-gray-700">
+                      {lead.title}
+                    </p>
+                    <p className="text-gray-500">Company: {lead.companyName}</p>
+                    <p className="text-gray-500">Contact: {lead.contactName}</p>
+                    <p className="text-gray-500">Email: {lead.email}</p>
+                    <p className="text-gray-500">Team: {lead.team}</p>
+                    <button
+                      onClick={() => handleViewDetails(lead)}
+                      className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 ))}
-              </Container>
+              </div>
             </div>
           ))}
         </div>

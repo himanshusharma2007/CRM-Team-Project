@@ -35,6 +35,7 @@ exports.createProject = async (req, res) => {
         const { name, description, serviceType, projectStatus, clientId, teamIds} = req.body;
         let hashtages = req.body.hashtages;
         if(!name || !description || !serviceType || !clientId){
+            console.log("all feild are")
             return res.status(400).json({ error: "All fields are required" });
         }
         if(await project.findOne({name})){

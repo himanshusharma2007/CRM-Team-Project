@@ -2,6 +2,7 @@ import api from "./api";
 
 export const leadService = {
   createLead: async (leadData) => {
+    console.log("leadData in leadService:", leadData);
     try {
       const response = await api.post("/lead/create", leadData);
       return response.data;
@@ -48,7 +49,7 @@ export const leadService = {
 
   updateStage: async (id, stageName) => {
     try {
-      console.log('update stage called stageName', stageName)
+      console.log("update stage called stageName", stageName);
       const response = await api.put(`/lead/update-stage/${id}`, {
         stageName,
       });

@@ -1,15 +1,41 @@
-// AddProjectModal.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getAllTeams } from "../../services/teamService";
+import { createProject } from "../../services/projectService";
+import { getAllClients } from "../../services/clientServices";
 
-const AddProjectModal = ({ isOpen, toggleModal, teams, onAddProject }) => {
+const AddProjectModal = ({ isOpen, onClose, onAddProject }) => {
   const [name, setName] = useState("");
   const [serviceType, setServiceType] = useState("");
   const [projectStatus, setProjectStatus] = useState("");
   const [teamIds, setTeamIds] = useState([]);
   const [hashtags, setHashtags] = useState("");
   const [description, setDescription] = useState("");
-  const [clientId, setClientId] = useState(""); // This should be populated with actual client data
+  const [clientId, setClientId] = useState("");
+  const [teams, setTeams] = useState([]);
+  const [clients, setClients] = useState([]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedTeams = await getAllTeams();
+        const fetchedClients = await getAllClients();
+        console.log("Fetched Teams: ", fetchedTeams);
+        console.log("Fetched Clients: ", fetchedClients);
+        setTeams(fetchedTeams);
+        setClients(fetchedClients);
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
+    };
+
+    if (isOpen) {
+      fetchData();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    console.log("useeffect ids", teamIds);
+  }, [teamIds]);
   const resetForm = () => {
     setName("");
     setServiceType("");
@@ -17,27 +43,56 @@ const AddProjectModal = ({ isOpen, toggleModal, teams, onAddProject }) => {
     setTeamIds([]);
     setHashtags("");
     setDescription("");
-    setClientId("");
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onAddProject({
-      name,
-      description,
-      serviceType,
-      projectStatus,
-      clientId,
-      hashtags: hashtags.split(","),
-      teamIds,
-    });
-    resetForm();
-    toggleModal();
+  const handleSubmit = async (e) => {
+    if (
+      !name ||
+      !serviceType ||
+      !projectStatus ||
+      !clientId ||
+      teamIds.length === 0
+    ) {
+      console.error("Please fill all required fields");
+      alert("Please fill all required fields");
+      return;
+    }
+
+    try {
+      const projectData = {
+        name,
+        description,
+        serviceType,
+        projectStatus,
+        clientId,
+        hashtags: hashtags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== ""),
+        teamIds: Array.isArray(teamIds) ? teamIds : [teamIds],
+      };
+
+      console.log(
+        "Submitting project with the following data:",
+        JSON.stringify(projectData, null, 2)
+      );
+
+      const data = await createProject(projectData);
+
+      console.log("Project created successfully:", data);
+      resetForm();
+      onClose();
+      if (onAddProject) onAddProject(data);
+    } catch (error) {
+      console.error("Error creating project:", error);
+      // Display error message to the user
+      alert(`Failed to create project: ${error.message}`);
+    }
   };
 
   const handleCancel = () => {
     resetForm();
-    toggleModal();
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -73,75 +128,62 @@ const AddProjectModal = ({ isOpen, toggleModal, teams, onAddProject }) => {
           </div>
 
           <div className="flex mb-4 space-x-4">
-            <div className="w-1/2">
-              <label className="block text-sm font-semibold mb-1">Status</label>
-              <input
-                type="text"
-                value={projectStatus}
-                onChange={(e) => setProjectStatus(e.target.value)}
-                className="border border-gray-300 p-2 w-full rounded-lg"
-                required
-              />
-            </div>
-            <div className="w-1/2">
+            <div className="w-full">
               <label className="block text-sm font-semibold mb-1">Team</label>
               <select
-                multiple
                 value={teamIds}
-                onChange={(e) =>
-                  setTeamIds(
-                    Array.from(
-                      e.target.selectedOptions,
-                      (option) => option.value
-                    )
-                  )
-                }
+                onChange={(e) => setTeamIds([e.target.value])}
                 className="border border-gray-300 p-2 w-full rounded-lg"
                 required
               >
-                {teams.map((t, index) => (
-                  <option key={index} value={t}>
-                    {t}
+                <option value="">Select Team</option>
+                {teams.map((team) => (
+                  <option key={team._id} value={team._id}>
+                    {team.teamName}
                   </option>
                 ))}
               </select>
             </div>
           </div>
 
-          <div className="flex mb-4 space-x-4">
-            <div className="w-1/2">
+          <div className=" mb-4 ">
+            <div className="w-full">
               <label className="block text-sm font-semibold mb-1">
                 Hashtags (optional)
               </label>
-              <input
-                type="text"
+              <textarea
                 value={hashtags}
                 onChange={(e) => setHashtags(e.target.value)}
-                className="border border-gray-300 p-2 w-full rounded-lg"
+                className="border border-gray-300 p-2 w-full rounded-lg resize-none h-20"
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-full">
               <label className="block text-sm font-semibold mb-1">
                 Description (optional)
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="border border-gray-300 p-2 w-full rounded-lg resize-none"
-                rows="1"
+                className="border border-gray-300 p-2 w-full resize-none rounded-lg h-20"
               />
             </div>
           </div>
 
-          <div className="w-full">
+          <div className="mb-4">
             <label className="block text-sm font-semibold mb-1">Client</label>
-            <input
-              type="text"
+            <select
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
               className="border border-gray-300 p-2 w-full rounded-lg"
               required
-            />
+            >
+              <option value="">Select Client</option>
+              {clients.map((client) => (
+                <option key={client._id} value={client._id}>
+                  {client.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex justify-end">
@@ -156,7 +198,7 @@ const AddProjectModal = ({ isOpen, toggleModal, teams, onAddProject }) => {
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded-lg"
             >
-              Add Project
+              Create
             </button>
           </div>
         </form>
