@@ -136,6 +136,7 @@ const AddProjectModal = ({ isOpen, onClose, onAddProject }) => {
                 required
               />
             </div>
+            
             <div className="w-1/2">
               <label className="block text-sm font-semibold mb-1">Team</label>
               <select
