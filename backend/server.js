@@ -45,7 +45,7 @@ app.use("/api/client", clientRoutes);
 app.use("/api/project", projectRoutes);
 app.use("/api/meeting", meetingRoutes);
 
-app.listen(PORT, () => {
-  connectDB(URL);
+app.listen(PORT, async () => {
+  await connectDB(URL);
   console.log(`Server running on Post- ${PORT}`.bgBlue.black);
 });
