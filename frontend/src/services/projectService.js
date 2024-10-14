@@ -24,14 +24,17 @@ export const getProjectById = async (id) => {
 // Service to create a new project
 export const createProject = async (projectData) => {
   try {
+    console.log("Sending project data to API:", projectData);
     const response = await api.post('/project/create', projectData);
-    console.log('response in createProject', response)
+    console.log("API response:", response.data);
     return response.data;
   } catch (error) {
-    console.log('error in create service', error)
-    throw new Error(error.response.data.message || 'Error creating project');
+    console.error("Error in createProject service:", error);
+    const errorMessage = error.response?.data?.message || 'Error creating project';
+    throw new Error(errorMessage);
   }
 };
+
 
 // Service to update a project
 export const updateProject = async (id, projectData) => {
