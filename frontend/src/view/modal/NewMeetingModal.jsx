@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getAllProjects } from "../../services/projectService";
 import { getAllClients } from "../../services/clientServices";
 
-const NewMeetingModal = ({ isOpen, toggleModal, onAddMeeting }) => {
+const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
   const [allProjects, setAllProjects] = useState([]); // Projects state as an array
   const [allClients, setAllClients] = useState([]); // Clients state as an array
 
@@ -94,7 +94,7 @@ const NewMeetingModal = ({ isOpen, toggleModal, onAddMeeting }) => {
           </button>
           <button
             className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
-            onClick={toggleModal} // Close the modal
+            onClick={onClose} // Close the modal
           >
             Close
           </button>
