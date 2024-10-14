@@ -128,7 +128,18 @@ const AddProjectModal = ({ isOpen, onClose, onAddProject }) => {
           </div>
 
           <div className="flex mb-4 space-x-4">
-            <div className="w-full">
+            <div className="w-1/2">
+              <label className="block text-sm font-semibold mb-1">Status</label>
+              <input
+                type="text"
+                value={projectStatus}
+                onChange={(e) => setProjectStatus(e.target.value)}
+                className="border border-gray-300 p-2 w-full rounded-lg"
+                required
+              />
+            </div>
+            
+            <div className="w-1/2">
               <label className="block text-sm font-semibold mb-1">Team</label>
               <select
                 value={teamIds}
