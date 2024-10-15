@@ -3,14 +3,14 @@ import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
-import { FaPencilAlt, FaPlus, FaTrash } from "react-icons/fa";
+import { FaPencilAlt, FaPlus, FaTrash, FaSave } from "react-icons/fa";
 import {
   getAllProjects,
   createProject,
   updateProject,
 } from "../../services/projectService";
 import { createMeeting, updateMeeting } from "../../services/meetingService";
-import { getAllClients, deleteClient } from "../../services/clientServices";
+import { getAllClients, deleteClient, updateClient } from "../../services/clientServices";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -24,6 +24,8 @@ const MeetingManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [addProjectToClient, setAddProjectToClient] = useState(null);
+  const [editingClientId, setEditingClientId] = useState(null);
+  const [editedClientName, setEditedClientName] = useState("");
 
   useEffect(() => {
     console.log("clients in useEffect", clients);
@@ -98,11 +100,14 @@ const MeetingManagement = () => {
 
   const handleAddMeeting = async (meetingData) => {
     try {
+      console.log("meetingData in frontend ", meetingData);
       const newMeeting = await createMeeting(meetingData);
       setMeetings((prevMeetings) => [...prevMeetings, newMeeting]);
       alert("Meeting created successfully");
+      toggleMeetingModal(); // Close the modal after adding the meeting
     } catch (error) {
       setError("Error creating meeting. Please try again.");
+      console.error("Error creating meeting:", error);
     }
   };
 
@@ -139,7 +144,30 @@ const MeetingManagement = () => {
       console.log("error in handleAddClient", error);
     }
   };
+  const handleEditClient = (clientId, clientName) => {
+    setEditingClientId(clientId);
+    setEditedClientName(clientName);
+  };
 
+  const handleSaveClientName = async (clientId) => {
+    try {
+      const updatedClient = await updateClient(clientId, {
+        name: editedClientName,
+      });
+      setClients((prevClients) =>
+        prevClients.map((client) =>
+          client._id === clientId
+            ? { ...client, name: updatedClient.name }
+            : client
+        )
+      );
+      setEditingClientId(null);
+      setEditedClientName("");
+    } catch (error) {
+      setError("Error updating client name. Please try again.");
+      console.log("error in handleSaveClientName", error);
+    }
+  };
   const filteredProjects = projects
     .filter(
       (project) =>
@@ -255,12 +283,33 @@ const MeetingManagement = () => {
               className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl transition-shadow duration-300 ease-in-out"
             >
               {/* Client Header */}
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">{client.name}</h2>
+           <div className="flex justify-between items-center mb-6">
+                {editingClientId === client._id ? (
+                  <input
+                    type="text"
+                    value={editedClientName}
+                    onChange={(e) => setEditedClientName(e.target.value)}
+                    className="text-xl font-bold text-gray-900 border-b border-gray-300 focus:outline-none focus:border-blue-500"
+                  />
+                ) : (
+                  <h2 className="text-xl font-bold text-gray-900">{client.name}</h2>
+                )}
                 <div className="flex gap-3">
-                  <button className="text-gray-600 hover:text-blue-600" >
-                    <FaPencilAlt />
-                  </button>
+                  {editingClientId === client._id ? (
+                    <button
+                      className="text-green-600 hover:text-green-700"
+                      onClick={() => handleSaveClientName(client._id)}
+                    >
+                      <FaSave />
+                    </button>
+                  ) : (
+                    <button
+                      className="text-gray-600 hover:text-blue-600"
+                      onClick={() => handleEditClient(client._id, client.name)}
+                    >
+                      <FaPencilAlt />
+                    </button>
+                  )}
                   <button
                     className="text-gray-600 hover:text-red-600"
                     onClick={() => handleDeleteClient(client._id)}
@@ -344,7 +393,6 @@ const MeetingManagement = () => {
         isOpen={isMeetingModalOpen}
         onClose={toggleMeetingModal}
         onAddMeeting={handleAddMeeting}
-        projects={projects}
       />
       <AddProjectModal
         isOpen={isProjectModalOpen}
