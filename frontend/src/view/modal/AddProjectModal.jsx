@@ -43,7 +43,11 @@ const AddProjectModal = ({ isOpen, onClose, onAddProject, clientId }) => {
       alert("Please fill all required fields");
       return;
     }
-
+    console.log("name in modal", name);
+    console.log("serviceType in modal", serviceType);
+    console.log("projectStatus in modal", projectStatus);
+    console.log("teamIds in modal", teamIds);
+    console.log("clientId in modal", clientId);
     const projectData = {
       name,
       description,
@@ -56,7 +60,7 @@ const AddProjectModal = ({ isOpen, onClose, onAddProject, clientId }) => {
       teamIds: Array.isArray(teamIds) ? teamIds : [teamIds],
       clientId,
     };
-
+    console.log("projectData in modal", projectData);
     onAddProject(projectData);
     resetForm();
     onClose();
