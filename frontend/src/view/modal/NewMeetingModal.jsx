@@ -15,6 +15,9 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
 
   const [filteredProjects, setFilteredProjects] = useState([]);
 
+  // New state for meeting title
+  const [meetingTitle, setMeetingTitle] = useState("");
+
   // Fetch all projects
   const allProjectsfun = async () => {
     try {
@@ -82,6 +85,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
       dateTime: meetingDateTime,
       notifyClient,
       notifyTeamLeader,
+      title: meetingTitle, // Add the title to the meeting data
     };
     onAddMeeting(meetingData);
     onClose();
@@ -102,6 +106,16 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
         <h2 className="text-xl font-semibold mb-4">Schedule New Meeting</h2>
 
         <form onSubmit={handleSubmit}>
+          {/* Add the new input field for meeting title */}
+          <input
+            type="text"
+            className="border border-gray-300 p-2 w-full rounded-lg mb-4"
+            value={meetingTitle}
+            onChange={(e) => setMeetingTitle(e.target.value)}
+            placeholder="Meeting Title"
+            required
+          />
+
           <select
             className="border border-gray-300 p-2 w-full rounded-lg mb-4"
             value={selectedClient}
