@@ -9,6 +9,7 @@ const LeadDetails = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [lead, setLead] = useState(null);
+  console.log("lead details in Lead Deatils  page:", lead);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -146,6 +147,9 @@ const LeadDetails = () => {
               <strong>Phone:</strong> {lead.phone}
             </p>
             <p className="text-xl text-gray-700">
+              <strong>Email:</strong> {lead.email}
+            </p>
+            <p className="text-xl text-gray-700">
               <strong>Description:</strong> {lead.description}
             </p>
             <p className="text-xl text-gray-700">
@@ -154,10 +158,10 @@ const LeadDetails = () => {
             <p className="text-xl text-gray-700">
               <strong>Team:</strong> {lead.team}
             </p>
-            <p className="text-xl text-gray-700">
+            {/* <p className="text-xl text-gray-700">
               <strong>Assigned To:</strong>{" "}
               {lead.assignedTo?.name || "Not Assigned"}
-            </p>
+            </p> */}
           </>
         )}
       </div>

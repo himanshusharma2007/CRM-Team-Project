@@ -27,6 +27,7 @@ export const getUpcomingMeetings = async (id) => {
 export const createMeeting = async (meetingData) => {
   try {
     const response = await api.post("/meeting/create", meetingData);
+    console.log("response in meeting service", response.data);
     return response.data;
   } catch (error) {
     throw new Error(error.response.data.message || "Error creating meeting");

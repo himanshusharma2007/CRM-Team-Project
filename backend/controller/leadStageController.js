@@ -1,4 +1,5 @@
 const stages = require("../models/leadStagesModels");
+const lead = require("../models/leadModels");
 
 
 exports.addStage = async (req, res) => {
@@ -82,6 +83,7 @@ exports.updateStage = async (req, res) => {
         message: "stageName and newStageName are required",
       });
     }
+    console.log(stageName, newStageName);
     if(! (await stages.findOne({stageName}))){
         return res.status(400).send({
             success: false,
@@ -94,8 +96,14 @@ exports.updateStage = async (req, res) => {
         message: "newStageName already exists",
       });
     }
-    const stage = await stages.findOneAndUpdate({stageName}, {stageName: newStageName}, {new: true});
-    return res.status(200).send(stage);
+    const stage = await stages.findOneAndUpdate({stageName}, {stageName: newStageName});
+    await stage.leads.map( async (leadId) => {
+      console.log(leadId);
+      await lead.findByIdAndUpdate(leadId, {currentStage: newStageName});
+    });
+    const updatedStage = await stages.findOne({stageName: newStageName}).populate("leads");
+    console.log(updatedStage);
+    return res.status(200).send(updatedStage);
   } catch (err) {
     return res.status(500).send({
       success: false,
