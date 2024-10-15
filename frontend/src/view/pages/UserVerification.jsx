@@ -55,7 +55,7 @@ const UserVerificationList = () => {
 
   // Handle user verification
   const handleVerify = async () => {
-    if (!selectTeam || !selectedUserId) {
+    if (!selectTeam || !selectedUserId ) {
       setMessage("Please fill all fields before verifying");
       return;
     }
