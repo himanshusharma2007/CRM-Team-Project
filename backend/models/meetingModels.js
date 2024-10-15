@@ -11,6 +11,10 @@ const meetingSchema = new mongoose.Schema({
         ref: "project",
         required: [true, "Project id is required"]
     },
+    title: {
+        type: String,
+        required: [true, "Title is required"]
+    },
     meetingDateTime: {
         type: Date,
         required: [true, "Meeting date is required"]

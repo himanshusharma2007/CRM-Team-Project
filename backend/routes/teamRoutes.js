@@ -8,6 +8,6 @@ router.get("/:id", jwtToken, checkAdmin, getTeamById);
 router.post("/create", jwtToken, checkAdmin, createTeam);
 router.put("/update/:id", jwtToken, checkAdmin, updateTeam);
 router.delete("/delete/:id", jwtToken, checkAdmin, deleteTeam);
-router.post("/removeParticipant/:id", jwtToken, checkAdmin, removeParticipant);
+router.put("/removeParticipant/:id", jwtToken, checkAdmin, removeParticipant);
 
 module.exports = router;

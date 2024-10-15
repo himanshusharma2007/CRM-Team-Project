@@ -158,8 +158,8 @@ const sendNotification = async (clientNotification, leaderNotification, clientDa
 
 exports.createMeeting = async (req, res) => {
     try {
-        const { clientId, projectId, meetingDateTime,meetingStatus, clientNotification, leaderNotification } = req.body;
-        if(!clientId || !projectId || !meetingDateTime){
+        const { clientId, projectId,title, meetingDateTime,meetingStatus, clientNotification, leaderNotification } = req.body;
+        if(!clientId || !projectId || !meetingDateTime || !title){
             return res.status(400).json({ error: "All fields are required" });
         }
         const clientData = await client.findById(clientId);
@@ -167,7 +167,7 @@ exports.createMeeting = async (req, res) => {
         if(!clientData || !projectData){
             return res.status(404).json({ error: "Client or project not found" });
         }
-        const meetingData = await meeting.create({ clientId, projectId, meetingDateTime, meetingStatus });
+        const meetingData = await meeting.create({ clientId, projectId, title, meetingDateTime, meetingStatus });
         projectData.lastMeetingId = meetingData._id;
         await projectData.save();
         let notification = await sendNotification(clientNotification, leaderNotification, clientData, projectData, meetingDateTime);
@@ -231,7 +231,7 @@ exports.getAllMeetingsByProjectId = async (req, res) => {
 
 exports.updateMeeting = async (req, res) => {
     try {
-        const { meetingConclusion, meetingStatus, meetingDateTime } = req.body;
+        const { meetingConclusion, meetingStatus, meetingDateTime, title } = req.body;
         const meetingData = await meeting.findById(req.params.id);
         if(!meetingData){
             return res.status(404).json({ error: "Meeting not found" });
@@ -239,9 +239,11 @@ exports.updateMeeting = async (req, res) => {
         meetingData.meetingConclusion = meetingConclusion || meetingData.meetingConclusion;
         meetingData.meetingStatus = meetingStatus || meetingData.meetingStatus;
         meetingData.meetingDateTime = meetingDateTime || meetingData.meetingDateTime;
+        meetingData.title = title || meetingData.title;
         await meetingData.save();
         res.status(200).json(meetingData);
     } catch (error) {
+        console.log("error in update meeting");
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
     }

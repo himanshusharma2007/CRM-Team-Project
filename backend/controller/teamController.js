@@ -1,4 +1,5 @@
 const Team = require("../models/teamModels");
+const User = require("../models/userModels");
 
 
 exports.createTeam = async (req, res) => {
@@ -124,10 +125,19 @@ exports.removeParticipant = async (req, res) => {
         message: "Participant not found",
       });
     }
+    if(!team.participants.includes(participantId)){
+      return res.status(400).send({
+        success: false,
+        message: "Participant not in team",
+      });
+    }
+    if(team.leaderId.equals(participantId)){
+      team.leaderId = null;
+      participant.role = "emp";
+    }
     await team.participants.pull(participantId);
     participant.team = null;
     participant.verify = false;
-
     await participant.save();
     await team.save();
     return res.status(200).send({
