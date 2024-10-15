@@ -3,14 +3,26 @@ import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
-import { FaPencilAlt, FaPlus, FaTrash, FaSave, FaSearch, FaSort } from "react-icons/fa";
+import {
+  FaPencilAlt,
+  FaPlus,
+  FaTrash,
+  FaSave,
+  FaSearch,
+  FaSort,
+} from "react-icons/fa";
 import {
   getAllProjects,
   createProject,
   updateProject,
 } from "../../services/projectService";
 import { createMeeting, updateMeeting } from "../../services/meetingService";
-import { getAllClients, deleteClient, updateClient } from "../../services/clientServices";
+import {
+  getAllClients,
+  deleteClient,
+  updateClient,
+} from "../../services/clientServices";
+import { useNavigate } from "react-router-dom";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -29,6 +41,7 @@ const MeetingManagement = () => {
   const [clientSearchTerms, setClientSearchTerms] = useState({});
   const [clientSortOptions, setClientSortOptions] = useState({});
   const [showSearchFields, setShowSearchFields] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log("clients in useEffect", clients);
@@ -55,39 +68,38 @@ const MeetingManagement = () => {
 
   const toggleClientModal = () => setIsClientModalOpen(!isClientModalOpen);
   const toggleMeetingModal = () => setIsMeetingModalOpen(!isMeetingModalOpen);
-  
- const toggleProjectModal = (clientId = null) => {
-   setAddProjectToClient(clientId);
-   setIsProjectModalOpen(!isProjectModalOpen);
- };
 
- const handleAddProject = async (projectData) => {
-   try {
-  console.log("handle add project called")
-    console.log("projectData in frontend ", projectData);
-     const newProject = await createProject(projectData);
-     setProjects((prevProjects) => [...prevProjects, newProject]);
+  const toggleProjectModal = (clientId = null) => {
+    setAddProjectToClient(clientId);
+    setIsProjectModalOpen(!isProjectModalOpen);
+  };
 
-     // Update the client's projects list
-     if (projectData.clientId) {
-       setClients((prevClients) =>
-         prevClients.map((client) =>
-           client._id === projectData.clientId
-             ? {
-                 ...client,
-                 projectId: [...(client.projectId || []), newProject],
-               }
-             : client
-         )
-       );
-     }
+  const handleAddProject = async (projectData) => {
+    try {
+      console.log("handle add project called");
+      console.log("projectData in frontend ", projectData);
+      const newProject = await createProject(projectData);
+      setProjects((prevProjects) => [...prevProjects, newProject]);
 
-     toggleProjectModal(); // Close the modal after adding the project
-   } catch (error) {
-     setError("Error creating project. Please try again.");
-   }
- };
+      // Update the client's projects list
+      if (projectData.clientId) {
+        setClients((prevClients) =>
+          prevClients.map((client) =>
+            client._id === projectData.clientId
+              ? {
+                  ...client,
+                  projectId: [...(client.projectId || []), newProject],
+                }
+              : client
+          )
+        );
+      }
 
+      toggleProjectModal(); // Close the modal after adding the project
+    } catch (error) {
+      setError("Error creating project. Please try again.");
+    }
+  };
 
   const handleUpdateProject = async (id, projectData) => {
     try {
@@ -173,23 +185,23 @@ const MeetingManagement = () => {
   };
 
   const toggleSearchField = (clientId) => {
-    setShowSearchFields(prev => ({
+    setShowSearchFields((prev) => ({
       ...prev,
-      [clientId]: !prev[clientId]
+      [clientId]: !prev[clientId],
     }));
   };
 
   const handleClientSearch = (clientId, searchTerm) => {
-    setClientSearchTerms(prev => ({
+    setClientSearchTerms((prev) => ({
       ...prev,
-      [clientId]: searchTerm
+      [clientId]: searchTerm,
     }));
   };
 
   const handleSortChange = (clientId, sortOption) => {
-    setClientSortOptions(prev => ({
+    setClientSortOptions((prev) => ({
       ...prev,
-      [clientId]: sortOption
+      [clientId]: sortOption,
     }));
   };
 
@@ -240,16 +252,16 @@ const MeetingManagement = () => {
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return 'bg-yellow-200 text-yellow-800';
-      case 'ongoing':
-        return 'bg-blue-200 text-blue-800';
-      case 'completed':
-        return 'bg-green-200 text-green-800';
-      case 'cancelled':
-        return 'bg-red-200 text-red-800';
+      case "pending":
+        return "bg-yellow-200 text-yellow-800";
+      case "ongoing":
+        return "bg-blue-200 text-blue-800";
+      case "completed":
+        return "bg-green-200 text-green-800";
+      case "cancelled":
+        return "bg-red-200 text-red-800";
       default:
-        return 'bg-gray-200 text-gray-800';
+        return "bg-gray-200 text-gray-800";
     }
   };
 
@@ -439,7 +451,12 @@ const MeetingManagement = () => {
                 >
                   + Add New Project
                 </button>
-                <button className="text-blue-600 hover:underline focus:outline-none">
+                <button
+                  className="text-blue-600 hover:underline focus:outline-none"
+                  onClick={() => {
+                    navigate(`/thread/${client._id}`);
+                  }}
+                >
                   View in Graph
                 </button>
               </div>
