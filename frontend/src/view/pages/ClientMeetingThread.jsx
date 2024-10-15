@@ -39,9 +39,12 @@ const Meetings = ({ projectId }) => {
         >
           <FaCalendarAlt className="text-purple-500 text-xl" />
           <div>
-            <h4 className="text-md font-semibold">{meeting.title}</h4>
+            {/* <h4 className="text-md font-semibold">{meeting.title}</h4> */}
             <p className="text-sm text-gray-600">
-              {new Date(meeting.date).toLocaleString()}
+              {new Date(meeting.meetingDateTime).toLocaleString()}
+            </p>
+            <p className="text-sm text-gray-600">
+              Status:{meeting.meetingStatus}
             </p>
           </div>
         </div>
