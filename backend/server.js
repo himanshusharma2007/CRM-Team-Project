@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const colors = require("colors");
-const connectDB=require("./database/db")
+const connectDB = require("./database/db");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const leadRouter = require("./routes/leadRoutes");
@@ -14,7 +14,7 @@ const teamRoutes = require("./routes/teamRoutes");
 const clientRoutes = require("./routes/clientRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
-const contactRoutes = require("./routes/contactRoutes")
+const contactRoutes = require("./routes/contactRoutes");
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
@@ -38,7 +38,7 @@ app.use("/api/profile", userRoutes);
 app.use("/api/lead", leadRouter);
 app.use("/api/stage", stageRoutes);
 app.use("/api/todoStatus", todoStatusRoutes);
-app.use("/api/contact", contactRoutes)
+app.use("/api/contact", contactRoutes);
 app.use("/api/contactUs", contactUsRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/client", clientRoutes);
@@ -49,4 +49,3 @@ app.listen(PORT, async () => {
   await connectDB(URL);
   console.log(`Server running on Post- ${PORT}`.bgBlue.black);
 });
-

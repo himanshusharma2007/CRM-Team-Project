@@ -22,6 +22,8 @@ import Lead from "./view/pages/Lead";
 import LeadDetails from "./view/pages/LeadDetails";
 import Teams from "./view/pages/Teams";
 import MeetingManagement from "./view/pages/MeetingManagement";
+import ProjectPage from "./view/pages/ProjectPage";
+import ProjectDetails from "./view/pages/ProjectDetails";
 
 function App() {
   return (
@@ -30,7 +32,22 @@ function App() {
         <Routes>
           {/* Home page is public */}
           <Route path="/" element={<Landing />} />
-
+          <Route
+            path="/projects"
+            element={
+              <Layout>
+                <ProjectPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/project/:id"
+            element={
+              <Layout>
+                <ProjectDetails />
+              </Layout>
+            }
+          />
           {/* Routes for Landing Page */}
           <Route
             path="/home"

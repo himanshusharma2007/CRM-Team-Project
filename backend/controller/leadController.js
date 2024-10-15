@@ -3,28 +3,47 @@ const stages = require("../models/leadStagesModels");
 const contact = require("../models/contactModels");
 
 exports.createLead = async (req, res) => {
-  console.log('req.body in create lead', req.body)
-  const { title, companyName, contactName, phone, email, description, stage, location } =
-    req.body;
+  console.log("req.body in create lead", req.body);
+  const {
+    title,
+    companyName,
+    contactName,
+    phone,
+    email,
+    description,
+    stage,
+    location,
+  } = req.body;
 
   try {
-    if (!title || !companyName || !contactName || !phone || !email || !description || !location) {
+    if (
+      !title ||
+      !companyName ||
+      !contactName ||
+      !phone ||
+      !email ||
+      !description ||
+      !location
+    ) {
       console.log("please fill all fields");
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
       });
     }
-    const stageData = await stages.findOne({"stageName": stage});
-    console.log('stageData', stageData)
-    if(!stageData){
+    const stageData = await stages.findOne({ stageName: stage });
+    console.log("stageData", stageData);
+    if (!stageData) {
       console.log("stageName does not exist");
       return res.status(400).send({
         success: false,
         message: "stageName does not exist",
       });
     }
-    if(await contact.findOne({email}) || await lead.findOne({phoneNo: phone})){
+    if (
+      (await contact.findOne({ email })) ||
+      (await lead.findOne({ phoneNo: phone }))
+    ) {
       console.log("email or phoneNo already exists");
       return res.status(400).send({
         success: false,
@@ -46,6 +65,7 @@ exports.createLead = async (req, res) => {
       description,
       location,
       currentStage: stageData.stageName,
+      location,
     });
     stageData.leads.push(leaddata._id);
     await stageData.save();
@@ -61,7 +81,10 @@ exports.createLead = async (req, res) => {
 
 exports.getLeads = async (req, res) => {
   try {
-    const leads = await lead.find().populate("assignedTo team").select("-password");
+    const leads = await lead
+      .find()
+      .populate("assignedTo team")
+      .select("-password");
     res.status(200).send(leads);
   } catch (error) {
     res
@@ -101,24 +124,24 @@ exports.updateLead = async (req, res) => {
 
 exports.updateStage = async (req, res) => {
   try {
-    console.log('req.body in update Stage', req.body)
+    console.log("req.body in update Stage", req.body);
     const { stageName } = req.body;
     const { id } = req.params;
     const leadData = await lead.findById(id);
-    if(!leadData){
+    if (!leadData) {
       return res.status(400).send({
         success: false,
         message: "lead does not exist",
       });
     }
-    if(leadData.currentStage === stageName){
+    if (leadData.currentStage === stageName) {
       return res.status(400).send({
         success: false,
         message: "lead already in this stage",
       });
     }
-    const stageData = await stages.findOne({stageName});
-    if(!stageData){
+    const stageData = await stages.findOne({ stageName });
+    if (!stageData) {
       return res.status(400).send({
         success: false,
         message: "stageName does not exist",
@@ -127,14 +150,17 @@ exports.updateStage = async (req, res) => {
     stageData.leads.push(leadData._id);
     await stageData.save();
 
-    const oldStageData = await stages.findOne({stageName: leadData.currentStage});
-    oldStageData.leads = oldStageData.leads.filter((lead) => lead.toString() !== leadData._id.toString());
+    const oldStageData = await stages.findOne({
+      stageName: leadData.currentStage,
+    });
+    oldStageData.leads = oldStageData.leads.filter(
+      (lead) => lead.toString() !== leadData._id.toString()
+    );
     await oldStageData.save();
 
     leadData.currentStage = stageName;
     await leadData.save();
     res.status(200).send(leadData);
-    
   } catch (error) {
     console.log("Error in updateStage:>> ", error);
     res
@@ -152,8 +178,12 @@ exports.deleteLead = async (req, res) => {
       return res.status(404).json({ message: "Lead not found" });
     }
 
-    const stageData = await stages.findOne({stageName: deletedLead.currentStage});
-    stageData.leads = stageData.leads.filter((lead) => lead.toString() !== deletedLead._id.toString());
+    const stageData = await stages.findOne({
+      stageName: deletedLead.currentStage,
+    });
+    stageData.leads = stageData.leads.filter(
+      (lead) => lead.toString() !== deletedLead._id.toString()
+    );
     await stageData.save();
 
     res.status(200).json({ message: "Lead deleted successfully" });
@@ -170,11 +200,12 @@ exports.getLeadById = async (req, res) => {
     console.log("get lead by id called", id);
     const leadData = await lead
       .findOne({ _id: id })
-      .populate("assignedTo team").select("-password");
+      .populate("assignedTo team")
+      .select("-password");
     console.log("lead in get lead by id:>> ", leadData);
     res.status(200).json(leadData);
   } catch (error) {
-    console.log('error in getLeadById', error)
+    console.log("error in getLeadById", error);
     res
       .status(500)
       .json({ message: "Error fetching leads", error: error.message });
