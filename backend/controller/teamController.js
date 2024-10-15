@@ -1,4 +1,5 @@
 const Team = require("../models/teamModels");
+const User = require("../models/userModels");
 
 
 exports.createTeam = async (req, res) => {
@@ -95,6 +96,53 @@ exports.deleteTeam = async (req, res) => {
     return res.status(200).send({
       success: true,
       message: "Team deleted successfully",
+    });
+  } catch (err) {
+    console.log("err", err)
+    return res.status(500).send({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+
+exports.removeParticipant = async (req, res) => {
+  try {
+    const { participantId } = req.body;
+    const teamId = req.params.id;
+    const team = await Team.findById(teamId);
+    if(!team){
+      return res.status(400).send({
+        success: false,
+        message: "Team not found",
+      });
+    }
+    const participant = await User.findById(participantId);
+    if(!participant){
+      return res.status(400).send({
+        success: false,
+        message: "Participant not found",
+      });
+    }
+    if(!team.participants.includes(participantId)){
+      return res.status(400).send({
+        success: false,
+        message: "Participant not in team",
+      });
+    }
+    if(team.leaderId.equals(participantId)){
+      team.leaderId = null;
+      participant.role = "emp";
+    }
+    await team.participants.pull(participantId);
+    participant.team = null;
+    participant.verify = false;
+    await participant.save();
+    await team.save();
+    return res.status(200).send({
+      success: true,
+      message: "Participant removed successfully",
     });
   } catch (err) {
     console.log("err", err)
