@@ -31,7 +31,7 @@ const Meetings = ({ projectId }) => {
   if (meetings.length === 0) return <div>No meetings scheduled</div>;
 
   return (
-    <div className="ml-12 mt-2">
+    <div className="ml-12 mt-2 w-[50%]">
       {meetings.map((meeting) => (
         <div
           key={meeting.id}
@@ -40,11 +40,24 @@ const Meetings = ({ projectId }) => {
           <FaCalendarAlt className="text-purple-500 text-xl" />
           <div>
             {/* <h4 className="text-md font-semibold">{meeting.title}</h4> */}
+            <h4 className="text-md font-semibold">Meeting Title</h4>
             <p className="text-sm text-gray-600">
               {new Date(meeting.meetingDateTime).toLocaleString()}
             </p>
-            <p className="text-sm text-gray-600">
-              Status:{meeting.meetingStatus}
+          </div>
+          <div>
+            <p
+              className={`text-sm ml-52 p-1 rounded-xl text-gray-600 ${
+                meeting.meetingStatus === "pending"
+                  ? "bg-yellow-200 text-yellow-800"
+                  : meeting.meetingStatus === "cancelled"
+                  ? "bg-red-200 text-red-800"
+                  : meeting.meetingStatus === "completed"
+                  ? "bg-green-200 text-green-800"
+                  : "bg-orange-200 text-orange-800"
+              }`}
+            >
+              {meeting.meetingStatus}
             </p>
           </div>
         </div>
