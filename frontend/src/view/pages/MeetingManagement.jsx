@@ -355,7 +355,7 @@ const MeetingManagement = () => {
           clients.map((client, index) => (
             <div
               key={index}
-              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl transition-shadow duration-300 ease-in-out"
+              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl  transition-shadow duration-300 ease-in-out"
             >
               {/* Client Header */}
               <div className="flex justify-between items-center mb-6">
@@ -445,7 +445,7 @@ const MeetingManagement = () => {
               </div>
 
               {/* Services List */}
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
                 {client && Array.isArray(client.projectId) ? (
                   sortAndFilterProjects(client.projectId, client._id).map(
                     (service, idx) => (
@@ -458,7 +458,11 @@ const MeetingManagement = () => {
                           <h3 className="text-md font-semibold text-gray-800">
                             {service.name}
                           </h3>
-                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(service.projectStatus)}`}>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(
+                              service.projectStatus
+                            )}`}
+                          >
                             {service.projectStatus}
                           </span>
                         </div>
