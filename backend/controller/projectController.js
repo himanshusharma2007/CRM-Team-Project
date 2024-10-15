@@ -117,6 +117,7 @@ exports.getProjectById = async (req, res) => {
 
 exports.getProjectByClientId = async (req, res) => {
   try {
+    console.log(" getProjectByClientId called req.params.id", req.params.id);
     if (!(await client.findById(req.params.id))) {
       return res.status(404).json({ error: "Client not found" });
     }
