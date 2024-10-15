@@ -122,7 +122,7 @@ exports.getProjectByClientId = async (req, res) => {
     }
     const projectData = await project
       .find({ clientId: req.params.id })
-      .populate("clientId teamIds leaderId lastMeetingId");
+      .populate("clientId teamIds lastMeetingId");
     res.status(200).json(projectData);
   } catch (error) {
     console.log(error);
@@ -133,7 +133,7 @@ exports.getProjectByClientId = async (req, res) => {
 exports.updateProject = async (req, res) => {
   try {
     const { name, description, serviceType, projectStatus, teamIds } = req.body;
-    let hashtages = req.body.hashtages;
+    let hashtags = req.body.hashtags;
     const projectData = await project.findById(req.params.id);
     if (!projectData) {
       return res.status(404).json({ error: "Project not found" });
@@ -145,10 +145,10 @@ exports.updateProject = async (req, res) => {
     if (existingProject) {
       return res.status(400).json({ error: "Project name already exists" });
     }
-    hashtages = hashtages ? hashtages.split(",") : [];
-    await hashtages.map(async (item) => {
-      if (!projectData.hashtages.includes(item)) {
-        projectData.hashtages.push(item);
+    hashtags = hashtags ? hashtags.split(",") : [];
+    await hashtags.map(async (item) => {
+      if (!projectData.hashtags.includes(item)) {
+        projectData.hashtags.push(item);
       }
     });
     await teamIds.map(async (item) => {

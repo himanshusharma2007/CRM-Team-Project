@@ -43,7 +43,7 @@ const projectSchema = new mongoose.Schema(
         ref: "team",
       },
     ],
-    hashtages: {
+    hashtags: {
       type: Array,
       default: [],
     },
