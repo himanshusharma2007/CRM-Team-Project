@@ -117,12 +117,13 @@ exports.getProjectById = async (req, res) => {
 
 exports.getProjectByClientId = async (req, res) => {
   try {
+    console.log(" getProjectByClientId called req.params.id", req.params.id);
     if (!(await client.findById(req.params.id))) {
       return res.status(404).json({ error: "Client not found" });
     }
     const projectData = await project
       .find({ clientId: req.params.id })
-      .populate("clientId teamIds leaderId lastMeetingId");
+      .populate("clientId teamIds  lastMeetingId");
     res.status(200).json(projectData);
   } catch (error) {
     console.log(error);

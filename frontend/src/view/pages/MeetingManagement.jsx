@@ -301,11 +301,13 @@ const MeetingManagement = () => {
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="w-36 bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-300"
+            disabled={!searchTerm}
           >
             <option value="all">All Status</option>
-            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="ongoing">Ongoing</option>
             <option value="completed">Completed</option>
-            <option value="on-hold">On Hold</option>
+            <option value="cancelled">Cancelled</option>
           </select>
           <button
             onClick={toggleClientModal}
@@ -325,16 +327,14 @@ const MeetingManagement = () => {
                 className="border border-gray-200 rounded-lg p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out"
               >
                 {/* Card Header */}
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4 gap-3 min-w-52">
                   <h3 className="text-xl font-semibold text-gray-800">
                     {project.name}
                   </h3>
                   <span
-                    className={`text-xs px-3 py-1 rounded-full ${
-                      project.projectStatus === "Completed"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-yellow-100 text-yellow-600"
-                    }`}
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(
+                      project.projectStatus
+                    )}`}
                   >
                     {project.projectStatus}
                   </span>
@@ -367,7 +367,7 @@ const MeetingManagement = () => {
           clients.map((client, index) => (
             <div
               key={index}
-              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl transition-shadow duration-300 ease-in-out"
+              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl  transition-shadow duration-300 ease-in-out"
             >
               {/* Client Header */}
               <div className="flex justify-between items-center mb-6">
@@ -462,7 +462,7 @@ const MeetingManagement = () => {
               </div>
 
               {/* Services List */}
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
                 {client && Array.isArray(client.projectId) ? (
                   sortAndFilterProjects(client.projectId, client._id).map(
                     (service, idx) => (

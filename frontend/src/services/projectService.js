@@ -20,6 +20,14 @@ export const getProjectById = async (id) => {
     throw new Error(error.response.data.message || 'Error fetching project');
   }
 };
+export const getProjectByClientId = async (id) => {
+  try {
+    const response = await api.get(`/project/client/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || "Error fetching project");
+  }
+};
 
 // Service to create a new project
 export const createProject = async (projectData) => {
