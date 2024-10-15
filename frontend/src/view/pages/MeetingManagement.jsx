@@ -23,7 +23,7 @@ const MeetingManagement = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const teams = ["Team A", "Team B", "Team C"]; // This should ideally come from the backend
+  const [addProjectToClient, setAddProjectToClient] = useState(null);
 
   useEffect(() => {
     console.log("clients in useEffect", clients);
@@ -50,16 +50,39 @@ const MeetingManagement = () => {
 
   const toggleClientModal = () => setIsClientModalOpen(!isClientModalOpen);
   const toggleMeetingModal = () => setIsMeetingModalOpen(!isMeetingModalOpen);
-  const toggleProjectModal = () => setIsProjectModalOpen(!isProjectModalOpen);
+  
+ const toggleProjectModal = (clientId = null) => {
+   setAddProjectToClient(clientId);
+   setIsProjectModalOpen(!isProjectModalOpen);
+ };
 
-  const handleAddProject = async (projectData) => {
-    try {
-      const newProject = await createProject(projectData);
-      setProjects((prevProjects) => [...prevProjects, newProject]);
-    } catch (error) {
-      setError("Error creating project. Please try again.");
-    }
-  };
+ const handleAddProject = async (projectData) => {
+   try {
+  console.log("handle add project called")
+    console.log("projectData in frontend ", projectData);
+     const newProject = await createProject(projectData);
+     setProjects((prevProjects) => [...prevProjects, newProject]);
+
+     // Update the client's projects list
+     if (projectData.clientId) {
+       setClients((prevClients) =>
+         prevClients.map((client) =>
+           client._id === projectData.clientId
+             ? {
+                 ...client,
+                 projectId: [...(client.projectId || []), newProject],
+               }
+             : client
+         )
+       );
+     }
+
+     toggleProjectModal(); // Close the modal after adding the project
+   } catch (error) {
+     setError("Error creating project. Please try again.");
+   }
+ };
+
 
   const handleUpdateProject = async (id, projectData) => {
     try {
@@ -225,100 +248,97 @@ const MeetingManagement = () => {
       </div>
 
       <div className="flex w-full gap-6 px-6 py-8 min-h-screen bg-gray-100 overflow-x-auto">
-  {clients &&
-    clients.map((client, index) => (
-      <div
-        key={index}
-        className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl transition-shadow duration-300 ease-in-out"
-      >
-        {/* Client Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-900">{client.name}</h2>
-          <div className="flex gap-3">
-            <button className="text-gray-600 hover:text-blue-600" >
-              <FaPencilAlt />
-            </button>
-            <button
-              className="text-gray-600 hover:text-red-600"
-              onClick={() => handleDeleteClient(client._id)}
+        {clients &&
+          clients.map((client, index) => (
+            <div
+              key={index}
+              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl transition-shadow duration-300 ease-in-out"
             >
-              <FaTrash />
-            </button>
-          </div>
-        </div>
-
-        {/* Filter Input */}
-        <input
-          type="text"
-          placeholder="Filter projects"
-          className="border border-gray-300 p-2 w-full rounded-md text-sm text-gray-700 mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        />
-
-        {/* Add/View Buttons */}
-        <div className="flex justify-between items-center mb-6">
-          <button
-            className="text-blue-600 hover:underline focus:outline-none"
-            onClick={toggleProjectModal}
-          >
-            + Add New Project
-          </button>
-          <button className="text-blue-600 hover:underline focus:outline-none">
-            View in Graph
-          </button>
-        </div>
-
-        {/* Services List */}
-        <div className="space-y-4">
-          {client && Array.isArray(client.projectId) ? (
-            client.projectId.map((service, idx) => (
-              <div
-                key={idx}
-                className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition duration-200 ease-in-out"
-              >
-                {/* Service Header */}
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-md font-semibold text-gray-800">
-                    {service.name}
-                  </h3>
-                  <span className="bg-green-200 text-xs text-green-800 px-2 py-1 rounded-full">
-                    {service.projectStatus}
-                  </span>
+              {/* Client Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900">{client.name}</h2>
+                <div className="flex gap-3">
+                  <button className="text-gray-600 hover:text-blue-600" >
+                    <FaPencilAlt />
+                  </button>
+                  <button
+                    className="text-gray-600 hover:text-red-600"
+                    onClick={() => handleDeleteClient(client._id)}
+                  >
+                    <FaTrash />
+                  </button>
                 </div>
-
-                {/* Service Details */}
-                <p className="text-sm text-gray-700">{service.description}</p>
-                <p className="text-xs text-gray-500 mt-2">
-                  Service Type: {service.serviceType}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Company Name: {client.company}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Created On:{" "}
-                  {new Date(service.createdAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </p>
               </div>
-            ))
-          ) : (
-            <p className="text-sm text-gray-600">No services available.</p>
-          )}
-        </div>
+
+              {/* Filter Input */}
+              <input
+                type="text"
+                placeholder="Filter projects"
+                className="border border-gray-300 p-2 w-full rounded-md text-sm text-gray-700 mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+
+              {/* Add/View Buttons */}
+              <div className="flex justify-between items-center mb-6">
+                <button
+                  className="text-blue-600 hover:underline focus:outline-none"
+                  onClick={() => toggleProjectModal(client._id)}
+                >
+                  + Add New Project
+                </button>
+                <button className="text-blue-600 hover:underline focus:outline-none">
+                  View in Graph
+                </button>
+              </div>
+
+              {/* Services List */}
+              <div className="space-y-4">
+                {client && Array.isArray(client.projectId) ? (
+                  client.projectId.map((service, idx) => (
+                    <div
+                      key={idx}
+                      className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition duration-200 ease-in-out"
+                    >
+                      {/* Service Header */}
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-md font-semibold text-gray-800">
+                          {service.name}
+                        </h3>
+                        <span className="bg-green-200 text-xs text-green-800 px-2 py-1 rounded-full">
+                          {service.projectStatus}
+                        </span>
+                      </div>
+
+                      {/* Service Details */}
+                      <p className="text-sm text-gray-700">{service.description}</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Service Type: {service.serviceType}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Company Name: {client.company}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Created On:{" "}
+                        {new Date(service.createdAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600">No services available.</p>
+                )}
+              </div>
+            </div>
+          ))}
       </div>
-    ))}
-</div>
-
-
 
       {/* Modals */}
       <AddClientModal
         isOpen={isClientModalOpen}
         onClose={toggleClientModal}
         onAddClient={handleAddClient}
-        teams={teams}
       />
       <NewMeetingModal
         isOpen={isMeetingModalOpen}
@@ -328,9 +348,9 @@ const MeetingManagement = () => {
       />
       <AddProjectModal
         isOpen={isProjectModalOpen}
-        onClose={toggleProjectModal}
+        onClose={() => toggleProjectModal()}
         onAddProject={handleAddProject}
-        teams={teams}
+        clientId={addProjectToClient}
       />
     </div>
   );
