@@ -10,8 +10,8 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
   const allProjectsfun = async () => {
     try {
       const projects = await getAllProjects();
-      console.log("Fetched Projects: ", projects); // Log fetched projects
-      setAllProjects(projects); // Set the fetched projects to state
+      console.log("Fetched Projects: ", projects);
+      setAllProjects(projects);
     } catch (error) {
       console.error("Error fetching projects:", error.message);
     }
@@ -21,8 +21,8 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
   const allClientsfun = async () => {
     try {
       const clients = await getAllClients();
-      console.log("Fetched Clients: ", clients); // Log fetched clients
-      setAllClients(clients); // Set the fetched clients to state
+      console.log("Fetched Clients: ", clients); 
+      setAllClients(clients);
     } catch (error) {
       console.error("Error fetching clients:", error.message);
     }
@@ -30,6 +30,8 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
 
   // Fetch projects and clients on component mount
   useEffect(() => {
+    console.log("allProjects", allProjects);
+    console.log("allClients", allClients);
     allProjectsfun();
     allClientsfun();
   }, []);
@@ -88,7 +90,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
         <div className="flex justify-center">
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
-            onClick={onAddMeeting} // Trigger `onAddMeeting` when clicking Schedule
+            onClick={onAddMeeting} 
           >
             Schedule
           </button>
