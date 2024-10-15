@@ -182,6 +182,7 @@ exports.createMeeting = async (req, res) => {
     const {
       clientId,
       projectId,
+      title,
       dateTime: meetingDateTime,
       meetingStatus,
       clientNotification,
@@ -191,13 +192,14 @@ exports.createMeeting = async (req, res) => {
     console.log("Extracted data from request body:", {
       clientId,
       projectId,
+      title,
       meetingDateTime,
       meetingStatus,
       clientNotification,
       leaderNotification,
     });
 
-    if (!clientId || !projectId || !meetingDateTime) {
+    if (!clientId || !projectId || !meetingDateTime || !title) {
       console.log("Missing required fields");
       return res.status(400).json({ error: "All fields are required" });
     }
@@ -219,6 +221,7 @@ exports.createMeeting = async (req, res) => {
     const meetingData = await meeting.create({
       clientId,
       projectId,
+      title,
       meetingDateTime,
       meetingStatus,
     });
