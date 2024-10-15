@@ -1,6 +1,7 @@
 const client = require("../models/clientModels");
 const contact = require("../models/contactModels");
 const lead = require("../models/leadModels");
+const project = require("../models/projectModels");
 
 exports.createClient = async (req, res) => {
     try {
@@ -107,6 +108,10 @@ exports.deleteClient = async (req, res) => {
         const clientData = await client.findById(id);
         if (!clientData) {
             return res.status(404).json({ error: "Client not found" });
+        }
+        const projectData = await project.findOne({clientId: id});
+        if(projectData){
+            return res.status(400).json({ error: "Client has a project" });
         }
         await clientData.deleteOne(); // Use deleteOne instead of delete
         res.status(200).json({ message: "Client deleted successfully" });
