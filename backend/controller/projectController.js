@@ -92,6 +92,7 @@ exports.getProjectByClientId = async (req, res) => {
         const projectData = await project.find({ clientId: req.params.id }).populate("clientId teamIds leaderId lastMeetingId");
         res.status(200).json(projectData);
     } catch (error) {
+        
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
     }

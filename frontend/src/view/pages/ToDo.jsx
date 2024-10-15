@@ -12,6 +12,7 @@ import {
   FaSave,
   FaTimes,
 } from "react-icons/fa";
+import "../styles/hideScroll.css";
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
@@ -118,7 +119,7 @@ const ToDo = () => {
         }));
         setTitle("");
         setTaskPriority("Medium");
-        setTaskStage(null);
+        setTaskStage("todo");
       } catch (error) {
         console.error("Failed to save task:", error);
         alert(
@@ -387,73 +388,76 @@ const ToDo = () => {
     setEditStatusName("");
   };
 
- const saveEditedStatus = async (oldStatus) => {
-   if (editStatusName.trim() === "") {
-     alert("Status name cannot be empty.");
-     return;
-   }
+  const saveEditedStatus = async (oldStatus) => {
+    if (editStatusName.trim() === "") {
+      alert("Status name cannot be empty.");
+      return;
+    }
 
-   if (editStatusName.trim() === oldStatus) {
-     cancelEditingStatus();
-     return;
-   }
+    if (editStatusName.trim() === oldStatus) {
+      cancelEditingStatus();
+      return;
+    }
 
-   if (statuses.includes(editStatusName.trim())) {
-     alert("This status name already exists.");
-     return;
-   }
+    if (statuses.includes(editStatusName.trim())) {
+      alert("This status name already exists.");
+      return;
+    }
 
-   setIsManagingStatus(true);
-   try {
-     // Update the status on the server
-     await todoStatusService.updateTodoStatus(oldStatus, editStatusName.trim());
+    setIsManagingStatus(true);
+    try {
+      // Update the status on the server
+      await todoStatusService.updateTodoStatus(
+        oldStatus,
+        editStatusName.trim()
+      );
 
-     // Update the statuses state
-     setStatuses((prevStatuses) =>
-       prevStatuses.map((status) =>
-         status === oldStatus ? editStatusName.trim() : status
-       )
-     );
+      // Update the statuses state
+      setStatuses((prevStatuses) =>
+        prevStatuses.map((status) =>
+          status === oldStatus ? editStatusName.trim() : status
+        )
+      );
 
-     // Update the tasks state
-     setTasks((prevTasks) => {
-       const updatedTasks = { ...prevTasks };
-       const tasksToUpdate = updatedTasks[oldStatus] || [];
+      // Update the tasks state
+      setTasks((prevTasks) => {
+        const updatedTasks = { ...prevTasks };
+        const tasksToUpdate = updatedTasks[oldStatus] || [];
 
-       // Update the status of each task
-       const updatedTaskList = tasksToUpdate.map((task) => ({
-         ...task,
-         status: { ...task.status, name: editStatusName.trim() },
-       }));
+        // Update the status of each task
+        const updatedTaskList = tasksToUpdate.map((task) => ({
+          ...task,
+          status: { ...task.status, name: editStatusName.trim() },
+        }));
 
-       // Remove the old status key and add the new one
-       delete updatedTasks[oldStatus];
-       updatedTasks[editStatusName.trim()] = updatedTaskList;
+        // Remove the old status key and add the new one
+        delete updatedTasks[oldStatus];
+        updatedTasks[editStatusName.trim()] = updatedTaskList;
 
-       return updatedTasks;
-     });
+        return updatedTasks;
+      });
 
-     // Update all tasks that were under the old status
-     const tasksToUpdate = tasks[oldStatus] || [];
-     for (const task of tasksToUpdate) {
-       await updateTask(task._id, {
-         ...task,
-         status: { ...task.status, name: editStatusName.trim() },
-       });
-     }
+      // Update all tasks that were under the old status
+      const tasksToUpdate = tasks[oldStatus] || [];
+      for (const task of tasksToUpdate) {
+        await updateTask(task._id, {
+          ...task,
+          status: { ...task.status, name: editStatusName.trim() },
+        });
+      }
 
-     cancelEditingStatus();
-   } catch (error) {
-     console.error("Failed to update status:", error);
-     alert(
-       `Failed to update status: ${
-         error.response?.data?.message || error.message
-       }`
-     );
-   } finally {
-     setIsManagingStatus(false);
-   }
- };
+      cancelEditingStatus();
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      alert(
+        `Failed to update status: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      setIsManagingStatus(false);
+    }
+  };
 
   const handleAddStatus = () => {
     if (newStatus.trim()) {
@@ -467,7 +471,7 @@ const ToDo = () => {
       <div className="relative min-h-screen overflow-auto ">
         {isUpdating && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-              <LoadingSpinner />
+            <LoadingSpinner />
           </div>
         )}
         {/* Add Task Section */}
@@ -646,7 +650,7 @@ const ToDo = () => {
                   )}
                 </div>
 
-                <div className="p-4 space-y-4 h-96 overflow-y-auto">
+                <div className="p-4 space-y-4 h-96 overflow-y-auto hideScroll">
                   {tasks[section] &&
                     tasks[section].map((task) => (
                       <div
