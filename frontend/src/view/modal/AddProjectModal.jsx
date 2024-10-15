@@ -33,6 +33,9 @@ const AddProjectModal = ({ isOpen, onClose, onAddProject }) => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    console.log("useeffect ids", teamIds);
+  }, [teamIds]);
   const resetForm = () => {
     setName("");
     setServiceType("");
@@ -40,7 +43,6 @@ const AddProjectModal = ({ isOpen, onClose, onAddProject }) => {
     setTeamIds([]);
     setHashtags("");
     setDescription("");
-    setClientId("");
   };
 
   const handleSubmit = async (e) => {
@@ -155,27 +157,25 @@ const AddProjectModal = ({ isOpen, onClose, onAddProject }) => {
             </div>
           </div>
 
-          <div className="flex mb-4 space-x-4">
-            <div className="w-1/2">
+          <div className=" mb-4 ">
+            <div className="w-full">
               <label className="block text-sm font-semibold mb-1">
                 Hashtags (optional)
               </label>
-              <input
-                type="text"
+              <textarea
                 value={hashtags}
                 onChange={(e) => setHashtags(e.target.value)}
-                className="border border-gray-300 p-2 w-full rounded-lg"
+                className="border border-gray-300 p-2 w-full rounded-lg resize-none h-20"
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-full">
               <label className="block text-sm font-semibold mb-1">
                 Description (optional)
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="border border-gray-300 p-2 w-full rounded-lg resize-none"
-                rows="1"
+                className="border border-gray-300 p-2 w-full resize-none rounded-lg h-20"
               />
             </div>
           </div>
@@ -209,7 +209,7 @@ const AddProjectModal = ({ isOpen, onClose, onAddProject }) => {
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded-lg"
             >
-              Add Project
+              Create
             </button>
           </div>
         </form>

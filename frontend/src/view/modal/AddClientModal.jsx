@@ -121,7 +121,7 @@ const AddClientModal = ({ isOpen, onClose }) => {
             >
               Save Client
             </button>
-          </form>
+          </form> 
         ) : (
           // Fetch from Lead Form
           <form className="space-y-6 bg-white p-6 rounded-lg shadow-md">

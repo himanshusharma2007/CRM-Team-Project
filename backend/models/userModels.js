@@ -14,9 +14,23 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      select: false,
     },
-    otp: String,
-    otpExpiry: Date,
+    otp: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+    otpVerify: {
+      type: Boolean,
+      default: false,
+      select: false,
+    },
     team: {
       type: String,
       enum: ["developer", "marketing", "noVerify"],
