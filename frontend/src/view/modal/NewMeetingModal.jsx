@@ -21,6 +21,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
   // Fetch all projects
   const allProjectsfun = async () => {
     try {
+      console.log("selectedClient", selectedClient);
       const projects = await getAllProjects();
       console.log("Fetched All Projects: ", projects);
       setAllProjects(projects);

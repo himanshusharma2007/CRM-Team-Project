@@ -89,7 +89,7 @@ const ProjectDetails = () => {
               <strong>Status:</strong> {project.projectStatus}
             </p>
             <p>
-              <strong>Client:</strong> {project.clientId.name}
+              <strong>Client:</strong> {project.clientId }
             </p>
           </div>
         </div>

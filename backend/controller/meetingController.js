@@ -317,10 +317,17 @@ exports.getAllMeetingsByProjectId = async (req, res) => {
 };
 
 exports.updateMeeting = async (req, res) => {
+  console.log("updateMeeting function called");
+  console.log("Request body:", req.body);
+  console.log("Meeting ID:", req.params.id);
+
   try {
     const {title, meetingConclusion, meetingStatus, meetingDateTime } = req.body;
     const meetingData = await meeting.findById(req.params.id);
+    console.log("Found meeting data:", meetingData);
+
     if (!meetingData) {
+      console.log("Meeting not found");
       return res.status(404).json({ error: "Meeting not found" });
     }
     meetingData.meetingConclusion = meetingConclusion || meetingData.meetingConclusion;
@@ -328,9 +335,11 @@ exports.updateMeeting = async (req, res) => {
     meetingData.meetingDateTime = meetingDateTime || meetingData.meetingDateTime;
     meetingData.title = title || meetingData.title;
     await meetingData.save();
+    console.log("Meeting saved successfully");
+
     res.status(200).json(meetingData);
   } catch (error) {
-    console.log(error);
+    console.error("Error in updateMeeting:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

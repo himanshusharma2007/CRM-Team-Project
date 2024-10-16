@@ -88,28 +88,44 @@ const UserVerificationList = () => {
   return (
     <div className="flex flex-col  min-h-screen bg-gray-100 p-8">
       <div className="bg-white shadow-md rounded-lg w-full h-full p-8 overflow-y-auto">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">User Verification</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+          User Verification
+        </h2>
 
         {message && (
-          <div className={`p-4 mb-4 text-white rounded-md ${message.includes("Error") ? 'bg-red-500' : 'bg-green-500'}`}>
+          <div
+            className={`p-4 mb-4 text-white rounded-md ${
+              message.includes("Error") ? "bg-red-500" : "bg-green-500"
+            }`}
+          >
             {message}
           </div>
         )}
 
         {loading ? (
-          <div className="flex justify-center relative"><LoadingSpinner /></div>
+          <div className="flex justify-center relative">
+            <LoadingSpinner />
+          </div>
         ) : (
           <>
             <div className="flex gap-3 mb-4">
               <button
                 onClick={() => handleSort("latest")}
-                className={`py-2 px-4 rounded-lg ${sortOrder === "latest" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"} transition duration-200`}
+                className={`py-2 px-4 rounded-lg ${
+                  sortOrder === "latest"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-300 text-gray-800"
+                } transition duration-200`}
               >
                 Latest
               </button>
               <button
                 onClick={() => handleSort("oldest")}
-                className={`py-2 px-4 rounded-lg ${sortOrder === "oldest" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"} transition duration-200`}
+                className={`py-2 px-4 rounded-lg ${
+                  sortOrder === "oldest"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-300 text-gray-800"
+                } transition duration-200`}
               >
                 Oldest
               </button>
@@ -117,9 +133,14 @@ const UserVerificationList = () => {
 
             <ul className="space-y-4">
               {users.map((user, index) => (
-                <li key={user._id} className="flex justify-between items-center bg-gray-50 p-4 rounded-md shadow hover:shadow-lg transition duration-200">
+                <li
+                  key={user._id}
+                  className="flex justify-between items-center bg-gray-50 p-4 rounded-md shadow hover:shadow-lg transition duration-200"
+                >
                   <div className="flex items-center space-x-4">
-                    <span className="text-lg font-semibold text-gray-800">{index + 1}.</span>
+                    <span className="text-lg font-semibold text-gray-800">
+                      {index + 1}.
+                    </span>
                     <div>
                       <p className="text-gray-800 font-semibold">{user.name}</p>
                       <p className="text-gray-600 text-sm">{user.email}</p>
@@ -145,10 +166,12 @@ const UserVerificationList = () => {
 
             <div className="mb-4">
               <label className="block mb-2 text-gray-700">Select Team:</label>
-              <select 
+              <select
                 onChange={(e) => {
                   const selectedTeamId = e.target.value;
-                  const selectedTeam = teams.find(team => team._id === selectedTeamId);
+                  const selectedTeam = teams.find(
+                    (team) => team._id === selectedTeamId
+                  );
                   setSelectTeam(selectedTeam || {});
                 }}
                 value={selectTeam ? selectTeam._id : ""}
@@ -166,7 +189,10 @@ const UserVerificationList = () => {
             {!selectTeam.leaderId && (
               <div className="mb-4">
                 <label className="block mb-2 text-gray-700">Select Role:</label>
-                <select onChange={(e) => setRole(e.target.value)} className="w-full border border-gray-300 rounded-md p-2">
+                <select
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md p-2"
+                >
                   <option value="">Select Role</option>
                   <option value="subAdmin">Leader</option>
                   <option value="emp">Member</option>
