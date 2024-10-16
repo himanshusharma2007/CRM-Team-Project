@@ -59,6 +59,7 @@ const userSchema = new mongoose.Schema(
         create: {type: Boolean, default: false} ,
         update: {type: Boolean, default: false},
         read: {type: Boolean, default: false},
+        requiredPermitions:["projects","clients"]
       },
       connection:{
         create: {type: Boolean, default: false} ,
