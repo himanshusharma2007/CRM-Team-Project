@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context"; // Import the useAuth hook
 import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon from React Icons
+import { uploadProfileImage } from "../../services/userService";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const Profile = () => {
   const { user, loading } = useAuth(); // Get user data from context
   const navigate = useNavigate();
-  const [profilePic, setProfilePic] = useState(user?.profilePic || ""); // State for profile picture
+  const [profileImage, setProfileImage] = useState(user?.profileImage || ""); // State for profile picture
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleChangePassword = () => {
@@ -23,24 +25,38 @@ const Profile = () => {
       setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfilePic(reader.result);
+        setProfileImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleUploadProfilePic = async () => {
-    if (selectedFile) {
-      // Upload the file to your backend or cloud storage service
-      // After successful upload, update the user's profile picture in your database and refresh the profile
-      console.log("Profile picture updated:", selectedFile);
+    if (!selectedFile) {
+      alert("Please select a file to upload");
+      return;
+    }
+    try {
+      const result = await uploadProfileImage(selectedFile);
+      if (result.success) {
+        alert("Profile picture updated successfully");
+        setProfileImage(result.imageUrl); // Update the displayed image
+      } else {
+        alert("Failed to update profile picture");
+      }
+    } catch (error) {
+      console.error("Error uploading profile image:", error);
+      alert("An error occurred while uploading the profile picture.");
     }
   };
+  
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="text-xl font-semibold">Loading...</div>
+        <div className="text-xl font-semibold">
+          <LoadingSpinner />
+        </div>
       </div>
     );
   }
@@ -62,9 +78,9 @@ const Profile = () => {
           Profile
         </h1>
         <div className="flex flex-col items-center mb-8 relative group">
-          {profilePic ? (
+          {profileImage ? (
             <img
-              src={profilePic}
+              src={profileImage}
               alt="Profile"
               className="w-24 h-24 rounded-full mb-4 object-cover border-4 border-blue-500 shadow-sm"
             />
@@ -85,12 +101,12 @@ const Profile = () => {
             />
           </label>
         </div>
-        {/* <button
+        <button
           onClick={handleUploadProfilePic}
           className="bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md mb-4"
         >
           Update Picture
-        </button> */}
+        </button>
         <div className="space-y-6">
           {[
             { label: "Name", value: user.name || "N/A" },

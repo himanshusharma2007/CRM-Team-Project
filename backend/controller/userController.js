@@ -1,5 +1,6 @@
 const user = require("../models/userModels");
 const team = require("../models/teamModels");
+const uploadOnCloudinary = require("../utils/cloudinary");
 
 exports.getUser = async (req, res) => {
   try {
@@ -109,4 +110,35 @@ exports.verifyUser = async (req, res) => {
       message: "Internel server error",
     });
   } 
+}
+
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    const { path } = req.file;
+    console.log(path)
+    const userData = await user.findById(req.user._id);
+    if(!userData){
+      return res.status(400).send({
+        success: false,
+        message: "User not found",
+      });
+    }       
+    const uploadResponse = await uploadOnCloudinary(path);
+    if(!uploadResponse){
+      throw new Error("Failed to upload image on cloudinary");
+    }
+    userData.profileImage = uploadResponse.url;
+    await userData.save();
+    return res.status(200).send({
+      success: true,
+      message: "Profile image uploaded successfully",
+      imageUrl: uploadResponse.url,
+    });
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      success: false,
+      message: "Internel server error",
+    });
+  }
 }
