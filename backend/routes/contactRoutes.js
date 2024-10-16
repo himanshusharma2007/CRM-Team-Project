@@ -8,4 +8,5 @@ router.get("/", jwtToken,checkSubAdmin, getContacts);
 router.post("/create",jwtToken, checkSubAdmin, createContact);
 router.delete("/delete/:id",jwtToken, checkAdmin, deleteContact);
 router.put("/update/:id",jwtToken, checkAdmin, updateContact);
+
 module.exports = router;   

@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Context } from "./context/Context";
+import "./view/styles/hideScroll.css";
 
 import LoginPage from "./view/screens/Login";
 import Register from "./view/screens/Register";
@@ -24,7 +25,7 @@ import Teams from "./view/pages/Teams";
 import MeetingManagement from "./view/pages/MeetingManagement";
 import ProjectPage from "./view/pages/ProjectPage";
 import ProjectDetails from "./view/pages/ProjectDetails";
-// import ClientProjectThread from "./view/pages/ClientProjectThread";
+import ClientMeetingThread from "./view/pages/ClientMeetingThread";
 
 function App() {
   return (
@@ -163,6 +164,15 @@ function App() {
               </Layout>
             }
           />
+          <Route
+            path="/thread/:id"
+            element={
+              <Layout>
+                <ClientMeetingThread />
+              </Layout>
+            }
+          />
+
           {/* Public routes */}
           {/* <Route path="/contactus" element={<ContactUs />} /> */}
           <Route path="/login" element={<LoginPage />} />

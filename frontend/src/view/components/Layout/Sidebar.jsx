@@ -8,8 +8,8 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { FaCalendar } from "react-icons/fa6";
-import { MdQueryBuilder, MdVerifiedUser } from 'react-icons/md';
-import { HiOutlineUserGroup } from 'react-icons/hi'
+import { MdQueryBuilder, MdVerifiedUser } from "react-icons/md";
+import { HiOutlineUserGroup } from "react-icons/hi";
 import { useAuth } from "../../../context/Context";
 import logo from "../../../assets/images/logoDevPurple.png";
 
@@ -32,7 +32,7 @@ const Sidebar = () => {
       {user?.role === "subAdmin" && (
         <SubAdminSidebar handleLogout={handleLogout} location={location} />
       )}
-   
+
       {user?.role === "emp" && (
         <EmployeeSidebar handleLogout={handleLogout} location={location} />
       )}
@@ -51,7 +51,7 @@ const AdminSidebar = ({ handleLogout, location }) => {
       </div>
 
       {/* Sidebar Navigation */}
-      <nav className="flex-grow overflow-y-auto p-4">
+      <nav className="flex-grow overflow-y-auto p-4 hideScroll">
         <ul className="space-y-2">
           <SidebarItem
             to="/dashboard"
@@ -157,12 +157,12 @@ const SubAdminSidebar = ({ handleLogout, location }) => {
   return (
     <div className="flex flex-col h-[100dvh] max-h-screen w-full bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
-      <div className="p-5 text-center text-2xl font-semibold bg-gray-800">
-        <span className="text-purple-400">CRM</span> Dashboard
+      <div className="flex-shrink-0 p-4 bg-gray-900 flex justify-center">
+        <img src={logo} alt="Logo Image" className="w-[150px] object-contain" />
       </div>
 
       {/* Sidebar Navigation */}
-      <nav className="flex-grow p-4">
+      <nav className="flex-grow p-4 hideScroll">
         <ul className="space-y-2">
           <SidebarItem
             to="/dashboard"
@@ -188,7 +188,12 @@ const SubAdminSidebar = ({ handleLogout, location }) => {
             text="Leads"
             location={location}
           />
-         
+          <SidebarItem
+            to="/projects"
+            icon={<FaHandshake />}
+            text="Projects"
+            location={location}
+          />
         </ul>
       </nav>
 
@@ -209,12 +214,12 @@ const EmployeeSidebar = ({ handleLogout, location }) => {
   return (
     <div className="flex flex-col h-screen w-64 bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
-      <div className="p-5 text-center text-2xl font-semibold bg-gray-800">
-        <span className="text-purple-400">CRM</span> Dashboard
+      <div className="flex-shrink-0 p-4 bg-gray-900 flex justify-center">
+        <img src={logo} alt="Logo Image" className="w-[150px] object-contain" />
       </div>
 
       {/* Sidebar Navigation */}
-      <nav className="flex-grow p-4">
+      <nav className="flex-grow p-4 hideScroll">
         <ul className="space-y-2">
           <SidebarItem
             to="/dashboard"

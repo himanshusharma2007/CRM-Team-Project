@@ -11,6 +11,7 @@ import { FaTrashCan, FaPlus } from "react-icons/fa6";
 import leadService from "../../services/leadServices";
 import leadStageService from "../../services/leadStageService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import "../styles/hideScroll.css";
 
 const Lead = () => {
   const [pipeline, setPipeline] = useState({});
@@ -300,7 +301,7 @@ const Lead = () => {
                 </div>
               )}
 
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto hideScroll">
                 {pipeline[stage.stageName]?.map((lead) => (
                   <div
                     key={lead._id}
@@ -311,9 +312,15 @@ const Lead = () => {
                     <p className="font-bold text-lg text-gray-700">
                       {lead.title}
                     </p>
-                    <p className="text-gray-500 break-all">Company: {lead.companyName}</p>
-                    <p className="text-gray-500 break-all">Contact: {lead.contactName}</p>
-                    <p className="text-gray-500 break-all">Email: {lead.email}</p>
+                    <p className="text-gray-500 break-all">
+                      Company: {lead.companyName}
+                    </p>
+                    <p className="text-gray-500 break-all">
+                      Contact: {lead.contactName}
+                    </p>
+                    <p className="text-gray-500 break-all">
+                      Email: {lead.email}
+                    </p>
                     <p className="text-gray-500 break-all">Team: {lead.team}</p>
                     <button
                       onClick={() => handleViewDetails(lead)}

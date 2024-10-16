@@ -92,8 +92,8 @@ const ProjectDetails = () => {
             <p className="text-gray-600 mb-1">
               <strong className="font-medium">Status:</strong> {project.projectStatus}
             </p>
-            <p className="text-gray-600">
-              <strong className="font-medium">Client:</strong> {project.clientId.name}
+            <p>
+              <strong>Client:</strong> {project.clientId }
             </p>
           </div>
         </div>

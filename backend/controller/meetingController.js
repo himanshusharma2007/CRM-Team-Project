@@ -6,15 +6,21 @@ const team = require("../models/teamModels");
 const sendEmail = require("../utils/mail");
 const convertTimeToTimeZone = require("../utils/convertTimeToTimeZone");
 
-
-
-const sendNotification = async (clientNotification, leaderNotification, clientData, projectData, meetingDateTime) => {
-
-    try {
-        let clientDateTime = convertTimeToTimeZone(meetingDateTime, clientData.timeZone);
-        let clientSubject = `Project Meeting for ${projectData.name} - ${clientDateTime}`;
-        if(clientNotification){
-            let msgToClient = `
+const sendNotification = async (
+  clientNotification,
+  leaderNotification,
+  clientData,
+  projectData,
+  meetingDateTime
+) => {
+  try {
+    let clientDateTime = convertTimeToTimeZone(
+      meetingDateTime,
+      clientData.timeZone
+    );
+    let clientSubject = `Project Meeting for ${projectData.name} - ${clientDateTime}`;
+    if (clientNotification) {
+      let msgToClient = `
             
 <!DOCTYPE html>
 <html lang="en">
@@ -72,15 +78,23 @@ const sendNotification = async (clientNotification, leaderNotification, clientDa
 
 
             `;
-            console.log("client notification in progress ..................");
-            const sendToClient = await sendEmail(clientData.email, clientSubject, msgToClient);
-            console.log((!sendToClient)? "client notification not sent successfully" : "client notification sent successfully");
-        }
-        let LeaderDateTime = convertTimeToTimeZone(meetingDateTime, "Asia/Kolkata");
-        let leaderSubject = `Project Meeting for ${projectData.name} - ${LeaderDateTime}`;
-        if(leaderNotification){
-            let msgToLeader = (leaderData) =>{
-                return `
+      console.log("client notification in progress ..................");
+      const sendToClient = await sendEmail(
+        clientData.email,
+        clientSubject,
+        msgToClient
+      );
+      console.log(
+        !sendToClient
+          ? "client notification not sent successfully"
+          : "client notification sent successfully"
+      );
+    }
+    let LeaderDateTime = convertTimeToTimeZone(meetingDateTime, "Asia/Kolkata");
+    let leaderSubject = `Project Meeting for ${projectData.name} - ${LeaderDateTime}`;
+    if (leaderNotification) {
+      let msgToLeader = (leaderData) => {
+        return `
                 
 <!DOCTYPE html>
 <html lang="en">
@@ -136,115 +150,188 @@ const sendNotification = async (clientNotification, leaderNotification, clientDa
 </html>
                 
                 `;
-            }
-            console.log("leader notification in progress ..................");
-            await projectData.teamIds.map(async (id) => {
-                const teamData = await team.findById(id);
-                const leaderData = await user.findById(teamData.leaderId);
-                const sendToLeader = await sendEmail(leaderData.email, leaderSubject, msgToLeader(leaderData));
-                console.log((!sendToLeader)? "leader notification not sent successfully" : `${leaderData.name} leader notification sent successfully`);
-            })
-            return true;
-        }
-    } catch (error) {
-        console.log(error);
-        return false;
+      };
+      console.log("leader notification in progress ..................");
+      await projectData.teamIds.map(async (id) => {
+        const teamData = await team.findById(id);
+        const leaderData = await user.findById(teamData.leaderId);
+        const sendToLeader = await sendEmail(
+          leaderData.email,
+          leaderSubject,
+          msgToLeader(leaderData)
+        );
+        console.log(
+          !sendToLeader
+            ? "leader notification not sent successfully"
+            : `${leaderData.name} leader notification sent successfully`
+        );
+      });
+      return true;
     }
-
-
-}
-
-
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
 
 exports.createMeeting = async (req, res) => {
-    try {
-        const { clientId, projectId, meetingDateTime,meetingStatus, clientNotification, leaderNotification } = req.body;
-        if(!clientId || !projectId || !meetingDateTime){
-            return res.status(400).json({ error: "All fields are required" });
-        }
-        const clientData = await client.findById(clientId);
-        const projectData = await project.findById(projectId);
-        if(!clientData || !projectData){
-            return res.status(404).json({ error: "Client or project not found" });
-        }
-        const meetingData = await meeting.create({ clientId, projectId, meetingDateTime, meetingStatus });
-        projectData.lastMeetingId = meetingData._id;
-        await projectData.save();
-        let notification = await sendNotification(clientNotification, leaderNotification, clientData, projectData, meetingDateTime);
-        if(!notification){
-            return res.status(500).json({ error: "error in sending notification to client and leader but meeting is created successfully" });
-        }
-        res.status(201).json(meetingData);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+  try {
+    console.log("Starting createMeeting function");
+    console.log("Request body:", req.body);
+
+    const {
+      clientId,
+      projectId,
+      title,
+      dateTime: meetingDateTime,
+      meetingStatus,
+      clientNotification,
+      leaderNotification,
+    } = req.body;
+
+    console.log("Extracted data from request body:", {
+      clientId,
+      projectId,
+      title,
+      meetingDateTime,
+      meetingStatus,
+      clientNotification,
+      leaderNotification,
+    });
+
+    if (!clientId || !projectId || !meetingDateTime || !title) {
+      console.log("Missing required fields");
+      return res.status(400).json({ error: "All fields are required" });
     }
+
+    console.log("Fetching client data");
+    const clientData = await client.findById(clientId);
+    console.log("Client data:", clientData);
+
+    console.log("Fetching project data");
+    const projectData = await project.findById(projectId);
+    console.log("Project data:", projectData);
+
+    if (!clientData || !projectData) {
+      console.log("Client or project not found");
+      return res.status(404).json({ error: "Client or project not found" });
+    }
+
+    console.log("Creating meeting");
+    const meetingData = await meeting.create({
+      clientId,
+      projectId,
+      title,
+      meetingDateTime,
+      meetingStatus,
+    });
+    console.log("Meeting created:", meetingData);
+
+    console.log("Updating project with last meeting ID");
+    projectData.lastMeetingId = meetingData._id;
+    await projectData.save();
+    console.log("Project updated");
+
+    if (clientNotification || leaderNotification) {
+      console.log("Sending notifications");
+      let notification = await sendNotification(
+        clientNotification,
+        leaderNotification,
+        clientData,
+        projectData,
+        meetingDateTime
+      );
+      console.log("Notification result:", notification);
+
+      if (!notification) {
+        console.log("Error in sending notifications");
+        return res.status(500).json({
+          error:
+            "Error in sending notification to client and leader but meeting is created successfully",
+        });
+      }
+    }
+
+    console.log("Meeting creation successful");
+    res.status(201).json(meetingData);
+  } catch (error) {
+    console.error("Error in createMeeting:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 exports.getMeetingById = async (req, res) => {
-    try {
-        const meetingData = await meeting.findById(req.params.id).populate("clientId projectId");
-        if(!meetingData){
-            return res.status(404).json({ error: "Meeting not found" });
-        }
-        res.status(200).json(meetingData);
-        res.status(200).json(meetingData);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+  try {
+    const meetingData = await meeting
+      .findById(req.params.id)
+      .populate("clientId projectId");
+    if (!meetingData) {
+      return res.status(404).json({ error: "Meeting not found" });
     }
+    res.status(200).json(meetingData);
+    res.status(200).json(meetingData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 exports.getUpcomingMeetings = async (req, res) => {
-    try {
-        const meetingsData = await meeting.find({ meetingDateTime: { $gte: Date.now() } }).populate("clientId projectId");
-        res.status(200).json(meetingsData);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+  try {
+    const meetingsData = await meeting
+      .find({ meetingDateTime: { $gte: Date.now() } })
+      .populate("clientId projectId");
+    res.status(200).json(meetingsData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 exports.getAllMeetingsByStatus = async (req, res) => {
-    try {
-        const {status} = req.params;
-        const meetingsData = await meeting.find({ meetingStatus: status }).populate("clientId projectId");
-        res.status(200).json(meetingsData);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+  try {
+    const { status } = req.params;
+    const meetingsData = await meeting
+      .find({ meetingStatus: status })
+      .populate("clientId projectId");
+    res.status(200).json(meetingsData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 exports.getAllMeetingsByProjectId = async (req, res) => {
-    try {
-        if(!(await project.findById(req.params.id))){
-            return res.status(404).json({ error: "Project not found" });
-        }
-        const meetingsData = await meeting.find({ projectId: req.params.id }).populate("clientId projectId");
-        res.status(200).json(meetingsData);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+  try {
+    if (!(await project.findById(req.params.id))) {
+      return res.status(404).json({ error: "Project not found" });
     }
+    const meetingsData = await meeting
+      .find({ projectId: req.params.id })
+      .populate("clientId projectId");
+    res.status(200).json(meetingsData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 exports.updateMeeting = async (req, res) => {
-    try {
-        const { meetingConclusion, meetingStatus, meetingDateTime } = req.body;
-        const meetingData = await meeting.findById(req.params.id);
-        if(!meetingData){
-            return res.status(404).json({ error: "Meeting not found" });
-        }
-        meetingData.meetingConclusion = meetingConclusion || meetingData.meetingConclusion;
-        meetingData.meetingStatus = meetingStatus || meetingData.meetingStatus;
-        meetingData.meetingDateTime = meetingDateTime || meetingData.meetingDateTime;
-        await meetingData.save();
-        res.status(200).json(meetingData);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+  try {
+    const { meetingConclusion, meetingStatus, meetingDateTime } = req.body;
+    const meetingData = await meeting.findById(req.params.id);
+    if (!meetingData) {
+      return res.status(404).json({ error: "Meeting not found" });
     }
+    meetingData.meetingConclusion =
+      meetingConclusion || meetingData.meetingConclusion;
+    meetingData.meetingStatus = meetingStatus || meetingData.meetingStatus;
+    meetingData.meetingDateTime =
+      meetingDateTime || meetingData.meetingDateTime;
+    await meetingData.save();
+    res.status(200).json(meetingData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
-
-
