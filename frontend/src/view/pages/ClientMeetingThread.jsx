@@ -13,6 +13,7 @@ import {
 } from "../../services/meetingService";
 
 const MeetingDetail = ({ meeting, onClose, onUpdate }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [editedMeeting, setEditedMeeting] = useState(meeting);
 
   const handleInputChange = (e) => {
@@ -23,9 +24,10 @@ const MeetingDetail = ({ meeting, onClose, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateMeeting(editedMeeting.id, editedMeeting);
-      onUpdate(editedMeeting);
-      onClose();
+      const updatedMeeting = await updateMeeting(editedMeeting._id, editedMeeting);
+      onUpdate(updatedMeeting);
+      setEditedMeeting(updatedMeeting); // Update the local state
+      setIsEditing(false);
     } catch (error) {
       console.error("Failed to update meeting:", error);
     }
@@ -35,7 +37,9 @@ const MeetingDetail = ({ meeting, onClose, onUpdate }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-xl w-96 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Edit Meeting Details</h2>
+          <h2 className="text-xl font-semibold">
+            {isEditing ? "Edit Meeting Details" : "Meeting Details"}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -45,52 +49,97 @@ const MeetingDetail = ({ meeting, onClose, onUpdate }) => {
         </div>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Title</label>
+            {isEditing ? (
+              <input
+                type="text"
+                name="title"
+                value={editedMeeting.title}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              />
+            ) : (
+              <p className="mt-1">{meeting.title}</p>
+            )}
+          </div>
+          <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
               Date & Time
             </label>
-            <input
-              type="datetime-local"
-              name="meetingDateTime"
-              value={editedMeeting.meetingDateTime}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            />
+            {isEditing ? (
+              <input
+                type="datetime-local"
+                name="meetingDateTime"
+                value={editedMeeting.meetingDateTime.slice(0, 16)}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              />
+            ) : (
+              <p className="mt-1">{new Date(meeting.meetingDateTime).toLocaleString()}</p>
+            )}
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
               Status
             </label>
-            <select
-              name="meetingStatus"
-              value={editedMeeting.meetingStatus}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            >
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+            {isEditing ? (
+              <select
+                name="meetingStatus"
+                value={editedMeeting.meetingStatus}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              >
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="rescheduled">Rescheduled</option>
+              </select>
+            ) : (
+              <p className="mt-1">{meeting.meetingStatus}</p>
+            )}
           </div>
-
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
-              Notes
+              Conclusion
             </label>
-            <textarea
-              name="notes"
-              value={editedMeeting.notes || ""}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              rows="3"
-            ></textarea>
+            {isEditing ? (
+              <textarea
+                name="meetingConclusion"
+                value={editedMeeting.meetingConclusion}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                rows="3"
+              ></textarea>
+            ) : (
+              <p className="mt-1">{meeting.meetingConclusion || "No conclusion yet"}</p>
+            )}
           </div>
           <div className="flex justify-end">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              Save Changes
-            </button>
+            {isEditing ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="mr-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                >
+                  Save Changes
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Edit
+              </button>
+            )}
           </div>
         </form>
       </div>
@@ -122,11 +171,12 @@ const Meetings = ({ projectId }) => {
   }, [projectId]);
 
   const handleMeetingUpdate = (updatedMeeting) => {
-    setMeetings(
-      meetings.map((meeting) =>
-        meeting.id === updatedMeeting.id ? updatedMeeting : meeting
+    setMeetings(prevMeetings =>
+      prevMeetings.map(meeting =>
+        meeting._id === updatedMeeting._id ? updatedMeeting : meeting
       )
     );
+    setSelectedMeeting(updatedMeeting);
   };
 
   if (loading) return <div>Loading meetings...</div>;
@@ -137,13 +187,13 @@ const Meetings = ({ projectId }) => {
     <div className="ml-12 mt-2 w-[50%]">
       {meetings.map((meeting) => (
         <div
-          key={meeting.id}
+          key={meeting._id}
           className="bg-white p-3 rounded-lg shadow-sm flex items-center space-x-3 mb-2 cursor-pointer"
           onClick={() => setSelectedMeeting(meeting)}
         >
           <FaCalendarAlt className="text-purple-500 text-xl" />
           <div>
-            <h4 className="text-md font-semibold">Meeting Title</h4>
+            <h4 className="text-md font-semibold">{meeting.title}</h4>
             <p className="text-sm text-gray-600">
               {new Date(meeting.meetingDateTime).toLocaleString()}
             </p>
