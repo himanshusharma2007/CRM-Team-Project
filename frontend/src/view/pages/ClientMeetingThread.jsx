@@ -71,11 +71,11 @@ const ClientMeetingThread = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">
+      <h1 className="text-3xl text-center font-bold mb-5">
         {clientData.name}'s Project Thread
       </h1>
-      <div className="flex flex-row items-center justify-center">
-        <div className="flex items-center w-96">
+      <div className="flex flex-row items-center  bg-red-500">
+        <div className="flex items-center w-80">
           <Shape
             type="circle"
             content={
@@ -85,16 +85,17 @@ const ClientMeetingThread = () => {
                 <p className="text-sm text-gray-600">{clientData.company}</p>
               </div>
             }
-            className="bg-white w-48 h-48"
+            className="bg-white w-40 h-40"
           />
-          <Arrow className="flex-grow mx-4" />
+          <Arrow className="flex-grow mr-2" />
         </div>
 
-        <div className="wraper flex flex-col items-start space-y-20">
+        <div className="wraper flex flex-col items-start relative">
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-300"></div>
           {clientData.projectId.map((project, index) => (
             <div
               key={project._id}
-              className="flex flex-row items-center w-full "
+              className="flex flex-row items-center w-full"
             >
               <div className="flex items-center w-full">
                 <div className="w-fit" /> {/* Spacer for alignment */}
@@ -110,7 +111,7 @@ const ClientMeetingThread = () => {
                       </p>
                     </div>
                   }
-                  className="bg-white w-40 h-40"
+                  className="bg-white w-32 h-32"
                 />
                 <Arrow className="flex-grow mx-4" />
               </div>
