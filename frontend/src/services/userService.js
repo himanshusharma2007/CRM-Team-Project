@@ -1,8 +1,8 @@
 import api from "./api";
 
-export const uploadProfileImage = async (profileImg) => {
+export const uploadProfileImage = async (formData) => {
   try {
-    const response = await api.patch("/profile/uploadProfileImage", profileImg);
+    const response = await api.patch("/profile/uploadProfileImage", formData);
     return response.data;
   } catch (error) {
     console.error("Error uploading profile image:", error);

@@ -21,6 +21,7 @@ const CreateProjectModal = ({
     clientId: "",
     teamIds: [],
     hashtags: "",
+    projectImage: ""
   });
   const [clients, setClients] = useState([]);
 

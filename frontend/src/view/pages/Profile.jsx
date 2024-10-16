@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context"; // Import the useAuth hook
 import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon from React Icons
@@ -8,8 +8,9 @@ import LoadingSpinner from "../components/UI/LoadingSpinner";
 const Profile = () => {
   const { user, loading } = useAuth(); // Get user data from context
   const navigate = useNavigate();
-  const [profileImage, setProfileImage] = useState(user?.profileImage || ""); // State for profile picture
+  const [profileImage, setProfileImage] = useState(""); // State for profile picture
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChangePassword = () => {
     navigate("/resetpassword"); // Navigate to the change password page
@@ -36,11 +37,15 @@ const Profile = () => {
       alert("Please select a file to upload");
       return;
     }
+    
+    const formData = new FormData();
+    formData.append("profileImage", selectedFile); // Ensure the key matches the one in the backend
+    setIsLoading(true); // Set loading state
     try {
-      const result = await uploadProfileImage(selectedFile);
+      const result = await uploadProfileImage(formData); // Send formData instead of selectedFile
       if (result.success) {
         alert("Profile picture updated successfully");
-        setProfileImage(result.imageUrl); // Update the displayed image
+        setProfileImage(result.imageUrl); // Ensure this is the correct URL
       } else {
         alert("Failed to update profile picture");
       }
@@ -48,15 +53,19 @@ const Profile = () => {
       console.error("Error uploading profile image:", error);
       alert("An error occurred while uploading the profile picture.");
     }
+    setIsLoading(false); // Reset loading state
   };
-  
 
+  useEffect(() => {
+    if (user) {
+      setProfileImage(user.profileImage || ""); // Set the initial profile image if user is defined
+    }
+  }, [user]); 
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="text-xl font-semibold">
-          <LoadingSpinner />
-        </div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -73,26 +82,26 @@ const Profile = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center py-10">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full ">
         <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">
           Profile
         </h1>
-        <div className="flex flex-col items-center mb-8 relative group">
+        <div className="flex flex-col items-center mb-8 relative">
           {profileImage ? (
             <img
               src={profileImage}
               alt="Profile"
-              className="w-24 h-24 rounded-full mb-4 object-cover border-4 border-blue-500 shadow-sm"
+              className="w-32 h-32 rounded-full mb-4 object-cover border-4 border-blue-500 shadow-md"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-semibold mb-4 shadow-md">
+            <div className="w-32 h-32 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-semibold mb-4 shadow-lg">
               {getInitials(user.name)}
             </div>
           )}
 
-          {/* Pencil Icon for Update */}
-          <label className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer">
-            <FaPencilAlt />
+          {/* Static Pencil Icon for Update */}
+          <label className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center cursor-pointer shadow-md hover:shadow-lg">
+            <FaPencilAlt className="text-xl" />
             <input
               type="file"
               accept="image/*"
@@ -104,12 +113,12 @@ const Profile = () => {
         <button
           onClick={handleUploadProfilePic}
           className="bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md mb-4"
+          disabled={isLoading} // Disable button while loading
         >
-          Update Picture
+          {isLoading ? "Uploading..." : "Update Picture"}
         </button>
         <div className="space-y-6">
-          {[
-            { label: "Name", value: user.name || "N/A" },
+          {[{ label: "Name", value: user.name || "N/A" },
             { label: "Email", value: user.email || "N/A" },
             { label: "Role", value: user.role || "N/A" },
             { label: "Team", value: user.team || "N/A" },
@@ -128,7 +137,8 @@ const Profile = () => {
         <div className="mt-8 text-center">
           <button
             onClick={handleChangePassword}
-            className="bg-gray-800 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-900 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-800 shadow-md"
+            className={`bg-gray-800 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-900 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-800 shadow-md ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={isLoading} // Optionally disable the button while loading
           >
             Change Password
           </button>

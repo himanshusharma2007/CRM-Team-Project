@@ -10,7 +10,7 @@ const uploadProjectImage = async (req, res, projectId) => {
     if (!projectData) {
       return res.status(404).json({ error: "Project not found" });
     }
-    console.log("file upload started ......................");
+    console.log("file upload started......................");
     const uploadResponse = await uploadOnCloudinary(path);
     console.log("uploadResponse", uploadResponse);
     if (!uploadResponse) {
@@ -18,7 +18,7 @@ const uploadProjectImage = async (req, res, projectId) => {
     }
     projectData.projectImage = uploadResponse.url;
     await projectData.save();
-    console.log("file uploaded successfully ......................");
+    console.log("file uploaded successfully......................");
     return uploadResponse.url;
   } catch (error) {
     console.log(error);
