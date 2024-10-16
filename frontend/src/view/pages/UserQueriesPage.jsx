@@ -13,9 +13,9 @@ const UserQueriesPage = () => {
   const fetchData = async () => {
     try {
       const data = await fetchContactUs();
-      console.log("Fetched Queries:", data); // Debugging line
+      console.log("Fetched Queries:", data);
       setQueries(data);
-      handleSort("pending", data); // Apply initial sorting with the fetched data
+      handleSort(sortBy, data); // Apply initial sorting with the fetched data
     } catch (error) {
       console.error("Error fetching queries:", error);
     }
@@ -26,18 +26,26 @@ const UserQueriesPage = () => {
   }, []);
 
   const handleSort = (option, queriesToSort = queries) => {
-    console.log("Sorting Option:", option); // Debugging line
-    console.log("Queries Before Sort:", queriesToSort); // Debugging line
-  
+    console.log("Sorting Option:", option);
+    console.log("Queries Before Sort:", queriesToSort);
+
     setSortBy(option);
     const sortedQueries = [...queriesToSort];
-  
+
     switch (option) {
       case "responded":
-        sortedQueries.sort((a, b) => (a.response ? 0 : 1) - (b.response ? 0 : 1));
+        sortedQueries.sort((a, b) => {
+          if (a.status === "responded" && b.status !== "responded") return -1;
+          if (a.status !== "responded" && b.status === "responded") return 1;
+          return 0;
+        });
         break;
       case "pending":
-        sortedQueries.sort((a, b) => (a.response ? 1 : 0) - (b.response ? 0 : 1));
+        sortedQueries.sort((a, b) => {
+          if (a.status === "pending" && b.status !== "pending") return -1;
+          if (a.status !== "pending" && b.status === "pending") return 1;
+          return 0;
+        });
         break;
       case "date":
         sortedQueries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -45,8 +53,8 @@ const UserQueriesPage = () => {
       default:
         break;
     }
-  
-    console.log("Sorted Queries:", sortedQueries); // Debugging line
+
+    console.log("Sorted Queries:", sortedQueries);
     setQueries(sortedQueries);
   };
 
