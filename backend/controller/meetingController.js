@@ -318,16 +318,15 @@ exports.getAllMeetingsByProjectId = async (req, res) => {
 
 exports.updateMeeting = async (req, res) => {
   try {
-    const { meetingConclusion, meetingStatus, meetingDateTime } = req.body;
+    const {title, meetingConclusion, meetingStatus, meetingDateTime } = req.body;
     const meetingData = await meeting.findById(req.params.id);
     if (!meetingData) {
       return res.status(404).json({ error: "Meeting not found" });
     }
-    meetingData.meetingConclusion =
-      meetingConclusion || meetingData.meetingConclusion;
+    meetingData.meetingConclusion = meetingConclusion || meetingData.meetingConclusion;
     meetingData.meetingStatus = meetingStatus || meetingData.meetingStatus;
-    meetingData.meetingDateTime =
-      meetingDateTime || meetingData.meetingDateTime;
+    meetingData.meetingDateTime = meetingDateTime || meetingData.meetingDateTime;
+    meetingData.title = title || meetingData.title;
     await meetingData.save();
     res.status(200).json(meetingData);
   } catch (error) {
