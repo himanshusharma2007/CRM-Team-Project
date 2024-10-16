@@ -9,10 +9,237 @@ const sendMail = require("../utils/mail");
 const generateToken = (id,res) => {
   console.log("id",id);
   const token = jwt.sign({ id }, process.env.JWT_KEY, { expiresIn: '1d' });
-  res.cookie("token",token)
+  const expirationTime = 24 * 60 * 60 * 1000; 
+  res.cookie("token",token, {
+    maxAge: expirationTime,
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict"
+  })
   console.log("token " + token)
   // return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
+
+
+const msgForRegister = (otp, name) => {
+  return `
+
+
+  <!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OTP Email Template</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 0;
+      margin: 0;
+    }
+
+    .container-sec {
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 30px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+    }
+
+    .otp-code {
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #f8f9fa;
+      padding: 15px;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px dashed #007bff;
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+
+    .footer-text {
+      color: #6c757d;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .footer-text a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .otp-lock {
+      color: #333;
+      font-size: 80px;
+    }
+
+    .welcome-section {
+      background: #144fa9db;
+      padding: 30px;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 20px;
+      margin: 20px 0px;
+    }
+
+    .welcome-text {
+      font-family: monospace;
+    }
+
+    .app-name {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 7px 0px;
+    }
+
+    .verify-text {
+      margin-top: 25px;
+      font-size: 25px;
+      letter-spacing: 3px;
+    }
+
+    i.fas.fa-envelope-open {
+      font-size: 35px !important;
+      color: #ffffff;
+    }
+
+    .copy-btn {
+      background-color: #007bff;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .copy-confirmation {
+      color: green;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-sec">
+    <div class="text-center">
+      <div><i class="fas fa-lock otp-lock"></i></div>
+      <div class="welcome-section">
+        <div class="app-name">
+          --- CodeDev ---
+        </div>
+        <div class="welcome-text">
+          Thanks for signing up !
+        </div>
+
+        <div class="verify-text">
+          Please Verify Your Email Address
+        </div>
+        <div class="email-icon">
+          <i class="fas fa-envelope-open"></i>
+        </div>
+
+      </div>
+      <h2>Hello, ${name}</h2>
+      <p>Your One-Time Password (OTP) for verification is:</p>
+      <div class="otp-code" id="otpCode">${otp}</div>
+
+      <button class="copy-btn" onclick="copyOTP()">Copy OTP</button>
+      <div class="copy-confirmation" id="copyConfirmation">OTP copied to clipboard!</div>
+
+      <p class="mt-4">Please use this OTP to complete your verification. The OTP is valid for the next 10 minutes.</p>
+    </div>
+    <div class="footer-text">
+      <p>If you did not request this OTP, please <a href="#">contact us</a> immediately.</p>
+      <p>Thank you,<br>The CodeDev Team</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script>
+    function copyOTP() {
+      // Get the OTP text
+      const otpText = document.getElementById("otpCode").textContent;
+
+      // Create a temporary input element to copy the text
+      const tempInput = document.createElement("input");
+      document.body.appendChild(tempInput);
+      tempInput.value = otpText;
+      tempInput.select();
+      tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+      // Copy the text to the clipboard
+      document.execCommand("copy");
+
+      // Remove the temporary input
+      document.body.removeChild(tempInput);
+
+      // Show confirmation message
+      const confirmation = document.getElementById("copyConfirmation");
+      confirmation.style.display = "block";
+
+      // Hide the confirmation message after 2 seconds
+      setTimeout(() => {
+        confirmation.style.display = "none";
+      }, 2000);
+    }
+  </script>
+</body>
+
+</html>
+
+
+
+  `;
+}
+
+
+exports.sendOtpForRegister = async (req, res) => {
+  const {name, email } = req.body;
+  try {
+    const userData = await user.findOne({ email });
+    if(userData){
+      return res.status(404).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await sendMail(email, "OTP for password reset", msgForRegister(otp, name));
+    const expirationTime = 10 * 60 * 1000; 
+    res.cookie("otp", otp, { 
+      maxAge: expirationTime,
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict"
+    });
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internel server error",
+    });
+  }
+}
 
 // Register a new user    "/signup"
 exports.registerUser = async (req, res) => {
@@ -101,14 +328,12 @@ exports.login = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-
-    // if(!userData.verify){
+    // if(!userData.isActive){
     //   return res.status(203).send({
     //     success: false,
-    //     message: "You are not verify by admin"
+    //     message: "You are not active user"
     //   })
     // }
-
     generateToken(userData.id, res);
     userData.password = "*****";
     console.log("user in userController",userData)
@@ -202,7 +427,6 @@ exports.updatePassword = async (req, res) => {
     });
   }
 };
-
 
 let msg = (otp, name) =>{
   return `
