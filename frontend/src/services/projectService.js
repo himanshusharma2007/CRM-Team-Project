@@ -35,7 +35,6 @@ export const createProject = async (projectData) => {
   }
 };
 
-
 // Service to update a project
 export const updateProject = async (id, projectData) => {
   try {

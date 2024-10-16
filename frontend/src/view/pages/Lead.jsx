@@ -311,10 +311,10 @@ const Lead = () => {
                     <p className="font-bold text-lg text-gray-700">
                       {lead.title}
                     </p>
-                    <p className="text-gray-500">Company: {lead.companyName}</p>
-                    <p className="text-gray-500">Contact: {lead.contactName}</p>
-                    <p className="text-gray-500">Email: {lead.email}</p>
-                    <p className="text-gray-500">Team: {lead.team}</p>
+                    <p className="text-gray-500 break-all">Company: {lead.companyName}</p>
+                    <p className="text-gray-500 break-all">Contact: {lead.contactName}</p>
+                    <p className="text-gray-500 break-all">Email: {lead.email}</p>
+                    <p className="text-gray-500 break-all">Team: {lead.team}</p>
                     <button
                       onClick={() => handleViewDetails(lead)}
                       className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"

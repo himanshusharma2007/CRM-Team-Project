@@ -118,7 +118,7 @@ const ToDo = () => {
         }));
         setTitle("");
         setTaskPriority("Medium");
-        setTaskStage(null);
+        setTaskStage("todo");
       } catch (error) {
         console.error("Failed to save task:", error);
         alert(

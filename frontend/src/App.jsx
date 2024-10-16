@@ -24,6 +24,7 @@ import Teams from "./view/pages/Teams";
 import MeetingManagement from "./view/pages/MeetingManagement";
 import ProjectPage from "./view/pages/ProjectPage";
 import ProjectDetails from "./view/pages/ProjectDetails";
+// import ClientProjectThread from "./view/pages/ClientProjectThread";
 
 function App() {
   return (
@@ -162,13 +163,12 @@ function App() {
               </Layout>
             }
           />
-
           {/* Public routes */}
           {/* <Route path="/contactus" element={<ContactUs />} /> */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Register />} />
-          {/* <Route path="/aboutus" element={<AboutUs />} /> */}
           <Route path="/forgot-password" element={<ForgetPassword />} />
+
         </Routes>
       </BrowserRouter>
     </Context>
