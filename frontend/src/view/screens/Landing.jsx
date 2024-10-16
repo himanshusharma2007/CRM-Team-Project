@@ -2,7 +2,11 @@ import { Link } from "react-router-dom";
 import image from "../../assets/images/crm-home-stay-informed.svg";
 import Navbar from "../components/Layout/NavBar";
 
+import { useAuth } from "../../context/Context";
+
 const Landing = () => {
+  const {user} = useAuth();
+
   return (
     <div className="flex flex-col ">
       <Navbar />
@@ -20,12 +24,21 @@ const Landing = () => {
               manage relationships, boost productivity, and grow your business
               efficiently.
             </p>
-            <Link
-              to="/login"
-              className="bg-green-500 text-white py-2 px-6 rounded hover:bg-green-600 transition duration-200 inline-block"
-            >
-              Get Started
-            </Link>
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="bg-green-500 text-white py-2 px-6 rounded hover:bg-green-600 transition duration-200 inline-block"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="bg-green-500 text-white py-2 px-6 rounded hover:bg-green-600 transition duration-200 inline-block"
+              >
+                Get Started
+              </Link>
+            )}
           </div>
 
           {/* Image Section */}

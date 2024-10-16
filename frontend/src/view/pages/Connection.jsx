@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import ConnectionService from "../../services/connectionService";
+import { FiSearch } from "react-icons/fi";
 
 function Connection() {
   const [contacts, setContacts] = useState([]);
+  const [filteredContacts, setFilteredContacts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentContact, setCurrentContact] = useState({
     contactName: "",
@@ -15,6 +18,17 @@ function Connection() {
   useEffect(() => {
     fetchContacts();
   }, []);
+
+  useEffect(() => {
+    const filtered = contacts.filter(
+      (contact) =>
+        contact.contactName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.phoneNo.includes(searchTerm)
+    );
+    setFilteredContacts(filtered);
+  }, [contacts, searchTerm]);
 
   const fetchContacts = async () => {
     try {
@@ -75,6 +89,10 @@ function Connection() {
     }
   };
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <div className="p-4 md:p-6">
       <div className="flex justify-between items-center mb-6">
@@ -96,6 +114,17 @@ function Connection() {
         </button>
       </div>
 
+      <div className="mb-6 relative">
+        <input
+          type="text"
+          placeholder="Search connections..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full p-2 pl-10 border rounded-md"
+        />
+        <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-500">
           <thead>
@@ -108,7 +137,7 @@ function Connection() {
             </tr>
           </thead>
           <tbody>
-            {contacts.map((contact) => (
+            {filteredContacts.map((contact) => (
               <tr key={contact._id}>
                 <td className="px-2 md:px-4 py-2 border">
                   {contact.contactName}
