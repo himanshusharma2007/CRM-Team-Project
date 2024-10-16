@@ -92,10 +92,11 @@ const ClientMeetingThread = () => {
 
         <div className="wraper flex flex-col items-start relative">
           <div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-300"></div>
+        <ul className="flex flex-col items-start space-y-20 relative">
           {clientData.projectId.map((project, index) => (
-            <div
+            <li
               key={project._id}
-              className="flex flex-row items-center w-full"
+              className="flex flex-row items-center  w-full"
             >
               <div className="flex items-center w-full">
                 <div className="w-fit" /> {/* Spacer for alignment */}
@@ -155,8 +156,9 @@ const ClientMeetingThread = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </li>
           ))}
+          </ul>
         </div>
       </div>
     </div>
