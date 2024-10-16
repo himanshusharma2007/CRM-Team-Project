@@ -141,3 +141,23 @@ exports.uploadProfileImage = async (req, res) => {
     });
   }
 }
+
+
+exports.updateUserPermission = async (req, res) => {
+  try {
+    const { permission } = req.body;
+    const userData = await user.findById(req.params.id);
+    if (!userData) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    console.log("permission", permission)
+    userData.permission = permission;
+    await userData.save();
+
+    return res.status(200).json({ message: "User permission updated successfully" });
+  } catch (error) {
+    console.error("Error in updateUserPermission:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+

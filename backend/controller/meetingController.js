@@ -343,3 +343,13 @@ exports.updateMeeting = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+exports.getAllMeeting = async (req, res) => {
+  try {
+    const meetingsData = await meeting.find().populate("clientId projectId");
+    res.status(200).json(meetingsData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
