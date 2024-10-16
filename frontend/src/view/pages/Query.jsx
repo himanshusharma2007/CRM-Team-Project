@@ -88,6 +88,7 @@ const UserQueriesPage = () => {
   };
   return (
     <div className=" min-h-screen w-full ">
+
       <div className=" mx-auto py-6 px-2 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-blue-800 mb-6 text-nowrap">
           User Queries
@@ -148,7 +149,7 @@ const UserQueriesPage = () => {
             ))}
           </ul>
         </div>
-      </div>
+      </div> 
 
       {/* Modal */}
       {showModal && selectedQuery && (
