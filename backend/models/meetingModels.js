@@ -33,11 +33,3 @@ const meetingSchema = new mongoose.Schema({
 
 const meeting = mongoose.model('meeting', meetingSchema);
 module.exports = meeting;
-
-
-/*
-
-
-
-
-*/

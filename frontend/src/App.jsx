@@ -177,8 +177,8 @@ function App() {
           {/* <Route path="/contactus" element={<ContactUs />} /> */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Register />} />
-          {/* <Route path="/aboutus" element={<AboutUs />} /> */}
           <Route path="/forgot-password" element={<ForgetPassword />} />
+
         </Routes>
       </BrowserRouter>
     </Context>

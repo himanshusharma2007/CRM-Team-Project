@@ -11,16 +11,40 @@ const ProjectPage = () => {
   const [projects, setProjects] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [usedColors, setUsedColors] = useState(new Set());
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProjects();
   }, []);
 
+  const getUniqueColor = () => {
+    let color;
+    do {
+      const r = Math.floor(Math.random() * 200 + 55);
+      const g = Math.floor(Math.random() * 200 + 55);
+      const b = Math.floor(Math.random() * 200 + 55);
+      color = `rgb(${r},${g},${b})`;
+    } while (usedColors.has(color));
+
+    setUsedColors((prevColors) => new Set(prevColors).add(color));
+    return color;
+  };
+
+  const assignUniqueColorsToProjects = (projectsData) => {
+    return projectsData.map((project) => {
+      if (!project.color) {
+        project.color = getUniqueColor();
+      }
+      return project;
+    });
+  };
+
   const fetchProjects = async () => {
     try {
       const data = await getAllProjects();
-      setProjects(data);
+      const projectsWithColors = assignUniqueColorsToProjects(data);
+      setProjects(projectsWithColors);
     } catch (error) {
       console.error("Error fetching projects:", error);
     }
@@ -36,19 +60,13 @@ const ProjectPage = () => {
 
   const handleCreateProject = async (projectData) => {
     try {
-      await createProject(projectData);
-      fetchProjects();
+      const newProject = await createProject(projectData);
+      const newProjectWithColor = { ...newProject, color: getUniqueColor() };
+      setProjects((prevProjects) => [...prevProjects, newProjectWithColor]);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error creating project:", error);
     }
-  };
-
-  const getRandomColor = () => {
-    const r = Math.floor(Math.random() * 200 + 55);
-    const g = Math.floor(Math.random() * 200 + 55);
-    const b = Math.floor(Math.random() * 200 + 55);
-    return `rgb(${r},${g},${b})`;
   };
 
   return (
@@ -78,7 +96,7 @@ const ProjectPage = () => {
               style={{
                 backgroundColor: project.projectImage
                   ? "transparent"
-                  : getRandomColor(),
+                  : project.color,
                 backgroundImage: project.projectImage
                   ? `url(${project.projectImage})`
                   : "none",

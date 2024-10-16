@@ -34,8 +34,8 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
   const allClientsfun = async () => {
     try {
       const clients = await getAllClients();
-      console.log("Fetched Clients: ", clients); // Log fetched clients
-      setAllClients(clients); // Set the fetched clients to state
+      console.log("Fetched Clients: ", clients); 
+      setAllClients(clients);
     } catch (error) {
       console.error("Error fetching clients:", error.message);
     }
@@ -59,6 +59,8 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
 
   // Fetch projects and clients on component mount
   useEffect(() => {
+    console.log("allProjects", allProjects);
+    console.log("allClients", allClients);
     allProjectsfun();
     allClientsfun();
   }, []);

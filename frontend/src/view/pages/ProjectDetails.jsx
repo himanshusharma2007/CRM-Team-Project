@@ -11,6 +11,7 @@ import { Card } from "../components/UI/ProjectCommanUI";
 import { Tag } from "../components/UI/ProjectCommanUI";
 import CreateProjectModal from "../modal/CreateProjectModal";
 import { ConfirmDialog } from "../components/UI/ProjectCommanUI";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -26,6 +27,7 @@ const ProjectDetails = () => {
   const fetchProjectDetails = async () => {
     try {
       const data = await getProjectById(id);
+      console.log("project data",data);
       setProject(data);
     } catch (error) {
       console.error("Error fetching project details:", error);
@@ -51,18 +53,19 @@ const ProjectDetails = () => {
     }
   };
 
-  if (!project) return <p className="text-center mt-8">Loading...</p>;
+  if (!project) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <Card>
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">{project.name}</h1>
-          <div className="space-x-2">
+    <div className="min-h-screen bg-gray-50 p-8">
+      <Card className="bg-white p-8 rounded-lg shadow-lg">
+        <div className="flex justify-between items-center mb-8 ">
+          <h1 className="text-3xl font-bold text-gray-800">{project.name}</h1>
+          <div className="space-x-3 flex">
             <Button
               variant="outline"
               icon={<FiEdit2 />}
               onClick={() => setIsEditModalOpen(true)}
+              className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 transition duration-200 ease-in-out rounded-md flex items-center gap-2"
             >
               Edit
             </Button>
@@ -70,42 +73,47 @@ const ProjectDetails = () => {
               variant="danger"
               icon={<FiTrash2 />}
               onClick={() => setIsDeleteDialogOpen(true)}
+              className="px-4 py-2 bg-red-500 text-white hover:bg-red-600 transition duration-200 ease-in-out rounded-md flex items-center gap-2"
             >
               Delete
             </Button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <h2 className="text-xl font-semibold mb-2">Description</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Description</h2>
             <p className="text-gray-600">{project.description}</p>
           </div>
           <div>
-            <h2 className="text-xl font-semibold mb-2">Details</h2>
-            <p>
-              <strong>Service Type:</strong> {project.serviceType}
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Details</h2>
+            <p className="text-gray-600 mb-1">
+              <strong className="font-medium">Service Type:</strong> {project.serviceType}
             </p>
-            <p>
-              <strong>Status:</strong> {project.projectStatus}
+            <p className="text-gray-600 mb-1">
+              <strong className="font-medium">Status:</strong> {project.projectStatus}
             </p>
             <p>
               <strong>Client:</strong> {project.clientId }
             </p>
           </div>
         </div>
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">Team Members</h2>
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">Team Members</h2>
           <div className="flex flex-wrap gap-2">
             {project.teamIds.map((member) => (
-              <Tag key={member._id}>{member.name}</Tag>
+              <Tag key={member._id} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                {member.name}
+              </Tag>
             ))}
           </div>
         </div>
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">Hashtags</h2>
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">Hashtags</h2>
           <div className="flex flex-wrap gap-2">
             {project.hashtages.map((tag, index) => (
-              <Tag key={index}>{tag}</Tag>
+              <Tag key={index} className="bg-green-100 text-green-600 px-3 py-1 rounded-full">
+                #{tag}
+              </Tag>
             ))}
           </div>
         </div>
