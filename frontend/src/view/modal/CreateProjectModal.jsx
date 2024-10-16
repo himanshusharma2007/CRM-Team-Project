@@ -3,6 +3,8 @@ import Modal from "../Modal/Modal";
 import { Input } from "../components/UI/ProjectCommanUI";
 import { Select } from "../components/UI/ProjectCommanUI";
 import { Button } from "../components/UI/ProjectCommanUI";
+import {getAllClients} from "../../services/clientServices";
+import {createProject} from "../../services/projectService";
 
 const CreateProjectModal = ({
   isOpen,
@@ -18,40 +20,59 @@ const CreateProjectModal = ({
     projectStatus: "pending",
     clientId: "",
     teamIds: [],
-    hashtages: "",
+    hashtags: "",
   });
+  const [clients, setClients] = useState([]);
+
 
   useEffect(() => {
     if (initialData && isEditing) {
+      console.log("initial data in useEffect",initialData);
       setFormData({
         ...initialData,
-        hashtages: initialData.hashtages.join(", "),
-        teamIds: initialData.teamIds.map((member) => member._id),
+        hashtags: initialData.hashtags?.join(", "),
+        teamIds: initialData.teamIds?.map((member) => member._id),
       });
     }
   }, [initialData, isEditing]);
-
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const clients = await getAllClients();
+        setClients(clients);
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+      }
+    };
+    fetchClients();
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleSubmit = (e) => {
+    console.log("handle submit called")
     e.preventDefault();
+    console.log("form data in handleSubmit",formData);
     const submissionData = {
       ...formData,
-      hashtages: formData.hashtages.split(",").map((tag) => tag.trim()),
+      hashtags: formData.hashtags.split(",").map((tag) => tag.trim()),
     };
+    
     onSubmit(submissionData);
   };
 
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={isEditing ? "Edit Project" : "Create New Project"}
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
+  isOpen={isOpen}
+  onClose={onClose}
+  title={isEditing ? "Edit Project" : "Create New Project"}
+  
+>
+  <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex flex-wrap gap-4">
+      <div className="flex-1">
         <Input
           name="name"
           label="Project Name"
@@ -59,6 +80,20 @@ const CreateProjectModal = ({
           onChange={handleChange}
           required
         />
+      </div>
+      <div className="flex-1">
+        <Input
+          name="serviceType"
+          label="Service Type"
+          value={formData.serviceType}
+          onChange={handleChange}
+          required
+        />
+      </div>
+    </div>
+    
+    <div className="flex flex-wrap gap-4">
+      <div className="flex-1">
         <Input
           name="description"
           label="Description"
@@ -68,13 +103,8 @@ const CreateProjectModal = ({
           multiline
           rows={4}
         />
-        <Input
-          name="serviceType"
-          label="Service Type"
-          value={formData.serviceType}
-          onChange={handleChange}
-          required
-        />
+      </div>
+      <div className="flex-1">
         <Select
           name="projectStatus"
           label="Project Status"
@@ -87,13 +117,28 @@ const CreateProjectModal = ({
             { value: "cancelled", label: "Cancelled" },
           ]}
         />
-        <Input
-          name="clientId"
-          label="Client ID"
-          value={formData.clientId}
-          onChange={handleChange}
-          required
-        />
+      </div>
+    </div>
+
+    <div className="flex flex-wrap gap-4">
+      <div className="flex-1">
+        <select className="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+        onChange={(e) =>
+          setFormData({
+            ...formData,
+            clientId: e.target.value,
+          })
+        }
+        >
+          <option value="">Select Client</option>
+          {clients.map((client) => (
+            <option key={client._id} value={client._id}>
+              {client.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex-1">
         <Input
           name="teamIds"
           label="Team IDs (comma-separated)"
@@ -105,22 +150,32 @@ const CreateProjectModal = ({
             })
           }
         />
+      </div>
+    </div>
+    
+    <div className="flex flex-wrap gap-4">
+      <div className="flex-1">
         <Input
-          name="hashtages"
+          name="hashtags"
           label="Hashtags (comma-separated)"
-          value={formData.hashtages}
+          value={formData.hashtags}
           onChange={handleChange}
         />
-        <div className="flex justify-end space-x-2">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit">
-            {isEditing ? "Update" : "Create"} Project
-          </Button>
-        </div>
-      </form>
-    </Modal>
+      </div>
+    </div>
+
+    <div className="flex justify-end space-x-2">
+      <Button type="button" variant="outline" onClick={onClose}>
+        Cancel
+      </Button>
+      <Button type="submit">
+        {isEditing ? "Update" : "Create"} Project
+      </Button>
+    </div>
+  </form>
+</Modal>
+
+  
   );
 };
 
