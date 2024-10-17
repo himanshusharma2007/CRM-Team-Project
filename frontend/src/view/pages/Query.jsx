@@ -4,6 +4,7 @@ import {
   respondToContactUs,
 } from "../../services/queryService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import { useAuth } from "../../context/Context";
 
 const UserQueriesPage = () => {
   const [queries, setQueries] = useState([]);
@@ -12,21 +13,27 @@ const UserQueriesPage = () => {
   const [selectedQuery, setSelectedQuery] = useState(null);
   const [response, setResponse] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
+
+  const canReadQuery = user?.role === "admin" || user?.permission?.query?.read;
+  const canRespondQuery = user?.role === "admin" || user?.permission?.query?.respond;
 
   const fetchData = async () => {
-    try {
-      const data = await fetchContactUs();
-      console.log("Fetched Queries:", data);
-      setQueries(data);
-      handleSort(sortBy, data); // Apply initial sorting with the fetched data
-    } catch (error) {
-      console.error("Error fetching queries:", error);
+    if (canReadQuery) {
+      try {
+        const data = await fetchContactUs();
+        console.log("Fetched Queries:", data);
+        setQueries(data);
+        handleSort(sortBy, data); // Apply initial sorting with the fetched data
+      } catch (error) {
+        console.error("Error fetching queries:", error);
+      }
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [canReadQuery]);
 
   const handleSort = (option, queriesToSort = queries) => {
     console.log("handleSort called with option:", option);
@@ -73,12 +80,19 @@ const UserQueriesPage = () => {
   };
 
   const handleQueryClick = (query) => {
-    setSelectedQuery(query);
-    setShowModal(true);
-    setResponse(query.response || "");
+    if (canReadQuery) {
+      setSelectedQuery(query);
+      setShowModal(true);
+      setResponse(query.response || "");
+    }
   };
 
   const handleSubmitResponse = async () => {
+    if (!canRespondQuery) {
+      alert("You don't have permission to respond to queries.");
+      return;
+    }
+
     if (!response.trim()) {
       alert("Please enter a response before submitting.");
       return;
@@ -105,6 +119,11 @@ const UserQueriesPage = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (!canReadQuery) {
+    return <div>You don't have permission to view queries.</div>;
+  }
+
   return (
     <div className="min-h-screen w-full">
       <div className="mx-auto py-6 px-2 sm:px-6 lg:px-8">
@@ -191,7 +210,7 @@ const UserQueriesPage = () => {
                         <p><strong>Response:</strong> {selectedQuery.responed}</p>
                       )}
                     </div>
-                    {selectedQuery.status !== "responded" && (
+                    {selectedQuery.status !== "responded" && canRespondQuery && (
                       <textarea
                         value={response}
                         onChange={(e) => setResponse(e.target.value)}
@@ -203,7 +222,7 @@ const UserQueriesPage = () => {
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                  {selectedQuery.status !== "responded" && (
+                  {selectedQuery.status !== "responded" && canRespondQuery && (
                     <button
                       type="button"
                       className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"

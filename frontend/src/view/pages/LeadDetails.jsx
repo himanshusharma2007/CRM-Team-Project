@@ -2,21 +2,32 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { leadService } from "../../services/leadServices";
 import { useAuth } from "../../context/Context";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const LeadDetails = () => {
   const { updateLead, deleteLead, getLeadById } = leadService;
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [lead, setLead] = useState(null);
-  console.log("lead details in Lead Deatils  page:", lead);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  console.log("lead details called id", id);
+
+  const canReadLead = user?.role === "admin" || user?.permission?.lead?.read;
+  const canUpdateLead = user?.role === "admin" || user?.permission?.lead?.update;
+  const canDeleteLead = user?.role === "admin" || user?.permission?.lead?.delete;
+
   useEffect(() => {
-    fetchLeadDetails();
-  }, [id]);
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else if (canReadLead) {
+      fetchLeadDetails();
+    } else {
+      setLoading(false);
+      setError("You don't have permission to view lead details.");
+    }
+  }, [isAuthenticated, canReadLead, id, navigate]);
 
   const fetchLeadDetails = async () => {
     try {
@@ -37,11 +48,14 @@ const LeadDetails = () => {
   };
 
   const handleUpdate = async () => {
+    if (!canUpdateLead) {
+      alert("You don't have permission to update leads.");
+      return;
+    }
     try {
       setError(null);
       await updateLead(id, lead);
       setIsEditing(false);
-      // Optionally, refresh lead data after update
       await fetchLeadDetails();
     } catch (err) {
       console.error("Error updating lead:", err);
@@ -50,6 +64,10 @@ const LeadDetails = () => {
   };
 
   const handleDelete = async () => {
+    if (!canDeleteLead) {
+      alert("You don't have permission to delete leads.");
+      return;
+    }
     if (window.confirm("Are you sure you want to delete this lead?")) {
       try {
         setError(null);
@@ -62,8 +80,16 @@ const LeadDetails = () => {
     }
   };
 
+  if (!isAuthenticated) {
+    return null;
+  }
+
   if (loading) {
-    return <div className="text-center mt-8">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (error) {
@@ -174,7 +200,7 @@ const LeadDetails = () => {
           Back to Leads
         </button>
 
-        {user.role === "admin" && (
+        {canUpdateLead && (
           <>
             {isEditing ? (
               <button
@@ -191,13 +217,15 @@ const LeadDetails = () => {
                 Edit Lead
               </button>
             )}
-            <button
-              onClick={handleDelete}
-              className="px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300"
-            >
-              Delete Lead
-            </button>
           </>
+        )}
+        {canDeleteLead && (
+          <button
+            onClick={handleDelete}
+            className="px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300"
+          >
+            Delete Lead
+          </button>
         )}
       </div>
     </div>

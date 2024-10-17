@@ -146,7 +146,7 @@ exports.updateProject = async (req, res) => {
     if (existingProject) {
       return res.status(400).json({ error: "Project name already exists" });
     }
-    hashtags = hashtags ? hashtags.split(",") : [];
+    hashtags = hashtags ? hashtags?.split(",") : [];
     await hashtags.map(async (item) => {
       if (!projectData.hashtags.includes(item)) {
         projectData.hashtags.push(item);

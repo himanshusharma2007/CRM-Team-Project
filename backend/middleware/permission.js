@@ -6,7 +6,7 @@ const checkPermission = (userAction) => {
         const resource = actionPermission[0];
         const action = actionPermission[1];
 
-        console.log(`permission[${resource}][${action}]`,permission[resource][action]);
+        // console.log(`permission[${resource}][${action}]`,permission[resource][action]);
         console.log(`req.user.role`,req.user.role);
         console.log(!permission[resource][action] && !req.user.role === "admin");
 

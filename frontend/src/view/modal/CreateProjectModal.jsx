@@ -57,6 +57,7 @@ const CreateProjectModal = ({
     const fetchClients = async () => {
       try {
         const clients = await getAllClients();
+        console.log("clients in fetchClients", clients);
         setClients(clients);
       } catch (error) {
         console.error("Error fetching clients:", error);
