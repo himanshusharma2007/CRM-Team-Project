@@ -6,6 +6,7 @@ import { Button } from "../components/UI/ProjectCommanUI";
 import { Card } from "../components/UI/ProjectCommanUI";
 import { Input } from "../components/UI/ProjectCommanUI";
 import CreateProjectModal from "../modal/CreateProjectModal";
+import { useAuth } from "../../context/Context";
 
 const ProjectPage = () => {
   const [projects, setProjects] = useState([]);
@@ -13,10 +14,20 @@ const ProjectPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [usedColors, setUsedColors] = useState(new Set());
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const canCreateProject =
+    user?.role === "admin" || user?.permission?.project?.create;
+  const canUpdateProject =
+    user?.role === "admin" || user?.permission?.project?.update;
+  const canReadProject =
+    user?.role === "admin" || user?.permission?.project?.read;
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (canReadProject) {
+      fetchProjects();
+    }
+  }, [canReadProject]);
 
   const getUniqueColor = () => {
     let color;
@@ -59,15 +70,28 @@ const ProjectPage = () => {
   );
 
   const handleCreateProject = async (projectData) => {
-    try {
-      const newProject = await createProject(projectData);
-      const newProjectWithColor = { ...newProject, color: getUniqueColor() };
-      setProjects((prevProjects) => [...prevProjects, newProjectWithColor]);
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Error creating project:", error);
+    if (canCreateProject) {
+      try {
+        console.log("projectData",projectData)
+        const newProject = await createProject(projectData);
+        const newProjectWithColor = { ...newProject, color: getUniqueColor() };
+        setProjects((prevProjects) => [...prevProjects, newProjectWithColor]);
+        setIsModalOpen(false);
+      } catch (error) {
+        console.error("Error creating project:", error);
+      }
     }
   };
+
+  const handleProjectClick = (projectId) => {
+    if (canUpdateProject) {
+      navigate(`/project/${projectId}`);
+    }
+  };
+
+  if (!canReadProject) {
+    return <div>You don't have permission to view projects.</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -79,7 +103,11 @@ const ProjectPage = () => {
           value={searchTerm}
           onChange={handleSearch}
         />
-        <Button onClick={() => setIsModalOpen(true)} icon={<FiPlus />}>
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          icon={<FiPlus />}
+          disabled={!canCreateProject}
+        >
           Create Project
         </Button>
       </div>
@@ -89,7 +117,10 @@ const ProjectPage = () => {
             key={project._id}
             title={project.name}
             subtitle={`Status: ${project.projectStatus}`}
-            onClick={() => navigate(`/project/${project._id}`)}
+            onClick={() => handleProjectClick(project._id)}
+            className={
+              canUpdateProject ? "cursor-pointer" : "cursor-not-allowed"
+            }
           >
             <div
               className="h-36 mb-4 bg-cover bg-center"
@@ -106,11 +137,13 @@ const ProjectPage = () => {
           </Card>
         ))}
       </div>
-      <CreateProjectModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleCreateProject}
-      />
+      {canCreateProject && (
+        <CreateProjectModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleCreateProject}
+        />
+      )}
     </div>
   );
 };

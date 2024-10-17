@@ -1,7 +1,7 @@
 const express = require("express");
 const { createTodo, updateTodo, getTodo, getSingleTodo, getAllTodoByAdmin } = require("../controller/todoController");
-const { jwtToken, checkAdmin } = require("../middleware/auth")
-
+const { jwtToken } = require("../middleware/auth")
+const { checkAdmin } = require("../middleware/checkAdmin")
 
 const routers = express.Router()
 

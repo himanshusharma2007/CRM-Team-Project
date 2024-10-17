@@ -28,27 +28,4 @@ const jwtToken = async (req, res, next) => {
   }
 };
 
-const checkAdmin = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).send({
-      success: false,
-      message: "Admin access required",
-    });
-  }
-  next();
-};
-
-const checkSubAdmin = (req, res, next) => {
-  if (
-    req.user.role !== "subAdmin" &&
-    req.user.role !== "admin"
-  ) {
-    return res.status(403).send({
-      success: false,
-      message: "Sub-admin access required",
-    });
-  }
-  next();
-};
-
-module.exports = { jwtToken, checkAdmin, checkSubAdmin };
+module.exports = { jwtToken };

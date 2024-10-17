@@ -14,6 +14,7 @@ import LoadingSpinner from "../components/UI/LoadingSpinner";
 import "../styles/hideScroll.css";
 
 const Lead = () => {
+  const { user } = useAuth();
   const [pipeline, setPipeline] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -36,7 +37,13 @@ const Lead = () => {
   const [newStageName, setNewStageName] = useState("");
   const pipelineRef = useRef(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
+
+  const canCreateLead = user?.role === "admin" || user?.permission?.lead?.create;
+  const canUpdateLead = user?.role === "admin" || user?.permission?.lead?.update;
+  const canDeleteLead = user?.role === "admin" || user?.permission?.lead?.delete;
+  const canUpdateStage = user?.role === "admin" || user?.permission?.lead?.updateStage;
+  const canCreateStage = user?.role === "admin" || user?.permission?.leadStage?.create;
+  const canDeleteStage = user?.role === "admin" || user?.permission?.leadStage?.delete;
 
   useEffect(() => {
     fetchStagesAndLeads();
@@ -106,7 +113,11 @@ const Lead = () => {
   };
 
   const handleDragStart = (e, lead) => {
-    e.dataTransfer.setData("application/json", JSON.stringify(lead));
+    if (canUpdateStage) {
+      e.dataTransfer.setData("application/json", JSON.stringify(lead));
+    } else {
+      e.preventDefault();
+    }
   };
 
   const handleDragOver = (e) => {
@@ -114,31 +125,33 @@ const Lead = () => {
   };
 
   const handleDrop = async (e, newStage) => {
-    e.preventDefault();
-    const leadData = JSON.parse(e.dataTransfer.getData("application/json"));
+    if (canUpdateStage) {
+      e.preventDefault();
+      const leadData = JSON.parse(e.dataTransfer.getData("application/json"));
 
-    if (leadData.currentStage !== newStage) {
-      const updatedPipeline = { ...pipeline };
+      if (leadData.currentStage !== newStage) {
+        const updatedPipeline = { ...pipeline };
 
-      // Remove lead from the old stage
-      updatedPipeline[leadData.currentStage] = updatedPipeline[
-        leadData.currentStage
-      ].filter((item) => item._id !== leadData._id);
+        // Remove lead from the old stage
+        updatedPipeline[leadData.currentStage] = updatedPipeline[
+          leadData.currentStage
+        ].filter((item) => item._id !== leadData._id);
 
-      // Add lead to the new stage
-      updatedPipeline[newStage] = [
-        ...updatedPipeline[newStage],
-        { ...leadData, currentStage: newStage },
-      ];
+        // Add lead to the new stage
+        updatedPipeline[newStage] = [
+          ...updatedPipeline[newStage],
+          { ...leadData, currentStage: newStage },
+        ];
 
-      setPipeline(updatedPipeline);
+        setPipeline(updatedPipeline);
 
-      try {
-        await leadService.updateStage(leadData._id, newStage);
-      } catch (err) {
-        console.error("Error updating lead stage:", err);
-        setError("Failed to update lead stage. Please try again.");
-        fetchStagesAndLeads();
+        try {
+          await leadService.updateStage(leadData._id, newStage);
+        } catch (err) {
+          console.error("Error updating lead stage:", err);
+          setError("Failed to update lead stage. Please try again.");
+          fetchStagesAndLeads();
+        }
       }
     }
   };
@@ -148,7 +161,7 @@ const Lead = () => {
   };
 
   const handleDeleteStage = async (stageName) => {
-    if (window.confirm("Are you sure you want to delete this stage?")) {
+    if (canDeleteStage && window.confirm("Are you sure you want to delete this stage?")) {
       try {
         await leadStageService.deleteStage(stageName);
         setStages(stages.filter((stage) => stage.stageName !== stageName));
@@ -163,7 +176,9 @@ const Lead = () => {
   };
 
   const handleAddStage = async () => {
-    setShowAddStageModal(true);
+    if (canCreateStage) {
+      setShowAddStageModal(true);
+    }
   };
 
   const handleAddStageSubmit = async (e) => {
@@ -187,23 +202,25 @@ const Lead = () => {
   };
 
   const handleSaveStageName = async (oldStageName) => {
-    try {
-      await leadStageService.updateStage(oldStageName, tempTitle);
-      const updatedStages = stages.map((stage) =>
-        stage.stageName === oldStageName
-          ? { ...stage, stageName: tempTitle }
-          : stage
-      );
-      setStages(updatedStages);
-      setEditingStage(null);
+    if (canUpdateStage) {
+      try {
+        await leadStageService.updateStage(oldStageName, tempTitle);
+        const updatedStages = stages.map((stage) =>
+          stage.stageName === oldStageName
+            ? { ...stage, stageName: tempTitle }
+            : stage
+        );
+        setStages(updatedStages);
+        setEditingStage(null);
 
-      const updatedPipeline = { ...pipeline };
-      updatedPipeline[tempTitle] = updatedPipeline[oldStageName];
-      delete updatedPipeline[oldStageName];
-      setPipeline(updatedPipeline);
-    } catch (err) {
-      console.error("Error updating stage name:", err);
-      setError("Failed to update stage name. Please try again.");
+        const updatedPipeline = { ...pipeline };
+        updatedPipeline[tempTitle] = updatedPipeline[oldStageName];
+        delete updatedPipeline[oldStageName];
+        setPipeline(updatedPipeline);
+      } catch (err) {
+        console.error("Error updating stage name:", err);
+        setError("Failed to update stage name. Please try again.");
+      }
     }
   };
 
@@ -221,22 +238,26 @@ const Lead = () => {
       <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
         CRM Pipeline
       </h1>
-      {user?.role === "admin" && (
-        <div className="text-center mb-6">
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition duration-300 mr-4"
-          >
-            <FaPlus className="inline mr-2" /> Add New Lead
-          </button>
-          <button
-            onClick={handleAddStage}
-            className="bg-green-500 text-white px-6 py-3 rounded-lg shadow hover:bg-green-600 transition duration-300"
-          >
-            <FaPlus className="inline mr-2" /> Add Stage
-          </button>
-        </div>
-      )}
+      <div className="text-center mb-6">
+        <button
+          onClick={() => setShowModal(true)}
+          className={`bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition duration-300 mr-4 ${
+            !canCreateLead && "opacity-50 cursor-not-allowed"
+          }`}
+          disabled={!canCreateLead}
+        >
+          <FaPlus className="inline mr-2" /> Add New Lead
+        </button>
+        <button
+          onClick={handleAddStage}
+          className={`bg-green-500 text-white px-6 py-3 rounded-lg shadow hover:bg-green-600 transition duration-300 ${
+            !canCreateStage && "opacity-50 cursor-not-allowed"
+          }`}
+          disabled={!canCreateStage}
+        >
+          <FaPlus className="inline mr-2" /> Add Stage
+        </button>
+      </div>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -256,7 +277,7 @@ const Lead = () => {
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, stage.stageName)}
             >
-              {editingStage === stage.stageName && user?.role === "admin" ? (
+              {editingStage === stage.stageName && canUpdateStage ? (
                 <div className="flex items-center justify-center space-x-1 mb-4">
                   <input
                     type="text"
@@ -282,7 +303,7 @@ const Lead = () => {
                   <h2 className="text-xl font-semibold text-gray-800">
                     {stage.stageName}
                   </h2>
-                  {user?.role === "admin" && (
+                  {canUpdateStage && (
                     <div className="flex space-x-2">
                       <span
                         className="text-blue-600 cursor-pointer"
@@ -290,12 +311,14 @@ const Lead = () => {
                       >
                         <AiFillEdit size={20} />
                       </span>
-                      <span
-                        className="text-red-500 cursor-pointer"
-                        onClick={() => handleDeleteStage(stage.stageName)}
-                      >
-                        <FaTrashCan />
-                      </span>
+                      {canDeleteStage && (
+                        <span
+                          className="text-red-500 cursor-pointer"
+                          onClick={() => handleDeleteStage(stage.stageName)}
+                        >
+                          <FaTrashCan />
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -306,7 +329,7 @@ const Lead = () => {
                   <div
                     key={lead._id}
                     className="p-4 bg-white rounded-lg shadow-sm transition-all duration-300 hover:shadow-md border border-gray-200 mb-2"
-                    draggable
+                    draggable={canUpdateStage}
                     onDragStart={(e) => handleDragStart(e, lead)}
                   >
                     <p className="font-bold text-lg text-gray-700">

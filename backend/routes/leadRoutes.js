@@ -7,15 +7,16 @@ const {
    updateStage,
   getLeads,
 } = require("../controller/leadController");
-const { jwtToken, checkSubAdmin, checkAdmin } = require("../middleware/auth");
+const { jwtToken } = require("../middleware/auth");
+const { checkPermission } = require("../middleware/permission");
 
 const routers = express.Router();
 
-routers.post("/create", jwtToken, checkAdmin, createLead);
-routers.get("/lead-details/:id", jwtToken, checkSubAdmin, getLeadById);
-routers.get("/", jwtToken, checkSubAdmin, getLeads);
-routers.put("/update/:id", jwtToken, checkAdmin, updateLead);
-routers.delete("/delete/:id", jwtToken, checkAdmin, deleteLead);
-routers.put("/update-stage/:id", jwtToken, checkSubAdmin, updateStage);
+routers.post("/create", jwtToken, checkPermission("lead create"), createLead);
+routers.get("/lead-details/:id", jwtToken, checkPermission("lead read"), getLeadById);
+routers.get("/", jwtToken, checkPermission("lead read"), getLeads);
+routers.put("/update/:id", jwtToken, checkPermission("lead update"), updateLead);
+routers.delete("/delete/:id", jwtToken, checkPermission("lead delete"), deleteLead);
+routers.put("/update-stage/:id", jwtToken, checkPermission("lead updateStage"), updateStage);
 
 module.exports = routers;

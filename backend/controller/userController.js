@@ -5,9 +5,7 @@ const uploadOnCloudinary = require("../utils/cloudinary");
 exports.getUser = async (req, res) => {
   try {
     let user = req.user;
-    res
-      .status(200)
-      .json(user);
+    res.status(200).json(user);
   } catch (error) {
     console.log(err);
     res.status(500).send({
@@ -22,7 +20,7 @@ exports.getAllUser = async (req, res) => {
     const users = await user.find();
     res.status(200).send(users);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
       success: false,
       message: "Internel server error",
@@ -32,9 +30,9 @@ exports.getAllUser = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   try {
-    const {id} = req.params;
-    const userData = await user.findById(id)
-    if(!userData){
+    const { id } = req.params;
+    const userData = await user.findById(id);
+    if (!userData) {
       return res.status(400).send({
         success: false,
         message: "User not found",
@@ -42,7 +40,7 @@ exports.getUserById = async (req, res) => {
     }
     res.status(200).send(userData);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
       success: false,
       message: "Internel server error",
@@ -52,10 +50,10 @@ exports.getUserById = async (req, res) => {
 
 exports.getUnVerifiedUser = async (req, res) => {
   try {
-    const users = await user.find({verify: false, role: {$ne: "admin"}})
+    const users = await user.find({ verify: false, role: { $ne: "admin" } });
     res.status(200).send(users);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
       success: false,
       message: "Internel server error",
@@ -64,67 +62,75 @@ exports.getUnVerifiedUser = async (req, res) => {
 };
 
 exports.verifyUser = async (req, res) => {
-  try{
-    console.log("Req.body", req.body)
-    const {userId, teamId, role} = req.body;
-    console.log("userId", "teamId", "role", userId, teamId, role)
-    if(!userId || !teamId ){
+  try {
+    console.log("Req.body in verifyUser", req.body);
+    const { userId, teamId, role, permissions } = req.body;
+    console.log("permissions", permissions);
+
+    if (!userId || !teamId || !permissions) {
       return res.status(400).send({
         success: false,
-        message: "please fill all fields",
+        message: "Please fill all fields",
       });
     }
-    const userData = await user.findById(userId)
-    console.log(userData)
-    if(!userData){
+
+    const userData = await user.findById(userId);
+    console.log(userData);
+    if (!userData) {
       return res.status(400).send({
         success: false,
         message: "User not found",
       });
     }
+
     const teamData = await team.findById(teamId);
-    console.log(teamData)
-    if(!teamData){
+    console.log(teamData);
+    if (!teamData) {
       return res.status(400).send({
         success: false,
         message: "Team not found",
       });
     }
+
     teamData.participants.push(userData._id);
     userData.verify = true;
     userData.teamId = teamId;
     userData.role = role || "emp";
-    if(userData.role === "admin" || userData.role === "subAdmin"){
+    userData.permission = permissions; // Store the permissions
+
+    if (userData.role === "admin" || userData.role === "subAdmin") {
       teamData.leaderId = userData._id;
     }
+
     await teamData.save();
     await userData.save();
+    console.log("verified user ", userData);
     return res.status(200).send({
       success: true,
       message: "User verified successfully",
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
       success: false,
-      message: "Internel server error",
+      message: "Internal server error",
     });
-  } 
-}
+  }
+};
 
 exports.uploadProfileImage = async (req, res) => {
   try {
     const { path } = req.file;
     console.log(path)
     const userData = await user.findById(req.user._id);
-    if(!userData){
+    if (!userData) {
       return res.status(400).send({
         success: false,
         message: "User not found",
       });
-    }       
+    }
     const uploadResponse = await uploadOnCloudinary(path);
-    if(!uploadResponse){
+    if (!uploadResponse) {
       throw new Error("Failed to upload image on cloudinary");
     }
     userData.profileImage = uploadResponse.url;
@@ -135,10 +141,30 @@ exports.uploadProfileImage = async (req, res) => {
       imageUrl: uploadResponse.url,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
       success: false,
       message: "Internel server error",
     });
   }
-}
+};
+
+exports.updateUserPermission = async (req, res) => {
+  try {
+    const { permission } = req.body;
+    const userData = await user.findById(req.params.id);
+    if (!userData) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    console.log("permission", permission);
+    userData.permission = permission;
+    await userData.save();
+
+    return res
+      .status(200)
+      .json({ message: "User permission updated successfully" });
+  } catch (error) {
+    console.error("Error in updateUserPermission:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
