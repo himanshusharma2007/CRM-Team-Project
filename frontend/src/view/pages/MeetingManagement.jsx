@@ -11,6 +11,8 @@ import {
   FaSearch,
   FaSort,
 } from "react-icons/fa";
+import { PiGraphBold } from "react-icons/pi";
+
 import {
   getAllProjects,
   createProject,
@@ -283,7 +285,7 @@ const MeetingManagement = () => {
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center gap-2"
           onClick={toggleMeetingModal}
         >
-          <FaPlus /> Schedule Meeting
+          <FaPlus /> Create Meeting
         </button>
       </div>
 
@@ -384,6 +386,14 @@ const MeetingManagement = () => {
                   </h2>
                 )}
                 <div className="flex gap-3">
+                  <button
+                    className="text-xl text-gray-600 hover:text-blue-600"
+                    onClick={() => {
+                      navigate(`/thread/${client._id}`);
+                    }}
+                  >
+                    <PiGraphBold />
+                  </button>
                   {editingClientId === client._id ? (
                     <button
                       className="text-green-600 hover:text-green-700"
@@ -453,11 +463,9 @@ const MeetingManagement = () => {
                 </button>
                 <button
                   className="text-blue-600 hover:underline focus:outline-none"
-                  onClick={() => {
-                    navigate(`/thread/${client._id}`);
-                  }}
+                  onClick={() => navigate(`/client/${client._id}/projects`)}
                 >
-                  View in Graph
+                  View Projects
                 </button>
               </div>
 
@@ -468,7 +476,10 @@ const MeetingManagement = () => {
                     (service, idx) => (
                       <div
                         key={idx}
-                        className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition duration-200 ease-in-out"
+                        className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition duration-200 ease-in-out cursor-pointer"
+                        onClick={() =>
+                          navigate(`/client/${client._id}/projects`)
+                        }
                       >
                         {/* Service Header */}
                         <div className="flex justify-between items-center mb-3">
