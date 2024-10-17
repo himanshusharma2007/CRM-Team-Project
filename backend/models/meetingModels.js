@@ -21,13 +21,17 @@ const meetingSchema = new mongoose.Schema({
     },
     meetingConclusion: {
         type: String,
-        default: ""
+        required:[true, "Meeting conclusion is required"]
     },
     meetingStatus: {
         type: String,
-        enum: ["pending", "completed", "cancelled", "rescheduled"],
-        default: "pending"
+        enum: ["initial", "pending", "completed"],
+        default: "initial"
     },
+    clientNotification: {
+        type: Boolean,
+        default: false
+    }
 }, {timestamps:true});
 
 
