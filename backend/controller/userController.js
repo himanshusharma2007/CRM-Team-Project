@@ -121,6 +121,7 @@ exports.verifyUser = async (req, res) => {
 exports.uploadProfileImage = async (req, res) => {
   try {
     const { path } = req.file;
+    console.log(path)
     const userData = await user.findById(req.user._id);
     if (!userData) {
       return res.status(400).send({

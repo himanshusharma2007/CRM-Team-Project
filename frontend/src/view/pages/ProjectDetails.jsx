@@ -27,7 +27,7 @@ const ProjectDetails = () => {
   const fetchProjectDetails = async () => {
     try {
       const data = await getProjectById(id);
-      console.log("project data",data);
+      console.log("project data", data);
       setProject(data);
     } catch (error) {
       console.error("Error fetching project details:", error);
@@ -93,28 +93,36 @@ const ProjectDetails = () => {
               <strong className="font-medium">Status:</strong> {project.projectStatus}
             </p>
             <p>
-              <strong>Client:</strong> {project.clientId }
+              <strong>Client:</strong> {project.clientId?.name || "No client name available"}
             </p>
           </div>
         </div>
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-3">Team Members</h2>
           <div className="flex flex-wrap gap-2">
-            {project.teamIds.map((member) => (
-              <Tag key={member._id} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
-                {member.name}
-              </Tag>
-            ))}
+            {project.teamIds && project.teamIds.length > 0 ? (
+              project.teamIds.map((member) => (
+                <Tag key={member._id} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                  {member.name}
+                </Tag>
+              ))
+            ) : (
+              <p className="text-gray-600">No team members assigned</p>
+            )}
           </div>
         </div>
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-3">Hashtags</h2>
           <div className="flex flex-wrap gap-2">
-            {project.hashtages.map((tag, index) => (
-              <Tag key={index} className="bg-green-100 text-green-600 px-3 py-1 rounded-full">
-                #{tag}
-              </Tag>
-            ))}
+            {project.hashtages && project.hashtages.length > 0 ? (
+              project.hashtages.map((tag, index) => (
+                <Tag key={index} className="bg-green-100 text-green-600 px-3 py-1 rounded-full">
+                  #{tag}
+                </Tag>
+              ))
+            ) : (
+              <p className="text-gray-600">No hashtags added</p>
+            )}
           </div>
         </div>
       </Card>
