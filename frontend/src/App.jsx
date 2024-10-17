@@ -14,6 +14,7 @@ import Layout from "./view/components/Layout/Layout";
 import Landing from "./view/screens/Landing";
 import Dashboard from "./view/pages/Dashboard";
 import Connection from "./view/pages/Connection";
+import MeetingDetailModal from "./view/modal/MeetingDetailModal";
 import ForgetPassword from "./view/pages/ForgetPassword";
 import UserVerification from "./view/pages/UserVerification";
 import Home from "./view/screens/Home";
@@ -26,6 +27,7 @@ import MeetingManagement from "./view/pages/MeetingManagement";
 import ProjectPage from "./view/pages/ProjectPage";
 import ProjectDetails from "./view/pages/ProjectDetails";
 import ClientMeetingThread from "./view/pages/ClientMeetingThread";
+import ClientProjects from "./view/pages/ClientProjects";
 
 function App() {
   return (
@@ -172,13 +174,28 @@ function App() {
               </Layout>
             }
           />
+          <Route
+            path="/client/:clientId/projects"
+            element={
+              <Layout>
+                <ClientProjects />
+              </Layout>
+            }
+          />
+          <Route
+            path="/meeting-detail/:id"
+            element={
+              <Layout>
+                <MeetingDetailModal />
+              </Layout>
+            }
+          />
 
           {/* Public routes */}
           {/* <Route path="/contactus" element={<ContactUs />} /> */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Register />} />
           <Route path="/forgot-password" element={<ForgetPassword />} />
-
         </Routes>
       </BrowserRouter>
     </Context>

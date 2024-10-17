@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { getAllProjects, getProjectByClientId } from "../../services/projectService";
+import {
+  getAllProjects,
+  getProjectByClientId,
+} from "../../services/projectService";
 import { getAllClients } from "../../services/clientServices";
 
 const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
@@ -34,7 +37,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
   const allClientsfun = async () => {
     try {
       const clients = await getAllClients();
-      console.log("Fetched Clients: ", clients); 
+      console.log("Fetched Clients: ", clients);
       setAllClients(clients);
     } catch (error) {
       console.error("Error fetching clients:", error.message);
@@ -106,7 +109,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg w-96">
-        <h2 className="text-xl font-semibold mb-4">Schedule New Meeting</h2>
+        <h2 className="text-xl font-semibold mb-4">Create New Meeting</h2>
 
         <form onSubmit={handleSubmit}>
           {/* Add the new input field for meeting title */}
@@ -181,7 +184,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
             >
-              Schedule
+              Create
             </button>
             <button
               type="button"
