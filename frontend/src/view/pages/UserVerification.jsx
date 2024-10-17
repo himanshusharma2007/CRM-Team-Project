@@ -127,28 +127,40 @@ const UserVerificationList = () => {
   const handlePermissionChange = (category, permission) => {
     setPermissions((prevPermissions) => {
       const newPermissions = JSON.parse(JSON.stringify(prevPermissions));
-      newPermissions[category][permission] =
-        !newPermissions[category][permission];
+      newPermissions[category][permission] = !newPermissions[category][permission];
 
       // Handle required permissions
-      if (newPermissions[category][permission]) {
-        newPermissions[category].requiredPermission?.forEach(
-          (requiredCategory) => {
-            newPermissions[requiredCategory].read = true;
-          }
-        );
-      } else {
-        // Uncheck dependent permissions
-        Object.keys(newPermissions).forEach((cat) => {
-          if (newPermissions[cat].requiredPermission?.includes(category)) {
-            Object.keys(newPermissions[cat]).forEach((perm) => {
-              if (perm !== "requiredPermission") {
-                newPermissions[cat][perm] = false;
-              }
-            });
-          }
-        });
-      }
+      const requiredCategories = newPermissions[category].requiredPermission || [];
+      const hasActivePermissions = Object.keys(newPermissions[category]).some(
+        (perm) => perm !== "requiredPermission" && newPermissions[category][perm]
+      );
+
+      requiredCategories.forEach((requiredCategory) => {
+        newPermissions[requiredCategory].read = hasActivePermissions;
+      });
+
+      return newPermissions;
+    });
+  };
+
+  const handleCategoryAllCheck = (category) => {
+    setPermissions((prevPermissions) => {
+      const newPermissions = JSON.parse(JSON.stringify(prevPermissions));
+      const allChecked = Object.keys(newPermissions[category]).every(
+        (perm) => perm === "requiredPermission" || newPermissions[category][perm]
+      );
+
+      Object.keys(newPermissions[category]).forEach((perm) => {
+        if (perm !== "requiredPermission") {
+          newPermissions[category][perm] = !allChecked;
+        }
+      });
+
+      // Handle required permissions
+      const requiredCategories = newPermissions[category].requiredPermission || [];
+      requiredCategories.forEach((requiredCategory) => {
+        newPermissions[requiredCategory].read = !allChecked;
+      });
 
       return newPermissions;
     });
@@ -170,6 +182,12 @@ const UserVerificationList = () => {
     return false;
   };
 
+  const isCategoryAllChecked = (category) => {
+    return Object.keys(permissions[category]).every(
+      (perm) => perm === "requiredPermission" || permissions[category][perm]
+    );
+  };
+
   const toggleCategory = (category) => {
     setExpandedCategories((prev) => ({
       ...prev,
@@ -179,39 +197,46 @@ const UserVerificationList = () => {
 
   const renderPermissionDropdowns = () => {
     return permissionCategories.map((category) => (
-      <div key={category} className="mb-4">
-        <button
-          onClick={() => toggleCategory(category)}
-          className="w-full text-left font-semibold text-lg mb-2 capitalize flex justify-between items-center"
-        >
-          {category} Permissions
-          <span>{expandedCategories[category] ? "▲" : "▼"}</span>
-        </button>
+      <div key={category} className="mb-4 border rounded-lg p-4 shadow-sm">
+        <div className="flex justify-between items-center mb-2">
+          <button
+            onClick={() => toggleCategory(category)}
+            className="text-left font-semibold text-lg capitalize flex items-center focus:outline-none"
+          >
+            {category} Permissions
+            <span className="ml-2">{expandedCategories[category] ? "▲" : "▼"}</span>
+          </button>
+          <label className="inline-flex items-center">
+            <input
+              type="checkbox"
+              checked={isCategoryAllChecked(category)}
+              onChange={() => handleCategoryAllCheck(category)}
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+            <span className="ml-2 text-sm">Select All</span>
+          </label>
+        </div>
         {expandedCategories[category] && (
-          <div className="pl-4">
+          <div className="pl-4 grid grid-cols-2 gap-2">
             {Object.keys(permissions[category]).map((permission) => {
               if (permission !== "requiredPermission") {
                 const isDisabled = isPermissionDisabled(category, permission);
                 return (
                   <div
                     key={`${category}-${permission}`}
-                    className="flex items-center mb-2"
+                    className="flex items-center"
                   >
                     <input
                       type="checkbox"
                       id={`${category}-${permission}`}
                       checked={permissions[category][permission]}
-                      onChange={() =>
-                        handlePermissionChange(category, permission)
-                      }
+                      onChange={() => handlePermissionChange(category, permission)}
                       disabled={isDisabled}
-                      className="mr-2"
+                      className="form-checkbox h-5 w-5 text-blue-600"
                     />
                     <label
                       htmlFor={`${category}-${permission}`}
-                      className={`capitalize ${
-                        isDisabled ? "text-gray-400" : ""
-                      }`}
+                      className={`ml-2 capitalize ${isDisabled ? "text-gray-400" : ""}`}
                     >
                       {permission}
                     </label>
@@ -231,7 +256,7 @@ const UserVerificationList = () => {
        setMessage("Please fill all required fields before verifying");
        return;
      }
-
+console.log("data to varify",permissions)
      try {
        await verifyUser(selectedUserId, selectTeam._id, role, permissions);
        setUsers(users.filter((u) => u._id !== selectedUserId));
@@ -332,7 +357,7 @@ return (
     {isModalOpen && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full m-4">
-          <h2 className="text-xl font-bold mb-4 text-center">Verify User</h2>
+          <h2 className="text-2xl font-bold mb-4 text-center">Verify User</h2>
 
           <div className="mb-4">
             <label className="block mb-2 text-gray-700">Select Team:</label>
@@ -370,8 +395,8 @@ return (
           </div>
 
           <div className="mb-4">
-            <h3 className="font-semibold text-lg mb-2">Set Permissions</h3>
-            <div className="max-h-60 overflow-y-auto border border-gray-300 rounded-md p-4">
+            <h3 className="font-semibold text-xl mb-2">Set Permissions</h3>
+            <div className="max-h-[60vh] overflow-y-auto border border-gray-300 rounded-md p-4">
               {renderPermissionDropdowns()}
             </div>
           </div>

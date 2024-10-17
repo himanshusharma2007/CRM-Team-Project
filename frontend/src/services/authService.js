@@ -104,7 +104,7 @@ export const verifyOTP = async (email, otp, password) => {
 
 export const verifyUser = async (userId, teamId, role, permissions) => {
   try {
-    const response = await axios.post('/profile/verifyuser', {
+    const response = await api.post('/profile/verifyuser', {
       userId,
       teamId,
       role,
