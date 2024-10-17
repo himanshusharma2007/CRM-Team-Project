@@ -12,7 +12,8 @@ import {
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { getClientById } from "../../services/clientServices";
 import { getProjectByClientId } from "../../services/projectService";
-// import { getAllMeetingsByProjectId } from "../../services/meetingService";
+import { getAllMeetingsByProjectId } from "../../services/meetingService";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const ClientProjects = () => {
   const { clientId } = useParams();
@@ -32,12 +33,14 @@ const ClientProjects = () => {
         const [clientData, projectsData] = await Promise.all([
           getClientById(clientId),
           getProjectByClientId(clientId),
-          //   getAllMeetingsByProjectId(projectsData._id),
         ]);
+
         console.log("Projects:", projectsData);
+        console.log("PRoject last: ", projectsData[0].lastMeetingId);
+
         setClient(clientData);
         setProjects(projectsData);
-        // setMeetings(meetingsData);
+        setMeetings(projectsData);
       } catch (err) {
         setError("Error fetching data. Please try again.");
         console.error(err);
@@ -89,6 +92,9 @@ const ClientProjects = () => {
     }
   };
 
+  // Add this function to filter meetings with valid lastMeetingId
+  const validMeetings = meetings.filter(meeting => meeting.lastMeetingId != null);
+
   if (loading)
     return (
       <div className="text-center mt-8">
@@ -101,7 +107,7 @@ const ClientProjects = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <button
-        onClick={() => navigate("/meeting-management")}
+        onClick={() => navigate("/meetingmanagement")}
         className="mb-4 flex items-center text-blue-600 hover:text-blue-800"
       >
         <FaArrowLeft className="mr-2" /> Back to Meeting Management
@@ -113,36 +119,52 @@ const ClientProjects = () => {
 
       {/* Meetings Carousel */}
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-          Upcoming Meetings
-        </h2>
-        {meetings.length > 0 ? (
-          <Carousel
-            showThumbs={false}
-            showStatus={false}
-            infiniteLoop={true}
-            autoPlay={true}
-            interval={5000}
-            className="bg-white rounded-lg shadow-md"
-          >
-            {meetings.map((meeting, index) => (
-              <div key={index} className="p-6 text-left">
-                <h3 className="text-xl font-semibold mb-2">{meeting.title}</h3>
-                <p className="text-gray-600 flex items-center mb-2">
-                  <FaCalendar className="mr-2" />
-                  {new Date(meeting.date).toLocaleDateString()}
+        <Carousel
+          showThumbs={false}
+          showStatus={false}
+          infiniteLoop={true}
+          autoPlay={true}
+          interval={5000}
+          centerMode={true}
+          centerSlidePercentage={50}
+          className=""
+          renderArrowPrev={(onClickHandler, hasPrev) => (
+            <button
+              onClick={onClickHandler}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600 transition z-10"
+            >
+              <FaChevronLeft />
+            </button>
+          )}
+          renderArrowNext={(onClickHandler, hasNext) => (
+            <button
+              onClick={onClickHandler}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600 transition z-10"
+            >
+              <FaChevronRight />
+            </button>
+          )}
+        >
+          {validMeetings.map((meeting, index) => (
+            <div key={index} className="p-4 text-left">
+              <div className="bg-gray-100 p-4 rounded-lg border border-gray-200 shadow-md mx-2 relative">
+                <span className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
+                  {meeting.name}
+                </span>
+                <h3 className="text-2xl font-bold mb-2 text-blue-600">{meeting.lastMeetingId.title || 'Untitled Meeting'}</h3>
+                <p className="text-gray-700 flex items-center mb-2">
+                  <FaCalendar className="mr-2 text-blue-500" />
+                  {new Date(meeting.lastMeetingId.meetingDateTime).toLocaleDateString()}
                 </p>
-                <p className="text-gray-600 flex items-center mb-2">
-                  <FaClock className="mr-2" />
-                  {new Date(meeting.date).toLocaleTimeString()}
+                <p className="text-gray-700 flex items-center mb-2">
+                  <FaClock className="mr-2 text-blue-500" />
+                  {new Date(meeting.lastMeetingId.meetingDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
-                <p className="mt-2">{meeting.description}</p>
+                <p className="mt-2 text-gray-600">{meeting.description || 'No description available'}</p>
               </div>
-            ))}
-          </Carousel>
-        ) : (
-          <p className="text-gray-600">No upcoming meetings scheduled.</p>
-        )}
+            </div>
+          ))}
+        </Carousel>
       </div>
 
       {/* Search and Sort Controls */}
