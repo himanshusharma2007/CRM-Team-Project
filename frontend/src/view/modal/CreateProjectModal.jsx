@@ -5,6 +5,7 @@ import { Select } from "../components/UI/ProjectCommanUI";
 import { Button } from "../components/UI/ProjectCommanUI";
 import {getAllClients} from "../../services/clientServices";
 import {createProject} from "../../services/projectService";
+import {getAllTeams} from "../../services/TeamService"
 
 const CreateProjectModal = ({
   isOpen,
@@ -24,8 +25,23 @@ const CreateProjectModal = ({
     projectImage: ""
   });
   const [clients, setClients] = useState([]);
+  const [allTeams, setAllTeams] = useState([]);
 
-
+  useEffect(()=>{
+    const fetchAllTeams = async () => {
+      try {
+        const allFetchedTeams = await getAllTeams();
+        setAllTeams(allFetchedTeams);
+      } catch (error) {
+        console.log("Error in fetch all teams: ", error.message)
+      }
+    }
+    fetchAllTeams()
+    if(isOpen){
+      console.log("All teams : ", allTeams)
+      console.log("Team ids : ", )
+    }
+  }, [isOpen])
   useEffect(() => {
     if (initialData && isEditing) {
       console.log("initial data in useEffect",initialData);
@@ -36,6 +52,7 @@ const CreateProjectModal = ({
       });
     }
   }, [initialData, isEditing]);
+
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -47,6 +64,7 @@ const CreateProjectModal = ({
     };
     fetchClients();
   }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -101,7 +119,7 @@ const CreateProjectModal = ({
           value={formData.description}
           onChange={handleChange}
           required
-          multiline
+          multiline="true"
           rows={4}
         />
       </div>
@@ -140,17 +158,20 @@ const CreateProjectModal = ({
         </select>
       </div>
       <div className="flex-1">
-        <Input
-          name="teamIds"
-          label="Team IDs (comma-separated)"
-          value={formData.teamIds.join(", ")}
+        <select 
+          className="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
           onChange={(e) =>
             setFormData({
               ...formData,
-              teamIds: e.target.value.split(",").map((id) => id.trim()),
+              clientId: e.target.value,
             })
           }
-        />
+        >
+          <option>Select Team</option>
+          {allTeams&&allTeams.map((allTeam, index) => (
+            <option key={index}>{allTeam.teamName}</option>
+          ))}
+        </select>
       </div>
     </div>
     
