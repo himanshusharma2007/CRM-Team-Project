@@ -93,7 +93,9 @@ const ClientProjects = () => {
   };
 
   // Add this function to filter meetings with valid lastMeetingId
-  const validMeetings = meetings.filter(meeting => meeting.lastMeetingId != null);
+  const validMeetings = meetings.filter(
+    (meeting) => meeting.lastMeetingId != null
+  );
 
   if (loading)
     return (
@@ -118,7 +120,7 @@ const ClientProjects = () => {
       </h1>
 
       {/* Meetings Carousel */}
-      <div className="mb-8">
+      <div className="mb-8 bg-white p-6 rounded-lg shadow-lg overflow-hidden">
         <Carousel
           showThumbs={false}
           showStatus={false}
@@ -126,41 +128,53 @@ const ClientProjects = () => {
           autoPlay={true}
           interval={5000}
           centerMode={true}
-          centerSlidePercentage={50}
-          className=""
+          centerSlidePercentage={50} // Show two cards at once
           renderArrowPrev={(onClickHandler, hasPrev) => (
             <button
               onClick={onClickHandler}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600 transition z-10"
+              className="absolute left-2 lg:left-6 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-800 transition z-10"
             >
-              <FaChevronLeft />
+              <FaChevronLeft className="w-6 h-6" />
             </button>
           )}
           renderArrowNext={(onClickHandler, hasNext) => (
             <button
               onClick={onClickHandler}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600 transition z-10"
+              className="absolute right-2 lg:right-6 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-800 transition z-10"
             >
-              <FaChevronRight />
+              <FaChevronRight className="w-6 h-6" />
             </button>
           )}
         >
           {validMeetings.map((meeting, index) => (
-            <div key={index} className="p-4 text-left">
-              <div className="bg-gray-100 p-4 rounded-lg border border-gray-200 shadow-md mx-2 relative">
-                <span className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
+            <div key={index} className="p-4 text-left flex-shrink-0">
+              <div className="bg-gradient-to-r from-blue-100 to-white p-6 rounded-xl border border-gray-200 shadow-xl mx-2 relative overflow-hidden hover:shadow-2xl transition"
+                onClick={() => navigate(`/projectmeetings/${meeting?.lastMeetingId?.projectId}`)}
+              >
+                <span className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
                   {meeting.name}
                 </span>
-                <h3 className="text-2xl font-bold mb-2 text-blue-600">{meeting.lastMeetingId.title || 'Untitled Meeting'}</h3>
-                <p className="text-gray-700 flex items-center mb-2">
-                  <FaCalendar className="mr-2 text-blue-500" />
-                  {new Date(meeting.lastMeetingId.meetingDateTime).toLocaleDateString()}
+                <h3 className="text-2xl font-semibold mb-3 text-blue-700">
+                  {meeting.lastMeetingId.title || "Untitled Meeting"}
+                </h3>
+                <p className="text-gray-600 flex items-center mb-2">
+                  <FaCalendar className="mr-2 text-blue-600" />
+                  {new Date(
+                    meeting.lastMeetingId.meetingDateTime
+                  ).toLocaleDateString()}
                 </p>
-                <p className="text-gray-700 flex items-center mb-2">
-                  <FaClock className="mr-2 text-blue-500" />
-                  {new Date(meeting.lastMeetingId.meetingDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <p className="text-gray-600 flex items-center mb-2">
+                  <FaClock className="mr-2 text-blue-600" />
+                  {new Date(
+                    meeting.lastMeetingId.meetingDateTime
+                  ).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
-                <p className="mt-2 text-gray-600">{meeting.description || 'No description available'}</p>
+                <p className="mt-4 text-gray-700 font-light">
+                  {meeting.description || "No description available"}
+                </p>
               </div>
             </div>
           ))}
