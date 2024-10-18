@@ -254,7 +254,7 @@ exports.createMeeting = async (req, res) => {
 
     if (!clientId || !projectId || !meetingDateTime || !title || !meetingConclusion) {
       console.log("Missing required fields");
-      return res.status(400).json({ error: "All fields are required" });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     console.log("Fetching client data");
@@ -306,13 +306,15 @@ exports.createMeeting = async (req, res) => {
             "Error in sending notification to leader but meeting is created successfully",
         });
       }
+      meetingData.leaderNotification = true
+      meetingData.save()
     }
 
     console.log("Meeting creation successful");
-    res.status(201).json(meetingData);
+    return res.status(201).json(meetingData);
   } catch (error) {
     console.error("Error in createMeeting:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -324,11 +326,10 @@ exports.getMeetingById = async (req, res) => {
     if (!meetingData) {
       return res.status(404).json({ error: "Meeting not found" });
     }
-    res.status(200).json(meetingData);
-    res.status(200).json(meetingData);
+    return res.status(200).json(meetingData);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -360,33 +361,49 @@ exports.getAllMeetingsByProjectId = async (req, res) => {
   }
 };
 
-// exports.updateMeeting = async (req, res) => {
-//   console.log("updateMeeting function called");
-//   console.log("Request body:", req.body);
-//   console.log("Meeting ID:", req.params.id);
-
-//   try {
-//     const {title, meetingConclusion, meetingStatus, meetingDateTime } = req.body;
-//     const meetingData = await meeting.findById(req.params.id);
-//     console.log("Found meeting data:", meetingData);
-
-//     if (!meetingData) {
-//       console.log("Meeting not found");
-//       return res.status(404).json({ error: "Meeting not found" });
-//     }
-//     meetingData.meetingConclusion = meetingConclusion || meetingData.meetingConclusion;
-//     meetingData.meetingStatus = meetingStatus || meetingData.meetingStatus;
-//     meetingData.meetingDateTime = meetingDateTime || meetingData.meetingDateTime;
-//     meetingData.title = title || meetingData.title;
-//     await meetingData.save();
-//     console.log("Meeting saved successfully");
-
-//     res.status(200).json(meetingData);
-//   } catch (error) {
-//     console.error("Error in updateMeeting:", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// };
+exports.isMeetingConclusionCompleted = async(req, res) =>{
+  try{
+    const {noteId, isCompleted} = req.body
+    if(!noteId){
+      return res.status(404).json({ message: "All fields are required" })
+    }
+    const meetingData = await meeting.findById(req.params.id).populate("meetingConclusion");
+    if(!meetingData){
+      return res.status(404).json({
+        error: "meeting not found"
+      })
+    }
+    let found = false;
+    let status = 0;
+    await meetingData.meetingConclusion.map((conclusion) => {
+      if(conclusion._id.equals(noteId)){
+        console.log(conclusion)
+        conclusion.isCompleted = isCompleted
+        found = true;
+      }
+      if(conclusion.isCompleted){
+        status++;
+      }
+    });
+    if(!found){
+      return res.status(404).json({
+        error: "Meeting Conclution not found"
+      })
+    }
+    console.log(status)
+    meetingData.meetingStatus = (status === 0)? "initial" : (status === meetingData.meetingConclusion.length)? "completed" : "pending"
+    await meetingData.save()
+    return res.status(200).json({
+      message: "Meeting conclution updated",
+      data: meetingData
+    })
+  }catch(error){
+    console.log(error)
+    return res.status(500).json({
+      error: "Internal server error"
+    })
+  }
+}
 
 exports.getAllMeeting = async (req, res) => {
   try {

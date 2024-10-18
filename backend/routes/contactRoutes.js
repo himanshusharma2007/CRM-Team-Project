@@ -5,9 +5,9 @@ const { jwtToken } = require("../middleware/auth");
 const { checkPermission } = require("../middleware/permission");
 
 
-router.get("/", jwtToken,checkPermission("contact read"), getContacts);
-router.post("/create",jwtToken, checkPermission("contact create"), createContact);
-router.delete("/delete/:id",jwtToken, checkPermission("contact delete"), deleteContact);
-router.put("/update/:id",jwtToken, checkPermission("contact update"), updateContact);
+router.get("/", jwtToken,checkPermission("connection read"), getContacts);
+router.post("/create",jwtToken, checkPermission("connection create"), createContact);
+router.delete("/delete/:id",jwtToken, checkPermission("connection delete"), deleteContact);
+router.put("/update/:id",jwtToken, checkPermission("connection update"), updateContact);
 
 module.exports = router;   
