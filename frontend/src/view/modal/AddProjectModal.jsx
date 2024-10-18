@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getAllTeams } from "../../services/teamService";
 import { createProject } from "../../services/projectService";
 

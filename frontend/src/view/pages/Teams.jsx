@@ -13,13 +13,11 @@ const Teams = () => {
   const [newTeamName, setNewTeamName] = useState("");
   const [newTeamDepartment, setNewTeamDepartment] = useState("");
   const [selectedTeamMembers, setSelectedTeamMembers] = useState([]);
-  // useEffect(() => {
-  //   console.log("selectedTeam", JSON.stringify(selectTeam, null, 2)); // This gives a pretty printed JSON
-  // }, [selectTeam]);
+
   const fetchTeams = async () => {
     try {
       const teams = await getAllTeams();
-      console.log('teams', teams)
+      console.log("teams", teams);
       setTeamsData(teams);
     } catch (error) {
       console.log("Failed to fetch teams: ", error);
@@ -32,17 +30,19 @@ const Teams = () => {
 
   const handleSort = (order) => {
     const sortedTeams = [...teamsData].sort((a, b) =>
-      order === 'latest' ? b.createdAt.localeCompare(a.createdAt) : a.createdAt.localeCompare(b.createdAt)
+      order === "latest"
+        ? b.createdAt.localeCompare(a.createdAt)
+        : a.createdAt.localeCompare(b.createdAt)
     );
     setTeamsData(sortedTeams);
   };
 
   const handleViewTeam = async (teamId) => {
     try {
-      console.log('teamId', teamId)
+      console.log("teamId", teamId);
       const team = await getTeamById(teamId);
-      console.log('team', team)
-      setSelectedTeamMembers(team.participants || []); // Assuming team.members contains the member data
+      console.log("team", team);
+      setSelectedTeamMembers(team.participants || []); // Assuming team.participants contains the member data
       setShowMembersModal(true); // Show members modal
     } catch (error) {
       console.error(`Error viewing team ${teamId}:`, error);
@@ -53,12 +53,22 @@ const Teams = () => {
     try {
       const newTeam = await createTeam(newTeamName, newTeamDepartment);
       setTeamsData((prevTeams) => [...prevTeams, newTeam]);
-      setNewTeamName('');
-      setNewTeamDepartment('');
+      setNewTeamName("");
+      setNewTeamDepartment("");
       setShowCreateModal(false);
     } catch (error) {
-      console.error('Error creating team:', error);
+      console.error("Error creating team:", error);
     }
+  };
+
+  // Function to sort members
+  const sortMembers = (members) => {
+    const rolePriority = ["admin", "subAdmin"]; // Priority roles
+    return [...members].sort((a, b) => {
+      const aIndex = rolePriority.indexOf(a.role);
+      const bIndex = rolePriority.indexOf(b.role);
+      return bIndex - aIndex; // Sort by index in rolePriority
+    });
   };
 
   return (
@@ -79,13 +89,13 @@ const Teams = () => {
         <span className="mr-4 text-gray-700">Sort by:</span>
         <button
           className="mr-2 px-4 py-2 border border-gray-300 rounded hover:bg-gray-200"
-          onClick={() => handleSort('latest')}
+          onClick={() => handleSort("latest")}
         >
           Latest
         </button>
         <button
           className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-200"
-          onClick={() => handleSort('oldest')}
+          onClick={() => handleSort("oldest")}
         >
           Oldest
         </button>
@@ -165,33 +175,43 @@ const Teams = () => {
       {/* Members Modal */}
       {showMembersModal && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-[400px] relative">
-          {/* Close Button */}
-          <button
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition duration-200"
-            onClick={() => setShowMembersModal(false)}
-          >
-            <FaTimes className="h-6 w-6" />
-          </button>
-      
-          {/* Modal Content */}
-          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Team Members</h2>
-      
-          <ul className="space-y-4">
-            {selectedTeamMembers && selectedTeamMembers.length > 0 ? (
-              selectedTeamMembers.map((member) => (
-                <li key={member._id} className="flex justify-between p-2 bg-gray-100 rounded-md hover:bg-gray-200 transition duration-200">
-                  <span className="text-gray-800 font-semibold">{member.name}</span>
-                  <span className="text-gray-600">{member.role}</span>
-                </li>
-              ))
-            ) : (
-              <li className="text-center text-gray-600">No members found</li>
-            )}
-          </ul>
+          <div className="bg-white p-8 rounded-lg shadow-lg w-[400px] relative">
+            {/* Close Button */}
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition duration-200"
+              onClick={() => setShowMembersModal(false)}
+            >
+              <FaTimes className="h-6 w-6" />
+            </button>
+
+            {/* Modal Content */}
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+              Team Members
+            </h2>
+
+            <ul className="space-y-4">
+              {selectedTeamMembers && selectedTeamMembers.length > 0 ? (
+                sortMembers(selectedTeamMembers).map((member) => (
+                  <li
+                    key={member._id}
+                    className={`flex justify-between p-2 rounded-md transition duration-200 ${
+                      member.role === "admin" || member.role === "subAdmin"
+                        ? "bg-purple-200"
+                        : "bg-gray-100"
+                    } hover:bg-gray-200`}
+                  >
+                    <span className="text-gray-800 font-semibold">
+                      {member.name}
+                    </span>
+                    <span className="text-gray-600">{member.role}</span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-center text-gray-600">No members found</li>
+              )}
+            </ul>
+          </div>
         </div>
-      </div>
-      
       )}
     </div>
   );
