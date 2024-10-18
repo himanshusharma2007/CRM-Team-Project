@@ -147,7 +147,7 @@ const UserVerificationList = () => {
   };
 
   const handleVerify = async () => {
-    if (!selectTeam || !selectedUserId || !role) {
+    if (!selectTeam || !selectedUserId ) {
       setMessage("Please fill all fields before verifying");
       return;
     }

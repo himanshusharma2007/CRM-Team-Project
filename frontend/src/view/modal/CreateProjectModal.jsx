@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Modal from "../Modal/Modal";
 import { Input } from "../components/UI/ProjectCommanUI";
 import { Select } from "../components/UI/ProjectCommanUI";
@@ -7,6 +7,7 @@ import {getAllClients} from "../../services/clientServices";
 import {createProject} from "../../services/projectService";
 import {getAllTeams} from "../../services/TeamService"
 import { Checkbox } from "../components/UI/ProjectCommanUI";
+import { FaChevronDown } from 'react-icons/fa';
 
 const CreateProjectModal = ({
   isOpen,
@@ -28,6 +29,8 @@ const CreateProjectModal = ({
   const [clients, setClients] = useState([]);
   const [allTeams, setAllTeams] = useState([]);
   const [isTeamDropdownOpen, setIsTeamDropdownOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(()=>{
     const fetchAllTeams = async () => {
@@ -68,21 +71,39 @@ const CreateProjectModal = ({
     fetchClients();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsTeamDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    console.log("handle submit called")
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("form data in handleSubmit",formData);
-    const submissionData = {
-      ...formData,
-      hashtags: formData.hashtags.split(",").map((tag) => tag.trim()),
-    };
-    
-    onSubmit(submissionData);
+    setIsCreating(true);
+    try {
+      const submissionData = {
+        ...formData,
+        hashtags: formData.hashtags.split(",").map((tag) => tag.trim()),
+      };
+     
+      onSubmit(submissionData);
+    } catch (error) {
+      console.error("Error creating project:", error);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleTeamChange = (teamId) => {
@@ -169,10 +190,8 @@ const CreateProjectModal = ({
               ))}
             </select>
           </div>
-          <div className="flex-1 relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Teams
-            </label>
+          <div className="flex-1 relative" ref={dropdownRef}>
+          
             <div
               className="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer"
               onClick={() => setIsTeamDropdownOpen(!isTeamDropdownOpen)}
@@ -183,11 +202,11 @@ const CreateProjectModal = ({
                     ? `${formData.teamIds.length} team(s) selected`
                     : "Select Teams"}
                 </span>
-               
+                <FaChevronDown className="h-5 w-5 text-gray-400" />
               </div>
             </div>
             {isTeamDropdownOpen && (
-              <div className="absolute z-10 w-full  bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                 {allTeams.map((team) => (
                   <div
                     key={team._id}
@@ -222,13 +241,14 @@ const CreateProjectModal = ({
           </div>
         </div>
 
-        <div className="flex justify-end space-x-2">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit">
-            {isEditing ? "Update" : "Create"} Project
-          </Button>
+        <div className="mt-5 sm:mt-6">
+          <button
+            type="submit"
+            className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+            disabled={isCreating}
+          >
+            {isCreating ? 'Creating...' : 'Create Project'}
+          </button>
         </div>
       </form>
     </Modal>
