@@ -497,19 +497,23 @@ const UserVerificationList = () => {
                   ))}
                 </select>
               </div>
+              {!selectTeam?.leaderId && (
+                <div className="mb-4">
+                  <label className="block mb-2 text-gray-700">
+                    Select Role:
+                  </label>
+                  <select
+                    onChange={(e) => setRole(e.target.value)}
+                    value={role}
+                    className="w-full border border-gray-300 rounded-md p-2"
+                  >
+                    <option value="">Select Role</option>
+                    <option value="subAdmin">Leader</option>
+                    <option value="emp">Member</option>
+                  </select>
+                </div>
+              )}
 
-              <div className="mb-4">
-                <label className="block mb-2 text-gray-700">Select Role:</label>
-                <select
-                  onChange={(e) => setRole(e.target.value)}
-                  value={role}
-                  className="w-full border border-gray-300 rounded-md p-2"
-                >
-                  <option value="">Select Role</option>
-                  <option value="subAdmin">Leader</option>
-                  <option value="emp">Member</option>
-                </select>
-              </div>
               <div className="mb-4">
                 <h3 className="font-semibold text-xl mb-2">Set Permissions</h3>
                 <div className="max-h-[30vh] overflow-y-auto border border-gray-300 rounded-md p-4">
