@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { getAllMeetingsByProjectId } from '../../services/meetingService';
 import { useEffect, useState } from 'react';
-import { FaCalendar, FaClock } from "react-icons/fa";
+import { FaCalendar, FaClock, FaCheckCircle, FaRegCircle } from "react-icons/fa";
 
 const ProjectMeeting = () => {
   const { id } = useParams();
@@ -14,6 +14,7 @@ const ProjectMeeting = () => {
     const fetchMeetings = async () => {
       try {
         const fetchedMeetings = await getAllMeetingsByProjectId(id);
+        console.log('fetchedMeetings', fetchedMeetings)
         setMeetings(fetchedMeetings); 
         setFilteredMeetings(fetchedMeetings); 
       } catch (error) {
@@ -95,9 +96,18 @@ const ProjectMeeting = () => {
                 minute: '2-digit',
               })}
             </p>
-            <p className="mt-4 text-gray-700 font-light">
-              {meeting?.meetingConclusion || "No conclusion available"}
-            </p>
+            <div className="mt-4 text-gray-700 font-light">
+              {meeting?.meetingConclusion?.map((conclusion, index) => (
+                <div key={index} className="flex items-center">
+                  {conclusion.isCompleted ? (
+                    <FaCheckCircle className="text-green-500 mr-2" />
+                  ) : (
+                    <FaRegCircle className="text-red-500 mr-2" />
+                  )}
+                  <p>{conclusion.note}</p>
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>

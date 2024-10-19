@@ -8,6 +8,8 @@ import {
   FaArrowLeft,
   FaCalendar,
   FaClock,
+  FaCheckCircle,
+  FaRegCircle,
 } from "react-icons/fa";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { getClientById } from "../../services/clientServices";
@@ -30,6 +32,7 @@ const ClientProjects = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        
         const [clientData, projectsData] = await Promise.all([
           getClientById(clientId),
           getProjectByClientId(clientId),
@@ -48,7 +51,7 @@ const ClientProjects = () => {
         setLoading(false);
       }
     };
-
+    console.log("All meetings: ", meetings)
     fetchData();
   }, [clientId]);
 
@@ -97,6 +100,7 @@ const ClientProjects = () => {
     (meeting) => meeting.lastMeetingId != null
   );
 
+console.log("validMeetings",validMeetings)
   if (loading)
     return (
       <div className="text-center mt-8">
@@ -172,9 +176,22 @@ const ClientProjects = () => {
                     minute: "2-digit",
                   })}
                 </p>
-                <p className="mt-4 text-gray-700 font-light">
-                  {meeting.description || "No description available"}
-                </p>
+                <div className="mt-4 text-gray-700 font-light">
+                  {meeting?.lastMeetingId?.meetingConclusion?.length > 0 ? (
+                    meeting.lastMeetingId.meetingConclusion.map((conclusion, index) => (
+                      <div key={index} className="flex items-center">
+                        {conclusion.isCompleted ? (
+                          <FaCheckCircle className="text-green-500 mr-2" />
+                        ) : (
+                          <FaRegCircle className="bg-yellow-500 mr-2 rounded-full text-transparent" />
+                        )}
+                        <p>{conclusion.note}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No conclusions available for this meeting.</p>
+                  )}
+                </div>
               </div>
             </div>
           ))}
