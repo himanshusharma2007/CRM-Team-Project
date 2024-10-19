@@ -98,7 +98,7 @@ const UserVerificationList = () => {
     console.log("selectedTeam", JSON.stringify(selectTeam, null, 2));
   }, [selectTeam]);
 
-  const fetchUnverifiedUsers = async () => {
+  const fetchUnverifiedUse = async () => {
     setLoading(true);
     try {
       const data = await getUnVerifiedUsers();
