@@ -95,6 +95,10 @@ const AdminDashboard = () => {
       }))
     : [];
 
+    const clientDataChart = [
+        { name: "Indian Clients", value: clientData.indian || 0 },
+        { name: "Foreigner Clients", value: clientData.foreigner || 0 },
+      ];
   const userChartData = [
     { name: "Active", value: userData.active || 0 },
     { name: "Verify", value: userData.verify || 0 },
@@ -104,13 +108,13 @@ const AdminDashboard = () => {
   const COLORS = ["#FFA500", "#4CAF50", "#8884d8"];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    <div className="p-6 max-w-7xl mx-auto bg-gray-50">
+      <h1 className="text-4xl font-bold mb-8 text-gray-800">Admin Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Projects section */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Projects</h2>
+        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Projects</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={projectChartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -120,12 +124,12 @@ const AdminDashboard = () => {
               <Bar dataKey="value" fill="#FFA500" />
             </BarChart>
           </ResponsiveContainer>
-          <p className="mt-2">Total Projects: {projectData.total || 0}</p>
+          <p className="mt-2 text-gray-600">Total Projects: {projectData.total || 0}</p>
         </div>
 
         {/* User Queries section */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">User Queries</h2>
+        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">User Queries</h2>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
               <Pie
@@ -148,16 +152,16 @@ const AdminDashboard = () => {
               <Legend />
             </PieChart>
           </ResponsiveContainer>
-          <p className="mt-2">Total Queries: {queryData.total || 0}</p>
-          <p>Today's Queries: {queryData.todayQueries || 0}</p>
+          <p className="mt-2 text-gray-600">Total Queries: {queryData.total || 0}</p>
+          <p className="text-gray-600">Today's Queries: {queryData.todayQueries || 0}</p>
         </div>
 
         {/* Clients Leads section */}
-        <div className="bg-white p-4 rounded-lg shadow col-span-2">
-          <h2 className="text-xl font-semibold mb-4">Clients Leads</h2>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 col-span-2">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Clients Leads</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={leadChartData}>
+              <LineChart data={clientDataChart}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -175,18 +179,17 @@ const AdminDashboard = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="mt-2">Today's Leads: {leadData.todayLeads || 0}</p>
-          <p>Total Indian Clients: {clientData.indian || 0}</p>
-          <p>Total Foreign Clients: {clientData.foreigner || 0}</p>
-          {/* <p>Converted Leads: {leadData.converted || 0}</p> */}
-          <p>Lost Leads: {leadData.lost || 0}</p>
-          <p>New Leads: {leadData.new || 0}</p>
-          <p>Total Leads: {leadData.total || 0}</p>
+          <p className="mt-2 text-gray-600">Today's Leads: {leadData.todayLeads || 0}</p>
+          <p className="text-gray-600">Total Indian Clients: {clientData.indian || 0}</p>
+          <p className="text-gray-600">Total Foreign Clients: {clientData.foreigner || 0}</p>
+          <p className="text-gray-600">Lost Leads: {leadData.lost || 0}</p>
+          <p className="text-gray-600">New Leads: {leadData.new || 0}</p>
+          <p className="text-gray-600">Total Leads: {leadData.total || 0}</p>
         </div>
 
         {/* Users section */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Users</h2>
+        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Users</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart layout="vertical" data={userChartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -199,17 +202,17 @@ const AdminDashboard = () => {
         </div>
 
         {/* Recent Connections section */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Recent Connections</h2>
-          <p>Total Connections: {connectionData.total || 0}</p>
+        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Recent Connections</h2>
+          <p className="text-gray-600">Total Connections: {connectionData.total || 0}</p>
           <div className="mt-2">
-            <h3 className="font-semibold">Last Two Connections:</h3>
+            <h3 className="font-semibold text-gray-700">Last Two Connections:</h3>
             {(connectionData.data || []).map((connection, index) => (
-              <div key={index} className="mt-1 p-2 border rounded">
-                <p>Name: {connection.contactName}</p>
-                <p>Phone: {connection.phoneNo}</p>
-                <p>Company: {connection.companyName}</p>
-                <p>Email: {connection.email}</p>
+              <div key={index} className="mt-2 p-3 border rounded shadow-sm hover:shadow-lg transition-shadow">
+                <p className="text-gray-800 font-medium">Name: {connection.contactName}</p>
+                <p className="text-gray-600">Phone: {connection.phoneNo}</p>
+                <p className="text-gray-600">Company: {connection.companyName}</p>
+                <p className="text-gray-600">Email: {connection.email}</p>
               </div>
             ))}
           </div>
