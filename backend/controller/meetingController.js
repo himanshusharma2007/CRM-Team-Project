@@ -35,7 +35,19 @@ const sendClientNotification = async (clientData, projectData, meetingDateTime, 
             background-color: #f9f9f9;
             border-radius: 8px;
         }
-
+ ol {
+            list-style-type: none;
+            counter-reset: item;
+        }
+        ol li {
+            counter-increment: item;
+            margin-bottom: 10px;
+        }
+        ol li:before {
+            content: counter(item) ". ";
+            font-weight: bold;
+            margin-right: 10px;
+        }
         h1 {
             color: #007bff;
         }
@@ -143,7 +155,19 @@ const sendLeaderNotification = async (projectData, meetingDateTime, meetingConcl
           background-color: #f9f9f9;
           border-radius: 8px;
       }
-
+ ol {
+            list-style-type: none;
+            counter-reset: item;
+        }
+        ol li {
+            counter-increment: item;
+            margin-bottom: 10px;
+        }
+        ol li:before {
+            content: counter(item) ". ";
+            font-weight: bold;
+            margin-right: 10px;
+        }
       h1 {
           color: #007bff;
       }
@@ -286,8 +310,27 @@ exports.createMeeting = async (req, res) => {
     await projectData.save();
     console.log("Project updated");
 
+    let mConclusion = ''
+    if(meetingConclusion.length > 0){
+      mConclusion = `
+      
+      <ol>
+        ${
+          meetingData.meetingConclusion.map((conclusion) => {
+              return `
+              <li>
+              <input type="checkbox" checked=${conclusion.isCompleted}>
+              <label>${conclusion.note}</label>
+            </li>`
+          })
+        }
+    </ol>
+      
+      `  
+    }
+
     if(clientNotification){
-      let notification = await sendClientNotification(clientData, projectData, meetingDateTime, meetingConclusion)
+      let notification = await sendClientNotification(clientData, projectData, meetingDateTime, mConclusion)
       if(!notification){
         return res.status(500).json({
           error:
@@ -295,11 +338,10 @@ exports.createMeeting = async (req, res) => {
         });
       }
       meetingData.clientNotification = true
-      meetingData.save()
     }
 
     if(leaderNotification){
-      let notification = await sendLeaderNotification(projectData, meetingDateTime, meetingConclusion)
+      let notification = await sendLeaderNotification(projectData, meetingDateTime, mConclusion)
       if(!notification){
         return res.status(500).json({
           error:
@@ -307,8 +349,17 @@ exports.createMeeting = async (req, res) => {
         });
       }
       meetingData.leaderNotification = true
-      meetingData.save()
     }
+
+    let status = 0;
+    await meetingData.meetingConclusion.map((conclusion) => {
+      if(conclusion.isCompleted){
+        status++;
+      }
+    });
+    console.log(status)
+    meetingData.meetingStatus = (status === 0)? "initial" : (status === meetingData.meetingConclusion.length)? "completed" : "pending"
+    await meetingData.save()
 
     console.log("Meeting creation successful");
     return res.status(201).json(meetingData);
