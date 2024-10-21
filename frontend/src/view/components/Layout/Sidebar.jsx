@@ -30,11 +30,10 @@ const Sidebar = () => {
         <AdminSidebar handleLogout={handleLogout} location={location} />
       )}
       {user?.role === "subAdmin" && (
-        <SubAdminSidebar handleLogout={handleLogout} location={location} />
+        <SubAdminSidebar handleLogout={handleLogout} location={location} user={user} />
       )}
-
       {user?.role === "emp" && (
-        <EmployeeSidebar handleLogout={handleLogout} location={location} />
+        <EmployeeSidebar handleLogout={handleLogout} location={location} user={user} />
       )}
     </>
   );
@@ -153,7 +152,7 @@ const SidebarItem = ({ to, icon, text, location }) => {
   );
 };
 
-const SubAdminSidebar = ({ handleLogout, location }) => {
+const SubAdminSidebar = ({ handleLogout, location, user }) => {
   return (
     <div className="flex flex-col h-[100dvh] max-h-screen w-full bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
@@ -182,18 +181,62 @@ const SubAdminSidebar = ({ handleLogout, location }) => {
             text="To-Do"
             location={location}
           />
-          <SidebarItem
-            to="/lead"
-            icon={<FaHandshake />}
-            text="Leads"
-            location={location}
-          />
-          <SidebarItem
-            to="/projects"
-            icon={<FaHandshake />}
-            text="Projects"
-            location={location}
-          />
+          {user.permission?.lead?.read && (
+            <SidebarItem
+              to="/lead"
+              icon={<FaHandshake />}
+              text="Leads"
+              location={location}
+            />
+          )}
+          {user.permission?.project?.read && (
+            <SidebarItem
+              to="/projects"
+              icon={<FaHandshake />}
+              text="Projects"
+              location={location}
+            />
+          )}
+          {user.permission?.team?.read && (
+            <SidebarItem
+              to="/teams"
+              icon={<HiOutlineUserGroup />}
+              text="Teams"
+              location={location}
+            />
+          )}
+          {user.permission?.meeting?.read && (
+            <SidebarItem
+              to="/meetingmanagement"
+              icon={<FaCalendar />}
+              text="Meetings"
+              location={location}
+            />
+          )}
+          {user.permission?.connection?.read && (
+            <SidebarItem
+              to="/connection"
+              icon={<FaUsers />}
+              text="Connection"
+              location={location}
+            />
+          )}
+          {user.permission?.userVerification?.read && (
+            <SidebarItem
+              to="/userverification"
+              icon={<MdVerifiedUser />}
+              text="User Verification"
+              location={location}
+            />
+          )}
+          {user.permission?.query?.read && (
+            <SidebarItem
+              to="/query"
+              icon={<MdQueryBuilder />}
+              text="Query"
+              location={location}
+            />
+          )}
         </ul>
       </nav>
 
@@ -210,7 +253,7 @@ const SubAdminSidebar = ({ handleLogout, location }) => {
   );
 };
 
-const EmployeeSidebar = ({ handleLogout, location }) => {
+const EmployeeSidebar = ({ handleLogout, location, user }) => {
   return (
     <div className="flex flex-col h-screen w-64 bg-gray-900 text-gray-100 shadow-lg">
       {/* Sidebar Header */}
@@ -239,6 +282,62 @@ const EmployeeSidebar = ({ handleLogout, location }) => {
             text="To-Do"
             location={location}
           />
+          {user.permission?.lead?.read && (
+            <SidebarItem
+              to="/lead"
+              icon={<FaHandshake />}
+              text="Leads"
+              location={location}
+            />
+          )}
+          {user.permission?.project?.read && (
+            <SidebarItem
+              to="/projects"
+              icon={<FaHandshake />}
+              text="Projects"
+              location={location}
+            />
+          )}
+          {user.permission?.team?.read && (
+            <SidebarItem
+              to="/teams"
+              icon={<HiOutlineUserGroup />}
+              text="Teams"
+              location={location}
+            />
+          )}
+          {user.permission?.meeting?.read && (
+            <SidebarItem
+              to="/meetingmanagement"
+              icon={<FaCalendar />}
+              text="Meetings"
+              location={location}
+            />
+          )}
+          {user.permission?.connection?.read && (
+            <SidebarItem
+              to="/connection"
+              icon={<FaUsers />}
+              text="Connection"
+              location={location}
+            />
+          )}
+          {user.permission?.userVerification?.read && (
+            <SidebarItem
+              to="/userverification"
+              icon={<MdVerifiedUser />}
+              text="User Verification"
+              location={location}
+            />
+          )}
+          {user.permission?.query?.read && (
+            <SidebarItem
+              to="/query"
+              icon={<MdQueryBuilder />}
+              text="Query"
+              location={location}
+            />
+          )}
         </ul>
       </nav>
 

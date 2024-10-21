@@ -28,6 +28,7 @@ import ProjectPage from "./view/pages/ProjectPage";
 import ProjectDetails from "./view/pages/ProjectDetails";
 import ClientMeetingThread from "./view/pages/ClientMeetingThread";
 import ClientProjects from "./view/pages/ClientProjects";
+import ProjectMeeting from "./view/pages/ProjectMeeting";
 
 function App() {
   return (
@@ -187,6 +188,14 @@ function App() {
             element={
               <Layout>
                 <MeetingDetailModal />
+              </Layout>
+            }
+          />
+          <Route
+            path="/projectmeetings/:id"
+            element={
+              <Layout>
+                <ProjectMeeting />
               </Layout>
             }
           />
