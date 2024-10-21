@@ -7,7 +7,6 @@ const ContactUs = require("../models/contactUsModels")
 const Contact = require("../models/contactModels")
 const team = require("../models/teamModels")
 
-
 const leadStatics = async () => {
     try {
         let leadData = {}

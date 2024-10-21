@@ -428,7 +428,7 @@ const MeetingManagement = () => {
           clients.map((client, index) => (
             <div
               key={index}
-              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl  transition-shadow duration-300 ease-in-out"
+              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white min-w-96 hover:shadow-xl  transition-shadow duration-300 ease-in-out"
             >
               {/* Client Header */}
               <div className="flex justify-between items-center mb-6">

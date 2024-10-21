@@ -21,7 +21,7 @@ function Connection() {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
 
   const canCreateConnection = user?.role === "admin" || user?.permission?.connection?.create;
   const canUpdateConnection = user?.role === "admin" || user?.permission?.connection?.update;
@@ -29,15 +29,15 @@ function Connection() {
   const canReadConnection = user?.role === "admin" || user?.permission?.connection?.read;
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-    } else if (canReadConnection) {
+    console.log("useeffect in connection ",user + canReadConnection)
+   if (canReadConnection) {
       fetchContacts();
+      setError(null);
     } else {
       setLoading(false);
       setError("You don't have permission to view connections.");
     }
-  }, [isAuthenticated, canReadConnection, navigate]);
+  }, [user, canReadConnection, navigate]);
 
   useEffect(() => {
     const filtered = contacts.filter(
@@ -52,8 +52,10 @@ function Connection() {
 
   const fetchContacts = async () => {
     try {
+      console.log("fetch connection called")
       const fetchedContacts = await ConnectionService.getcontact();
       console.log("Contacts in Connection Page:", fetchedContacts);
+      setError(null);
       setContacts(fetchedContacts);
       setLoading(false);
     } catch (error) {
@@ -124,9 +126,7 @@ function Connection() {
     setSearchTerm(e.target.value);
   };
 
-  if (!isAuthenticated) {
-    return null;
-  }
+
 
   if (loading) {
     return (
