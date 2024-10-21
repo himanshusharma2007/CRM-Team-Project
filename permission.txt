@@ -62,8 +62,58 @@
 
 
 
+user Model Permission
 
-
-
+user.permission: {
+      lead:{
+        create: false,
+        update: false,
+        delete: false,
+        updateStage: false,
+        read: false,
+      },
+      leadStage:{
+        create: false,
+        update: false,
+        delete: false,
+        read: false,
+      },
+      project:{
+        create: false,
+        update: false,
+        read: false,
+      },
+      team:{
+        create: false,
+        update: false,
+        removeParticipant: false,
+        read: false,
+      },
+      user:{
+        read: false,
+        verifyAndAssignRoleAndTeam: false,
+      },
+      client:{
+        create: false,
+        update: false,
+        delete: false,
+        read: false,
+      },
+      meeting:{
+        create: false,
+        update: false,
+        read: false,
+      },
+      connection:{
+        create: false,
+        update: false,
+        delete: false,
+        read: false,
+      },
+      query:{
+        respond: false,
+        read: false,
+      },
+    }
 
 

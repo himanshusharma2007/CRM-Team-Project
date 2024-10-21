@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { FaPlus, FaCheck } from "react-icons/fa";
 import {
   getAllProjects,
   getProjectByClientId,
@@ -6,45 +7,38 @@ import {
 import { getAllClients } from "../../services/clientServices";
 
 const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
-  const [allProjects, setAllProjects] = useState([]); // Projects state as an array
-  const [allClients, setAllClients] = useState([]); // Clients state as an array
-
-  // New state variables for meeting data
+  const [allProjects, setAllProjects] = useState([]);
+  const [allClients, setAllClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
   const [selectedProject, setSelectedProject] = useState("");
   const [meetingDateTime, setMeetingDateTime] = useState("");
   const [notifyClient, setNotifyClient] = useState(false);
   const [notifyTeamLeader, setNotifyTeamLeader] = useState(false);
-
   const [filteredProjects, setFilteredProjects] = useState([]);
-
-  // New state for meeting title
   const [meetingTitle, setMeetingTitle] = useState("");
+  const [conclusions, setConclusions] = useState([]);
+  const [newConclusion, setNewConclusion] = useState("");
+  const [isNewConclusionCompleted, setIsNewConclusionCompleted] = useState(false);
+  const [showConclusionInput, setShowConclusionInput] = useState(true);
 
-  // Fetch all projects
-  const allProjectsfun = async () => {
+  const allProjectsFun = async () => {
     try {
-      console.log("selectedClient", selectedClient);
       const projects = await getAllProjects();
-      console.log("Fetched All Projects: ", projects);
       setAllProjects(projects);
     } catch (error) {
       console.error("Error fetching all projects:", error.message);
     }
   };
 
-  // Fetch all clients
-  const allClientsfun = async () => {
+  const allClientsFun = async () => {
     try {
       const clients = await getAllClients();
-      console.log("Fetched Clients: ", clients);
       setAllClients(clients);
     } catch (error) {
       console.error("Error fetching clients:", error.message);
     }
   };
 
-  // New function to fetch projects by client ID
   const fetchProjectsByClient = async (clientId) => {
     if (!clientId) {
       setFilteredProjects([]);
@@ -52,7 +46,6 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
     }
     try {
       const projects = await getProjectByClientId(clientId);
-      console.log("Fetched Projects for Client: ", projects);
       setFilteredProjects(projects);
     } catch (error) {
       console.error("Error fetching projects for client:", error.message);
@@ -60,21 +53,11 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
     }
   };
 
-  // Fetch projects and clients on component mount
   useEffect(() => {
-    console.log("allProjects", allProjects);
-    console.log("allClients", allClients);
-    allProjectsfun();
-    allClientsfun();
+    allProjectsFun();
+    allClientsFun();
   }, []);
 
-  // Log whenever allProjects or allClients is updated
-  useEffect(() => {
-    console.log("Updated All Projects: ", allProjects);
-    console.log("Updated All Clients: ", allClients);
-  }, [allProjects, allClients]);
-
-  // New useEffect to fetch projects when a client is selected
   useEffect(() => {
     if (selectedClient) {
       fetchProjectsByClient(selectedClient);
@@ -82,6 +65,18 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
       setFilteredProjects([]);
     }
   }, [selectedClient]);
+
+  const handleAddConclusion = () => {
+    if (newConclusion.trim()) {
+      setConclusions([
+        ...conclusions,
+        { note: newConclusion.trim(), isCompleted: isNewConclusionCompleted }
+      ]);
+      setNewConclusion("");
+      setIsNewConclusionCompleted(false);
+      setShowConclusionInput(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -91,31 +86,44 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
       dateTime: meetingDateTime,
       notifyClient,
       notifyTeamLeader,
-      title: meetingTitle, // Add the title to the meeting data
+      title: meetingTitle,
+      meetingConclusion: conclusions
     };
+    console.log("meetingData", meetingData);
     onAddMeeting(meetingData);
+    
+    // Reset modal fields
+    setSelectedClient("");
+    setSelectedProject("");
+    setMeetingDateTime("");
+    setNotifyClient(false);
+    setNotifyTeamLeader(false);
+    setMeetingTitle("");
+    setConclusions([]);
+    setNewConclusion("");
+    setIsNewConclusionCompleted(false);
+    setShowConclusionInput(true);
+    
     onClose();
   };
 
   const handleClientChange = (e) => {
     const clientId = e.target.value;
     setSelectedClient(clientId);
-    setSelectedProject(""); // Reset selected project when client changes
+    setSelectedProject("");
   };
 
-  // Return null if the modal is not open
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg w-96">
+      <div className="bg-white p-6 rounded-lg w-96 max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-semibold mb-4">Create New Meeting</h2>
 
-        <form onSubmit={handleSubmit}>
-          {/* Add the new input field for meeting title */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
-            className="border border-gray-300 p-2 w-full rounded-lg mb-4"
+            className="border border-gray-300 p-2 w-full rounded-lg"
             value={meetingTitle}
             onChange={(e) => setMeetingTitle(e.target.value)}
             placeholder="Meeting Title"
@@ -123,7 +131,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
           />
 
           <select
-            className="border border-gray-300 p-2 w-full rounded-lg mb-4"
+            className="border border-gray-300 p-2 w-full rounded-lg"
             value={selectedClient}
             onChange={handleClientChange}
             required
@@ -137,7 +145,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
           </select>
 
           <select
-            className="border border-gray-300 p-2 w-full rounded-lg mb-4"
+            className="border border-gray-300 p-2 w-full rounded-lg"
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
             required
@@ -153,13 +161,13 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
 
           <input
             type="datetime-local"
-            className="border border-gray-300 p-2 w-full rounded-lg mb-4"
+            className="border border-gray-300 p-2 w-full rounded-lg"
             value={meetingDateTime}
             onChange={(e) => setMeetingDateTime(e.target.value)}
             required
           />
 
-          <div className="flex items-center mb-4">
+          <div className="flex items-center">
             <input
               type="checkbox"
               className="mr-2"
@@ -169,7 +177,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
             <label>Notify Client via email</label>
           </div>
 
-          <div className="flex items-center mb-4">
+          <div className="flex items-center">
             <input
               type="checkbox"
               className="mr-2"
@@ -179,16 +187,58 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
             <label>Notify Team Leader via email</label>
           </div>
 
-          <div className="flex justify-center">
+          <div className="space-y-2">
+            <h3 className="font-semibold">Meeting Conclusions</h3>
+            {conclusions.map((conclusion, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <FaCheck className={conclusion.isCompleted ? "text-green-500" : "text-gray-300"} />
+                <span>{conclusion.note}</span>
+              </div>
+            ))}
+            {showConclusionInput ? (
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={isNewConclusionCompleted}
+                  onChange={(e) => setIsNewConclusionCompleted(e.target.checked)}
+                  className="mr-2"
+                />
+                <input
+                  type="text"
+                  value={newConclusion}
+                  onChange={(e) => setNewConclusion(e.target.value)}
+                  placeholder="Add a conclusion note"
+                  className="flex-grow border border-gray-300 p-2 rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddConclusion}
+                  className="bg-blue-500 text-white px-2 py-1 rounded-lg"
+                >
+                  Add
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowConclusionInput(true)}
+                className="flex items-center space-x-2 text-blue-500"
+              >
+                <FaPlus /> <span>{conclusions.length > 0 ? "Add another conclusion" : "Add a conclusion"}</span>
+              </button>
+            )}
+          </div>
+
+          <div className="flex justify-center space-x-2">
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
             >
               Create
             </button>
             <button
               type="button"
-              className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-200"
               onClick={onClose}
             >
               Close

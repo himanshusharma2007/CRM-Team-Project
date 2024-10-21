@@ -15,6 +15,7 @@ const clientRoutes = require("./routes/clientRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes")
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
@@ -44,6 +45,7 @@ app.use("/api/team", teamRoutes);
 app.use("/api/client", clientRoutes);
 app.use("/api/project", projectRoutes);
 app.use("/api/meeting", meetingRoutes);
+app.use("/api/dashboard", dashboardRoutes)
 
 app.listen(PORT, async () => {
   await connectDB(URL);

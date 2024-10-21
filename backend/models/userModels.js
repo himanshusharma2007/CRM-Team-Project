@@ -16,6 +16,68 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    profileImage: {
+      type: String,
+      default: null,
+    },
+    permission: {
+      lead:{
+        create: {type: Boolean, default: false},
+        update: {type: Boolean, default: false},
+        delete: {type: Boolean, default: false},
+        updateStage: {type: Boolean, default: false},
+        read: {type: Boolean, default: false},
+        requiredPermission: ["leadStage", "team"]
+      },
+      leadStage:{
+        create: {type: Boolean, default: false},
+        update: {type: Boolean, default: false},
+        delete: {type: Boolean, default: false},
+        read: {type: Boolean, default: false},
+        requiredPermission: ["lead"]
+      },
+      project:{
+        create: {type: Boolean, default: false},
+        update: {type: Boolean, default: false},
+        read: {type: Boolean, default: false},
+        requiredPermission: ["client", "team"]
+      },
+      team:{
+        create: {type: Boolean, default: false} ,
+        update: {type: Boolean, default: false},
+        removeParticipant: {type: Boolean, default: false},
+        read: {type: Boolean, default: false},
+        requiredPermission: ["user"]
+      },
+      user:{
+        read: {type: Boolean, default: false},
+        verifyAndAssignRoleAndTeam: {type: Boolean, default: false},
+        requiredPermission: ["team"]
+      },
+      client:{
+        create: {type: Boolean, default: false},
+        update: {type: Boolean, default: false},
+        delete: {type: Boolean, default: false},
+        read: {type: Boolean, default: false},
+        requiredPermission: ["lead", "project", "meeting"]
+      },
+      meeting:{
+        create: {type: Boolean, default: false} ,
+        update: {type: Boolean, default: false},
+        read: {type: Boolean, default: false},
+        requiredPermission: ["client", "project"]
+      },
+      connection:{
+        create: {type: Boolean, default: false} ,
+        update: {type: Boolean, default: false},
+        delete: {type: Boolean, default: false},
+        read: {type: Boolean, default: false},
+      },
+      query:{
+        respond: {type: Boolean, default: false},
+        read: {type: Boolean, default: false},
+      },
+    },
     otp: {
       type: String,
       default: null,
@@ -31,10 +93,10 @@ const userSchema = new mongoose.Schema(
       default: false,
       select: false,
     },
-    team: {
-      type: String,
-      enum: ["developer", "marketing", "noVerify"],
-      default: "noVerify",
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "team",
+      default: null,
     },
     deal: [
       {
@@ -49,6 +111,10 @@ const userSchema = new mongoose.Schema(
     verify: {
       type: Boolean,
       default: false,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

@@ -90,4 +90,16 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
     </Modal>
   );
 };
-export { Button, Card, Input, Select, Tag,  ConfirmDialog };
+const Checkbox = ({ id, checked, onChange, className = "" }) => {
+  return (
+    <input
+      type="checkbox"
+      id={id}
+      checked={checked}
+      onChange={onChange}
+      className={`form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out ${className}`}
+    />
+  );
+};
+
+export { Button, Card, Input, Select, Tag, ConfirmDialog, Checkbox };

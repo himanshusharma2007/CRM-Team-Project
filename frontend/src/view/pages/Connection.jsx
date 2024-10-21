@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ConnectionService from "../../services/connectionService";
 import { FiSearch } from "react-icons/fi";
+import { useAuth } from "../../context/Context";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 function Connection() {
   const [contacts, setContacts] = useState([]);
@@ -14,10 +17,27 @@ function Connection() {
     phoneNo: "",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const canCreateConnection = user?.role === "admin" || user?.permission?.connection?.create;
+  const canUpdateConnection = user?.role === "admin" || user?.permission?.connection?.update;
+  const canDeleteConnection = user?.role === "admin" || user?.permission?.connection?.delete;
+  const canReadConnection = user?.role === "admin" || user?.permission?.connection?.read;
 
   useEffect(() => {
-    fetchContacts();
-  }, []);
+    console.log("useeffect in connection ",user + canReadConnection)
+   if (canReadConnection) {
+      fetchContacts();
+      setError(null);
+    } else {
+      setLoading(false);
+      setError("You don't have permission to view connections.");
+    }
+  }, [user, canReadConnection, navigate]);
 
   useEffect(() => {
     const filtered = contacts.filter(
@@ -32,12 +52,16 @@ function Connection() {
 
   const fetchContacts = async () => {
     try {
+      console.log("fetch connection called")
       const fetchedContacts = await ConnectionService.getcontact();
       console.log("Contacts in Connection Page:", fetchedContacts);
+      setError(null);
       setContacts(fetchedContacts);
+      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch contacts:", error);
-      // You might want to show an error message to the user here
+      setError("Failed to fetch contacts. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -47,12 +71,13 @@ function Connection() {
   };
 
   const handleAddOrUpdateContact = async () => {
+    if (!canCreateConnection && !canUpdateConnection) {
+      alert("You don't have permission to add or update connections.");
+      return;
+    }
     try {
       if (isEditing) {
-        await ConnectionService.updateContact(
-          currentContact._id,
-          currentContact
-        );
+        await ConnectionService.updateContact(currentContact._id, currentContact);
       } else {
         await ConnectionService.createContact(currentContact);
       }
@@ -64,27 +89,35 @@ function Connection() {
         phoneNo: "",
       });
       setIsEditing(false);
-      fetchContacts(); // Refresh the contact list
+      fetchContacts();
     } catch (error) {
       console.error("Failed to add/update contact:", error);
-      // You might want to show an error message to the user here
+      alert("Failed to add/update contact. Please try again.");
     }
   };
 
   const handleEditContact = (contact) => {
+    if (!canUpdateConnection) {
+      alert("You don't have permission to edit connections.");
+      return;
+    }
     setCurrentContact(contact);
     setIsEditing(true);
     setModalOpen(true);
   };
 
   const handleDeleteContact = async (id) => {
+    if (!canDeleteConnection) {
+      alert("You don't have permission to delete connections.");
+      return;
+    }
     if (window.confirm("Are you sure you want to delete this contact?")) {
       try {
         await ConnectionService.deleteContact(id);
-        fetchContacts(); // Refresh the contact list
+        fetchContacts();
       } catch (error) {
         console.error("Failed to delete contact:", error);
-        // You might want to show an error message to the user here
+        alert("Failed to delete contact. Please try again.");
       }
     }
   };
@@ -93,25 +126,41 @@ function Connection() {
     setSearchTerm(e.target.value);
   };
 
+
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center mt-8 text-red-500">{error}</div>;
+  }
+
   return (
     <div className="p-4 md:p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl md:text-2xl font-bold">Connection</h1>
-        <button
-          onClick={() => {
-            setCurrentContact({
-              contactName: "",
-              companyName: "",
-              email: "",
-              phoneNo: "",
-            });
-            setIsEditing(false);
-            setModalOpen(true);
-          }}
-          className="bg-blue-500 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-600"
-        >
-          + Add Connection
-        </button>
+        {canCreateConnection && (
+          <button
+            onClick={() => {
+              setCurrentContact({
+                contactName: "",
+                companyName: "",
+                email: "",
+                phoneNo: "",
+              });
+              setIsEditing(false);
+              setModalOpen(true);
+            }}
+            className="bg-blue-500 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-600"
+          >
+            + Add Connection
+          </button>
+        )}
       </div>
 
       <div className="mb-6 relative">
@@ -139,27 +188,27 @@ function Connection() {
           <tbody>
             {filteredContacts.map((contact) => (
               <tr key={contact._id}>
-                <td className="px-2 md:px-4 py-2 border">
-                  {contact.contactName}
-                </td>
-                <td className="px-2 md:px-4 py-2 border">
-                  {contact.companyName}
-                </td>
+                <td className="px-2 md:px-4 py-2 border">{contact.contactName}</td>
+                <td className="px-2 md:px-4 py-2 border">{contact.companyName}</td>
                 <td className="px-2 md:px-4 py-2 border">{contact.email}</td>
                 <td className="px-2 md:px-4 py-2 border">{contact.phoneNo}</td>
                 <td className="px-2 md:px-4 py-2 border">
-                  <button
-                    onClick={() => handleEditContact(contact)}
-                    className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteContact(contact._id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
+                  {canUpdateConnection && (
+                    <button
+                      onClick={() => handleEditContact(contact)}
+                      className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600"
+                    >
+                      Edit
+                    </button>
+                  )}
+                  {canDeleteConnection && (
+                    <button
+                      onClick={() => handleDeleteContact(contact._id)}
+                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

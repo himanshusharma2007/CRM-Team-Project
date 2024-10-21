@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { FaUser, FaProjectDiagram, FaArrowRight } from "react-icons/fa";
+import {
+  FaUser,
+  FaProjectDiagram,
+  FaArrowRight,
+  FaCalendarPlus,
+} from "react-icons/fa";
 import { SiGotomeeting } from "react-icons/si";
 
 import { useParams } from "react-router-dom";
@@ -28,17 +33,23 @@ const Shape = ({ type, content, className, onClick }) => {
 };
 
 const Arrow = ({ direction = "right", className }) => {
-  const arrowClasses = {
-    right: "w-8 h-1",
-    down: "w-1 h-8",
-  };
-
   return (
-    <div
-      className={`bg-gray-400 ${arrowClasses[direction]} ${className}`}
-    ></div>
+    <div className={`flex items-center ${className}`}>
+      <div className="bg-gray-400 w-32 h-1"></div>
+      <FaArrowRight className="size-6 ml-[-4px] text-gray-400" />
+    </div>
   );
 };
+
+const NoMeetingsCard = () => (
+  <div className="bg-white w-60 h-36 rounded-lg shadow-lg flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+    <FaCalendarPlus className="text-gray-400 text-3xl mb-2" />
+    <h4 className="text-lg font-semibold text-gray-700">No meetings yet</h4>
+    <p className="text-sm text-gray-500 text-center mt-1">
+      Click to schedule a meeting
+    </p>
+  </div>
+);
 
 const ClientMeetingThread = () => {
   const navigate = useNavigate();
@@ -98,11 +109,13 @@ const ClientMeetingThread = () => {
   if (!clientData) return <div>No data available</div>;
 
   return (
-    <div className="flex flex-col justify-center items-centerbg-gray-100">
-      <h1 className="text-3xl text-center font-bold mb-10">
-        {clientData.name}'s Project Thread
-      </h1>
-      <div className="flex-grow px-10 overflow-x-auto overflow-y-visible flex flex-row items-center">
+    <div className="flex flex-col justify-start items-center  min-h-screen w-full">
+      <div className="w-full flex justify-center items-center ">
+        <h1 className="text-3xl text-center font-bold ">
+          {clientData.name}'s Project Thread
+        </h1>
+      </div>
+      <div className="chart-container w-full px-10 overflow-x-auto overflow-y-hidden flex flex-row items-center  h-auto py-10 ">
         <div className="flex items-center w-80">
           <Shape
             type="circle"
@@ -115,22 +128,16 @@ const ClientMeetingThread = () => {
             }
             className="bg-white w-40 h-40"
           />
-          <Arrow className="flex-grow w-20" />
-          <FaArrowRight className="size-7 ml-[-5px] text-gray-400" />
+          <Arrow className="ml-4" />
         </div>
 
-        <div className="wraper flex flex-col items-start relative">
+        <div className="wrapper flex flex-col items-start relative">
           <div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-400"></div>
           <ul className="flex flex-col items-start space-y-20 relative">
             {clientData.projectId.map((project, index) => (
-              <li
-                key={project._id}
-                className="flex flex-row items-center  w-full"
-              >
-                <div className="flex items-center w-full">
-                  <div className="w-fit" /> {/* Spacer for alignment */}
-                  <Arrow className="w-8" />
-                  <FaArrowRight className="size-7 ml-[-5px] text-gray-400" />
+              <li key={project._id} className="flex flex-row items-center">
+                <div className="flex items-center justify-start">
+                  <Arrow className="mr-6" />
                   <Shape
                     type="diamond"
                     content={
@@ -144,55 +151,52 @@ const ClientMeetingThread = () => {
                         </p>
                       </div>
                     }
-                    className="bg-white w-32 h-32 ml-6"
+                    className="bg-white w-32 h-32"
                   />
-                  <Arrow className="flex-grow ml-4 w-28" />
-                  <FaArrowRight className="size-7 ml-[-2px] text-gray-400" />
+                  <Arrow className="ml-4" />
                 </div>
                 <div className="flex items-center">
-                  <div className="w-fit" /> {/* Spacer for alignment */}
                   <div className="flex ">
-                    {meetings[project._id]?.map((meeting, mIndex) => (
-                      <React.Fragment key={meeting._id}>
-                        {mIndex > 0 && (
-                          <>
-                            <Arrow className="self-center h-[3px]" />
-                            <FaArrowRight className=" self-center size-6 ml-[-4px] text-gray-400" />
-                          </>
-                        )}
-                        <Shape
-                          type="rectangle"
-                          content={
-                            <div className="flex flex-row justify-between">
-                              <div className="flex flex-col space-y-2">
-                                <SiGotomeeting className="text-blue-500 text-lg mb-2" />
-                                <h4 className="text-sm font-semibold">
-                                  {meeting.title}
-                                </h4>
-                                <p className="text-xs text-gray-600">
-                                  {new Date(
-                                    meeting.meetingDateTime
-                                  ).toLocaleString()}
-                                </p>
+                    {meetings[project._id]?.length > 0 ? (
+                      meetings[project._id].map((meeting, mIndex) => (
+                        <React.Fragment key={meeting._id}>
+                          {mIndex > 0 && <Arrow />}
+                          <Shape
+                            type="rectangle"
+                            content={
+                              <div className="flex flex-row justify-between">
+                                <div className="flex flex-col space-y-2">
+                                  <SiGotomeeting className="text-blue-500 text-lg mb-2" />
+                                  <h4 className="text-sm font-semibold">
+                                    {meeting.title}
+                                  </h4>
+                                  <p className="text-xs text-gray-600">
+                                    {new Date(
+                                      meeting.meetingDateTime
+                                    ).toLocaleString()}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`text-xs px-2 h-5 flex items-center justify-center rounded-full ${
+                                    meeting.meetingStatus === "pending"
+                                      ? "bg-yellow-200 text-yellow-800"
+                                      : meeting.meetingStatus === "cancelled"
+                                      ? "bg-red-200 text-red-800"
+                                      : "bg-green-200 text-green-800"
+                                  }`}
+                                >
+                                  {meeting.meetingStatus}
+                                </span>
                               </div>
-                              <span
-                                className={`text-xs px-2 h-5 flex items-center justify-center rounded-full ${
-                                  meeting.meetingStatus === "pending"
-                                    ? "bg-yellow-200 text-yellow-800"
-                                    : meeting.meetingStatus === "cancelled"
-                                    ? "bg-red-200 text-red-800"
-                                    : "bg-green-200 text-green-800"
-                                }`}
-                              >
-                                {meeting.meetingStatus}
-                              </span>
-                            </div>
-                          }
-                          className="bg-white w-60 h-36 cursor-pointer"
-                          onClick={() => handleMeetingClick(meeting)}
-                        />
-                      </React.Fragment>
-                    ))}
+                            }
+                            className="bg-white w-60 h-36 cursor-pointer"
+                            onClick={() => handleMeetingClick(meeting)}
+                          />
+                        </React.Fragment>
+                      ))
+                    ) : (
+                      <NoMeetingsCard />
+                    )}
                   </div>
                 </div>
               </li>

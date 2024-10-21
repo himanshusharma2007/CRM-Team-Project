@@ -8,11 +8,14 @@ import {
   FaArrowLeft,
   FaCalendar,
   FaClock,
+  FaCheckCircle,
+  FaRegCircle,
 } from "react-icons/fa";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { getClientById } from "../../services/clientServices";
 import { getProjectByClientId } from "../../services/projectService";
-// import { getAllMeetingsByProjectId } from "../../services/meetingService";
+import { getAllMeetingsByProjectId } from "../../services/meetingService";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const ClientProjects = () => {
   const { clientId } = useParams();
@@ -29,15 +32,18 @@ const ClientProjects = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        
         const [clientData, projectsData] = await Promise.all([
           getClientById(clientId),
           getProjectByClientId(clientId),
-          //   getAllMeetingsByProjectId(projectsData._id),
         ]);
+
         console.log("Projects:", projectsData);
+        console.log("PRoject last: ", projectsData[0].lastMeetingId);
+
         setClient(clientData);
         setProjects(projectsData);
-        // setMeetings(meetingsData);
+        setMeetings(projectsData);
       } catch (err) {
         setError("Error fetching data. Please try again.");
         console.error(err);
@@ -45,7 +51,7 @@ const ClientProjects = () => {
         setLoading(false);
       }
     };
-
+    console.log("All meetings: ", meetings)
     fetchData();
   }, [clientId]);
 
@@ -89,6 +95,12 @@ const ClientProjects = () => {
     }
   };
 
+  // Add this function to filter meetings with valid lastMeetingId
+  const validMeetings = meetings.filter(
+    (meeting) => meeting.lastMeetingId != null
+  );
+
+console.log("validMeetings",validMeetings)
   if (loading)
     return (
       <div className="text-center mt-8">
@@ -101,7 +113,7 @@ const ClientProjects = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <button
-        onClick={() => navigate("/meeting-management")}
+        onClick={() => navigate("/meetingmanagement")}
         className="mb-4 flex items-center text-blue-600 hover:text-blue-800"
       >
         <FaArrowLeft className="mr-2" /> Back to Meeting Management
@@ -112,37 +124,78 @@ const ClientProjects = () => {
       </h1>
 
       {/* Meetings Carousel */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-          Upcoming Meetings
-        </h2>
-        {meetings.length > 0 ? (
-          <Carousel
-            showThumbs={false}
-            showStatus={false}
-            infiniteLoop={true}
-            autoPlay={true}
-            interval={5000}
-            className="bg-white rounded-lg shadow-md"
-          >
-            {meetings.map((meeting, index) => (
-              <div key={index} className="p-6 text-left">
-                <h3 className="text-xl font-semibold mb-2">{meeting.title}</h3>
+      <div className="mb-8 bg-white p-6 rounded-lg shadow-lg overflow-hidden">
+        <Carousel
+          showThumbs={false}
+          showStatus={false}
+          infiniteLoop={true}
+          autoPlay={true}
+          interval={5000}
+          centerMode={true}
+          centerSlidePercentage={50} // Show two cards at once
+          renderArrowPrev={(onClickHandler, hasPrev) => (
+            <button
+              onClick={onClickHandler}
+              className="absolute left-2 lg:left-6 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-800 transition z-10"
+            >
+              <FaChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+          renderArrowNext={(onClickHandler, hasNext) => (
+            <button
+              onClick={onClickHandler}
+              className="absolute right-2 lg:right-6 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-800 transition z-10"
+            >
+              <FaChevronRight className="w-6 h-6" />
+            </button>
+          )}
+        >
+          {validMeetings.map((meeting, index) => (
+            <div key={index} className="p-4 text-left flex-shrink-0">
+              <div className="bg-gradient-to-r from-blue-100 to-white p-6 rounded-xl border border-gray-200 shadow-xl mx-2 relative overflow-hidden hover:shadow-2xl transition"
+                onClick={() => navigate(`/projectmeetings/${meeting?.lastMeetingId?.projectId}`)}
+              >
+                <span className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
+                  {meeting.name}
+                </span>
+                <h3 className="text-2xl font-semibold mb-3 text-blue-700">
+                  {meeting.lastMeetingId.title || "Untitled Meeting"}
+                </h3>
                 <p className="text-gray-600 flex items-center mb-2">
-                  <FaCalendar className="mr-2" />
-                  {new Date(meeting.date).toLocaleDateString()}
+                  <FaCalendar className="mr-2 text-blue-600" />
+                  {new Date(
+                    meeting.lastMeetingId.meetingDateTime
+                  ).toLocaleDateString()}
                 </p>
                 <p className="text-gray-600 flex items-center mb-2">
-                  <FaClock className="mr-2" />
-                  {new Date(meeting.date).toLocaleTimeString()}
+                  <FaClock className="mr-2 text-blue-600" />
+                  {new Date(
+                    meeting.lastMeetingId.meetingDateTime
+                  ).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
-                <p className="mt-2">{meeting.description}</p>
+                <div className="mt-4 text-gray-700 font-light">
+                  {meeting?.lastMeetingId?.meetingConclusion?.length > 0 ? (
+                    meeting.lastMeetingId.meetingConclusion.map((conclusion, index) => (
+                      <div key={index} className="flex items-center">
+                        {conclusion.isCompleted ? (
+                          <FaCheckCircle className="text-green-500 mr-2" />
+                        ) : (
+                          <FaRegCircle className="bg-yellow-500 mr-2 rounded-full text-transparent" />
+                        )}
+                        <p>{conclusion.note}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No conclusions available for this meeting.</p>
+                  )}
+                </div>
               </div>
-            ))}
-          </Carousel>
-        ) : (
-          <p className="text-gray-600">No upcoming meetings scheduled.</p>
-        )}
+            </div>
+          ))}
+        </Carousel>
       </div>
 
       {/* Search and Sort Controls */}

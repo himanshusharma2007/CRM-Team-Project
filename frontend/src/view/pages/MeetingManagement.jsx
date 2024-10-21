@@ -25,6 +25,7 @@ import {
   updateClient,
 } from "../../services/clientServices";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/Context";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -44,21 +45,31 @@ const MeetingManagement = () => {
   const [clientSortOptions, setClientSortOptions] = useState({});
   const [showSearchFields, setShowSearchFields] = useState({});
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const canCreateMeeting = user?.role === "admin" || user?.permission?.meeting?.create;
+  const canUpdateMeeting = user?.role === "admin" || user?.permission?.meeting?.update;
+  const canReadMeeting = user?.role === "admin" || user?.permission?.meeting?.read;
+  const canCreateClient = user?.role === "admin" || user?.permission?.client?.create;
+  const canUpdateClient = user?.role === "admin" || user?.permission?.client?.update;
+  const canDeleteClient = user?.role === "admin" || user?.permission?.client?.delete;
+  const canCreateProject = user?.role === "admin" || user?.permission?.project?.create;
+  const canUpdateProject = user?.role === "admin" || user?.permission?.project?.update;
 
   useEffect(() => {
     console.log("clients in useEffect", clients);
-    fetchData();
-  }, []);
+    if (canReadMeeting) {
+      fetchData();
+    }
+  }, [canReadMeeting]);
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
       const projectsData = await getAllProjects();
-      // const meetingsData = await getUpcomingMeetings();
       const clientsData = await getAllClients();
       setProjects(projectsData);
-      // setMeetings(meetingsData);
       setClients(clientsData);
     } catch (error) {
       setError("Error fetching data. Please try again.");
@@ -68,121 +79,159 @@ const MeetingManagement = () => {
     }
   };
 
-  const toggleClientModal = () => setIsClientModalOpen(!isClientModalOpen);
-  const toggleMeetingModal = () => setIsMeetingModalOpen(!isMeetingModalOpen);
+  const toggleClientModal = () => {
+    if (canCreateClient) {
+      setIsClientModalOpen(!isClientModalOpen);
+    } else {
+      alert("You don't have permission to add clients.");
+    }
+  };
+
+  const toggleMeetingModal = () => {
+    if (canCreateMeeting) {
+      setIsMeetingModalOpen(!isMeetingModalOpen);
+    } else {
+      alert("You don't have permission to create meetings.");
+    }
+  };
 
   const toggleProjectModal = (clientId = null) => {
-    setAddProjectToClient(clientId);
-    setIsProjectModalOpen(!isProjectModalOpen);
+    if (canCreateProject) {
+      setAddProjectToClient(clientId);
+      setIsProjectModalOpen(!isProjectModalOpen);
+    } else {
+      alert("You don't have permission to add projects.");
+    }
   };
 
   const handleAddProject = async (projectData) => {
-    try {
-      console.log("handle add project called");
-      console.log("projectData in frontend ", projectData);
-      const newProject = await createProject(projectData);
-      setProjects((prevProjects) => [...prevProjects, newProject]);
+    if (canCreateProject) {
+      try {
+        console.log("handle add project called");
+        console.log("projectData in frontend ", projectData);
+        const newProject = await createProject(projectData);
+        setProjects((prevProjects) => [...prevProjects, newProject]);
 
-      // Update the client's projects list
-      if (projectData.clientId) {
-        setClients((prevClients) =>
-          prevClients.map((client) =>
-            client._id === projectData.clientId
-              ? {
-                  ...client,
-                  projectId: [...(client.projectId || []), newProject],
-                }
-              : client
-          )
-        );
+        // Update the client's projects list
+        if (projectData.clientId) {
+          setClients((prevClients) =>
+            prevClients.map((client) =>
+              client._id === projectData.clientId
+                ? {
+                    ...client,
+                    projectId: [...(client.projectId || []), newProject],
+                  }
+                : client
+            )
+          );
+        }
+
+        toggleProjectModal(); // Close the modal after adding the project
+      } catch (error) {
+        setError("Error creating project. Please try again.");
       }
-
-      toggleProjectModal(); // Close the modal after adding the project
-    } catch (error) {
-      setError("Error creating project. Please try again.");
     }
   };
 
   const handleUpdateProject = async (id, projectData) => {
-    try {
-      const updatedProject = await updateProject(id, projectData);
-      setProjects((prevProjects) =>
-        prevProjects.map((p) => (p.id === id ? updatedProject : p))
-      );
-    } catch (error) {
-      setError("Error updating project. Please try again.");
-      console.log("error in handleUpdateProject", error);
-    }
-  };
-
-  const handleAddMeeting = async (meetingData) => {
-    try {
-      console.log("meetingData in frontend ", meetingData);
-      const newMeeting = await createMeeting(meetingData);
-      setMeetings((prevMeetings) => [...prevMeetings, newMeeting]);
-      alert("Meeting created successfully");
-      toggleMeetingModal(); // Close the modal after adding the meeting
-    } catch (error) {
-      setError("Error creating meeting. Please try again.");
-      console.error("Error creating meeting:", error);
-    }
-  };
-
-  const handleUpdateMeeting = async (id, meetingData) => {
-    try {
-      const updatedMeeting = await updateMeeting(id, meetingData);
-      setMeetings((prevMeetings) =>
-        prevMeetings.map((m) => (m.id === id ? updatedMeeting : m))
-      );
-    } catch (error) {
-      setError("Error updating meeting. Please try again.");
-    }
-  };
-
-  const handleDeleteClient = async (clientId) => {
-    if (window.confirm("Are you sure you want to delete this client?")) {
+    if (canUpdateProject) {
       try {
-        await deleteClient(clientId);
-        setClients((prevClients) =>
-          prevClients.filter((client) => client._id !== clientId)
+        const updatedProject = await updateProject(id, projectData);
+        setProjects((prevProjects) =>
+          prevProjects.map((p) => (p.id === id ? updatedProject : p))
         );
-        alert("Client deleted successfully.");
       } catch (error) {
-        setError("Error deleting client. Please try again.");
+        setError("Error updating project. Please try again.");
+        console.log("error in handleUpdateProject", error);
       }
     }
   };
 
-  const handleAddClient = async (newClient) => {
-    try {
-      setClients((prevClients) => [...prevClients, newClient]);
-    } catch (error) {
-      setError("Error creating client. Please try again.");
-      console.log("error in handleAddClient", error);
+  const handleAddMeeting = async (meetingData) => {
+    if (canCreateMeeting) {
+      try {
+        console.log("meetingData in frontend ", meetingData);
+        const newMeeting = await createMeeting(meetingData);
+        setMeetings((prevMeetings) => [...prevMeetings, newMeeting]);
+        alert("Meeting created successfully");
+        toggleMeetingModal(); // Close the modal after adding the meeting
+      } catch (error) {
+        setError("Error creating meeting. Please try again.");
+        console.error("Error creating meeting:", error);
+      }
     }
   };
+
+  const handleUpdateMeeting = async (id, meetingData) => {
+    if (canUpdateMeeting) {
+      try {
+        const updatedMeeting = await updateMeeting(id, meetingData);
+        setMeetings((prevMeetings) =>
+          prevMeetings.map((m) => (m.id === id ? updatedMeeting : m))
+        );
+      } catch (error) {
+        setError("Error updating meeting. Please try again.");
+      }
+    }
+  };
+
+  const handleDeleteClient = async (clientId) => {
+    if (canDeleteClient) {
+      if (window.confirm("Are you sure you want to delete this client?")) {
+        try {
+          await deleteClient(clientId);
+          setClients((prevClients) =>
+            prevClients.filter((client) => client._id !== clientId)
+          );
+          alert("Client deleted successfully.");
+        } catch (error) {
+          setError("Error deleting client. Please try again.");
+        }
+      }
+    } else {
+      alert("You don't have permission to delete clients.");
+    }
+  };
+
+  const handleAddClient = async (newClient) => {
+    if (canCreateClient) {
+      try {
+        setClients((prevClients) => [...prevClients, newClient]);
+      } catch (error) {
+        setError("Error creating client. Please try again.");
+        console.log("error in handleAddClient", error);
+      }
+    }
+  };
+
   const handleEditClient = (clientId, clientName) => {
-    setEditingClientId(clientId);
-    setEditedClientName(clientName);
+    if (canUpdateClient) {
+      setEditingClientId(clientId);
+      setEditedClientName(clientName);
+    } else {
+      alert("You don't have permission to edit clients.");
+    }
   };
 
   const handleSaveClientName = async (clientId) => {
-    try {
-      const updatedClient = await updateClient(clientId, {
-        name: editedClientName,
-      });
-      setClients((prevClients) =>
-        prevClients.map((client) =>
-          client._id === clientId
-            ? { ...client, name: updatedClient.name }
-            : client
-        )
-      );
-      setEditingClientId(null);
-      setEditedClientName("");
-    } catch (error) {
-      setError("Error updating client name. Please try again.");
-      console.log("error in handleSaveClientName", error);
+    if (canUpdateClient) {
+      try {
+        const updatedClient = await updateClient(clientId, {
+          name: editedClientName,
+        });
+        setClients((prevClients) =>
+          prevClients.map((client) =>
+            client._id === clientId
+              ? { ...client, name: updatedClient.name }
+              : client
+          )
+        );
+        setEditingClientId(null);
+        setEditedClientName("");
+      } catch (error) {
+        setError("Error updating client name. Please try again.");
+        console.log("error in handleSaveClientName", error);
+      }
     }
   };
 
@@ -267,6 +316,10 @@ const MeetingManagement = () => {
     }
   };
 
+  if (!canReadMeeting) {
+    return <div>You don't have permission to view meetings.</div>;
+  }
+
   if (loading)
     return (
       <div className="text-center top-1/2 relative">
@@ -282,8 +335,11 @@ const MeetingManagement = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Meeting Management</h1>
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center gap-2"
+          className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center gap-2 ${
+            !canCreateMeeting && "opacity-50 cursor-not-allowed"
+          }`}
           onClick={toggleMeetingModal}
+          disabled={!canCreateMeeting}
         >
           <FaPlus /> Create Meeting
         </button>
@@ -313,7 +369,10 @@ const MeetingManagement = () => {
           </select>
           <button
             onClick={toggleClientModal}
-            className="bg-blue-600 text-nowrap text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center"
+            className={`bg-blue-600 text-nowrap text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center ${
+              !canCreateClient && "opacity-50 cursor-not-allowed"
+            }`}
+            disabled={!canCreateClient}
           >
             <FaPlus /> Add A Client
           </button>
@@ -369,7 +428,7 @@ const MeetingManagement = () => {
           clients.map((client, index) => (
             <div
               key={index}
-              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white w-96 hover:shadow-xl  transition-shadow duration-300 ease-in-out"
+              className="p-6 shadow-lg rounded-lg border border-gray-300 bg-white min-w-96 hover:shadow-xl  transition-shadow duration-300 ease-in-out"
             >
               {/* Client Header */}
               <div className="flex justify-between items-center mb-6">
@@ -530,22 +589,28 @@ const MeetingManagement = () => {
       </div>
 
       {/* Modals */}
-      <AddClientModal
-        isOpen={isClientModalOpen}
-        onClose={toggleClientModal}
-        onAddClient={handleAddClient}
-      />
-      <NewMeetingModal
-        isOpen={isMeetingModalOpen}
-        onClose={toggleMeetingModal}
-        onAddMeeting={handleAddMeeting}
-      />
-      <AddProjectModal
-        isOpen={isProjectModalOpen}
-        onClose={() => toggleProjectModal()}
-        onAddProject={handleAddProject}
-        clientId={addProjectToClient}
-      />
+      {canCreateClient && (
+        <AddClientModal
+          isOpen={isClientModalOpen}
+          onClose={toggleClientModal}
+          onAddClient={handleAddClient}
+        />
+      )}
+      {canCreateMeeting && (
+        <NewMeetingModal
+          isOpen={isMeetingModalOpen}
+          onClose={toggleMeetingModal}
+          onAddMeeting={handleAddMeeting}
+        />
+      )}
+      {canCreateProject && (
+        <AddProjectModal
+          isOpen={isProjectModalOpen}
+          onClose={toggleProjectModal}
+          onAddProject={handleAddProject}
+          clientId={addProjectToClient}
+        />
+      )}
     </div>
   );
 };
