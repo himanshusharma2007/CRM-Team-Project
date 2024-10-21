@@ -322,9 +322,8 @@ exports.updateMeeting = async (req, res) => {
   console.log("Meeting ID:", req.params.id);
 
   try {
-    const { meetingConclusion, meetingStatus, meetingDateTime } = req.body;   
-    console.log("Extracted data:", { meetingConclusion, meetingStatus, meetingDateTime });
-
+    const { title, meetingConclusion, meetingStatus, meetingDateTime } =
+      req.body;
     const meetingData = await meeting.findById(req.params.id);
     console.log("Found meeting data:", meetingData);
 
@@ -332,15 +331,12 @@ exports.updateMeeting = async (req, res) => {
       console.log("Meeting not found");
       return res.status(404).json({ error: "Meeting not found" });
     }
-
     meetingData.meetingConclusion =
       meetingConclusion || meetingData.meetingConclusion;
     meetingData.meetingStatus = meetingStatus || meetingData.meetingStatus;
     meetingData.meetingDateTime =
       meetingDateTime || meetingData.meetingDateTime;
-
-    console.log("Updated meeting data before save:", meetingData);
-
+    meetingData.title = title || meetingData.title;
     await meetingData.save();
     console.log("Meeting saved successfully");
 
