@@ -11,7 +11,7 @@ const leadStatics = async () => {
   try {
     let leadData = {};
     leadData.total = await Lead.countDocuments(); // Total leads
-    // Use `for...of` to iterate over stages and await the results
+    // Use for...of to iterate over stages and await the results
     leadData.stages = await Lead.aggregate([
       {
         $group: {
@@ -148,15 +148,17 @@ exports.getAdminDashboardData = async (req, res) => {
     const connectionData = await connectionStatics();
     const teamData = await teamStatics();
 
-    return res.status(200).send({
-      leadData,
-      projectData,
-      userData,
-      clientData,
-      queryData,
-      connectionData,
-      teamData,
-    });
+    return res
+      .status(200)
+      .send({
+        leadData,
+        projectData,
+        userData,
+        clientData,
+        queryData,
+        connectionData,
+        teamData,
+      });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
