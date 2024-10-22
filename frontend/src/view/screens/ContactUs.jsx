@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { submitContactUs } from "../../services/queryService";
-
+import { useNavigate } from "react-router-dom";
 const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -20,7 +20,11 @@ const ContactUs = () => {
     console.log("FormData in Contactus:", formData);
     submitContactUs(name, email, message, subject); // Call function to add query to the query page
     setFormData({ name: "", email: "", subject: "", message: "" }); // Reset form after submit
+    alert("Your Query has been Submitted");
+    navigate("/");
   };
+
+  const navigate = useNavigate();
 
   return (
     <div className="p-8 max-w-2xl mx-auto bg-gray-50 rounded-lg shadow-lg mt-10 border border-gray-200">

@@ -63,6 +63,7 @@ function SubAdminDashboard() {
       try {
         const userData = await getUser();
         const team = await getTeamById(userData.teamId);
+        // console.log("participant:", team);
         setUser(userData);
         setTeamData(team);
         setParticipants(team.participants || []);
@@ -82,17 +83,6 @@ function SubAdminDashboard() {
         .join("")
         .toUpperCase() || "U"
     );
-  };
-
-  const getRoleIcon = (role) => {
-    switch (role?.toLowerCase()) {
-      case "admin":
-        return <MdAdminPanelSettings className="text-purple-500" />;
-      case "leader":
-        return <BsFillPersonCheckFill className="text-blue-500" />;
-      default:
-        return <FaUser className="text-green-500" />;
-    }
   };
 
   if (!teamData) {
@@ -135,31 +125,38 @@ function SubAdminDashboard() {
       <div className="space-y-2">
         <h1 className="text-2xl text-center">Team Members</h1>
         {participants.map((participant) => (
-          <Card key={participant._id} className=" ">
-            <CardContent className="flex items-center space-x-4">
-              <Avatar>
-                <AvatarFallback>{getInitials(participant.name)}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-2">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {participant.name}
-                  </p>
+          <Card key={participant._id} className="">
+            <CardContent className="flex items-center justify-between px-10">
+              {/* Left side - Avatar and Basic Info */}
+              <div className="flex items-center space-x-4">
+                <Avatar>
+                  <AvatarFallback>
+                    {getInitials(participant.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {participant.name}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-1 text-gray-500 mt-1">
+                    <FaEnvelope className="h-3 w-3" />
+                    <p className="text-sm truncate">{participant.email}</p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1 text-gray-500 mt-1">
-                  <FaEnvelope className="h-3 w-3" />
-                  <p className="text-sm truncate">{participant.email}</p>
-                </div>
-                <div className="flex items-center mt-2 space-x-2">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    {participant?.role || "Member"}
+              </div>
+
+              {/* Right side - Status and Role */}
+              <div className="flex flex-col items-end space-y-2">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  {participant?.role || "Member"}
+                </span>
+                {participant.isActive && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    Active
                   </span>
-                  {participant.isActive && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      Active
-                    </span>
-                  )}
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
