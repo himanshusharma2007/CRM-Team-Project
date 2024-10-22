@@ -8,24 +8,42 @@ const Contact = require("../models/contactModels");
 const team = require("../models/teamModels");
 
 const leadStatics = async () => {
-  try {
-    let leadData = {};
-    leadData.total = await Lead.countDocuments(); // Total leads
-    // Use `for...of` to iterate over stages and await the results
-    leadData.stages = await Lead.aggregate([
-      {
-        $group: {
-          _id: "$currentStage", // Group by the department field
-          count: { $sum: 1 }, // Count the number of teams in each department
-        },
-      },
-    ]);
-    return leadData;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
+    try {
+        let leadData = {}
+        leadData.total = await Lead.countDocuments(); // Total leads
+        // Use `for...of` to iterate over stages and await the results
+        leadData.stages = await Lead.aggregate([
+            {
+                $group: {
+                    _id: "$currentStage",  // Group by the department field
+                    count: { $sum: 1 }  // Count the number of teams in each department
+                }
+            }
+        ]);
+        leadData.monthlyCounts = await Lead.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
+        return leadData;
+    } catch (error) {
+        console.log(error)
+        throw error;
+
+    }
+}
 
 const projectStatics = async () => {
   try {

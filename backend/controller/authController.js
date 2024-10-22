@@ -228,6 +228,18 @@ exports.sendOtpForRegister = async (req, res) => {
       secure: true,
       sameSite: "strict"
     });
+    res.cookie("name", name, { 
+      maxAge: expirationTime,
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict"
+    });
+    res.cookie("email", email, { 
+      maxAge: expirationTime,
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict"
+    });
     return res.status(200).json({
       success: true,
       message: "OTP sent successfully",
@@ -243,14 +255,21 @@ exports.sendOtpForRegister = async (req, res) => {
 
 // Register a new user    "/signup"
 exports.registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
-
+  const { password, otp } = req.body;
+  
   try {
-    if (!name || !email || !password) {
+    const {otp: saveOtp, name, email} = req.cookies
+    if (!password || !otp) {
       return res.status(400).send({
         success: false,
         message: "please fill all fields",
       });
+    }
+    if(!name || !email || !saveOtp || saveOtp !== otp){
+      return res.status(400).send({
+        success: false,
+        message: "invalid otp or expired",
+      })
     }
     const userExists = await user.findOne({ email });
     if (userExists)
@@ -258,6 +277,7 @@ exports.registerUser = async (req, res) => {
         success: false,
         message: "User already exists",
       });
+
 
     const hashedPassword = await hashPassword(password);
     if(!hashedPassword){
@@ -289,6 +309,9 @@ exports.registerUser = async (req, res) => {
       name: "Done",
       userId: userData._id
     });
+    res.cookie("email", "", { maxAge: 0});
+    res.cookie("name", "", { maxAge: 0});
+    res.cookie("otp", "", { maxAge: 0});
     res.status(201).send({
       success: true,
       massage: "User Register successfully",
