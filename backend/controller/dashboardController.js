@@ -1,6 +1,5 @@
 const User = require("../models/userModels")
 const Lead = require("../models/leadModels")
-const LeadStage = require("../models/leadStagesModels")
 const Project = require("../models/projectModels")
 const Client = require("../models/clientModels")
 const ContactUs = require("../models/contactUsModels")
@@ -59,6 +58,23 @@ const projectStatics = async () => {
                 }
             }
         ]);
+        projectData.monthlyCounts = await Project.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
         return projectData;
     } catch (error) {
         console.log(error)
@@ -98,6 +114,23 @@ const clientStatics = async () => {
                 { "timeZone": "Asia/Delhi" }
             ]
         });
+        clientData.monthlyCounts = await Client.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
         return clientData
     } catch (error) {
         console.log(error)
@@ -116,6 +149,23 @@ const queryStatics = async () => {
                     count: { $sum: 1 }  // Count the number of teams in each department
                 }
             }
+        ]);
+        queryData.monthlyCounts = await ContactUs.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
         ]);
         return queryData;
     } catch (error) {
