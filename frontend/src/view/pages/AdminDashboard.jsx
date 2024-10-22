@@ -164,9 +164,9 @@ const AdminDashboard = () => {
           </ResponsiveContainer>
         </DashboardCard>
 
-        {/* Clients Leads Section */}
-        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 col-span-2">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-700">
+        {/* Clients & Leads Section */}
+        <div className="bg-white p-6 rounded-lg shadow-lg col-span-2">
+          <h2 className="text-2xl font-semibold mb-4text-gray-700">
             Clients & Leads
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -224,7 +224,7 @@ const AdminDashboard = () => {
 
 // Component for displaying individual dashboard cards
 const DashboardCard = ({ title, total, additionalInfo, children }) => (
-  <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+  <div className="bg-white p-6 rounded-lg shadow-lg">
     <h2 className="text-2xl font-semibold mb-4 text-gray-700">{title}</h2>
     {children}
     {total && <p className="mt-2 text-gray-600">{total}</p>}
