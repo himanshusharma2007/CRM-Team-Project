@@ -24,6 +24,7 @@ const AdminDashboard = () => {
     leadData: {},
     userData: {},
     connectionData: {},
+    teamData: {},
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,6 +57,7 @@ const AdminDashboard = () => {
     leadData,
     userData,
     connectionData,
+    teamData,
   } = dashboardData;
 
   const projectChartData = projectData?.status
@@ -132,6 +134,17 @@ const AdminDashboard = () => {
     { name: "Indian Clients", value: clientData.indian || 0 },
     { name: "Foreigner Clients", value: clientData.foreigner || 0 },
   ];
+  const monthClientChartData = allMonths.map((month, index) => {
+    // Check if we have data for this month
+    const monthData = clientData.monthlyCounts.find(
+      (item) => item._id.month === index + 1
+    );
+
+    return {
+      name: month,
+      value: monthData ? monthData.count : 0,
+    };
+  });
 
   // Colors for the pie chart
   const colors = ["#4CAF50", "#FFA500"]; // Green for Indian, Orange for Foreigner
@@ -199,8 +212,8 @@ const AdminDashboard = () => {
           <h2 className="text-2xl font-semibold mb-4 text-gray-700">Clients</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Line Chart for Monthly Clients Data */}
-            <ResponsiveContainer width="100%" height={200} className="mt-8">
-              <LineChart data={monthLeadChartData}>
+            <ResponsiveContainer width="100%" height={200} className="mt-2">
+              <LineChart data={monthClientChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis
@@ -212,32 +225,31 @@ const AdminDashboard = () => {
             </ResponsiveContainer>
 
             {/* Pie Chart for Client Data */}
-            <DashboardCard
-              total={`Total Clients: ${clientData.total || 0}`}
-            >
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={clientDataChart}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {clientDataChart.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={colors[index % colors.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </DashboardCard>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={clientDataChart}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {clientDataChart.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={colors[index % colors.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+              <p className="text-gray-600 mt-8">
+                Total Clients: {clientData.total || 0}
+              </p>
+            </ResponsiveContainer>
           </div>
 
           {/* Client Totals */}
@@ -281,8 +293,38 @@ const AdminDashboard = () => {
           <p className="text-gray-600">Total Leads: {leadData.total || 0}</p>
         </div>
 
+        {/* Teams Section */}
+        <DashboardCard
+          title="Department Teams"
+          total={`Total Teams: ${teamData.total || 0}`}
+        >
+          <div className="space-y-4">
+            {teamData?.department?.map((dept, index) => (
+              <div
+                key={index}
+                className="p-3 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-700 capitalize">
+                    {dept._id}
+                  </span>
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    {dept.count} {dept.count === 1 ? "team" : "teams"}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DashboardCard>
+
+        {/* Recent Connections Section */}
+        <RecentConnections
+          connections={connectionData.data || []}
+          totalConnections={connectionData.total || 0}
+        />
+
         {/* Users Section */}
-        <DashboardCard title="Users">
+        <UserCard title="Users">
           <ResponsiveContainer width="100%" height={200}>
             <BarChart layout="vertical" data={userChartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -292,13 +334,7 @@ const AdminDashboard = () => {
               <Bar dataKey="value" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
-        </DashboardCard>
-
-        {/* Recent Connections Section */}
-        <RecentConnections
-          connections={connectionData.data || []}
-          totalConnections={connectionData.total || 0}
-        />
+        </UserCard>
       </div>
     </div>
   );
@@ -306,7 +342,15 @@ const AdminDashboard = () => {
 
 // Component for displaying individual dashboard cards
 const DashboardCard = ({ title, total, additionalInfo, children }) => (
-  <div className="bg-white">
+  <div className="bg-white px-6 py-6 rounded-lg shadow-lg">
+    <h2 className="text-2xl font-semibold mb-4 text-gray-700">{title}</h2>
+    {children}
+    {total && <p className="mt-2 text-gray-600">{total}</p>}
+    {additionalInfo && <p className="mt-1 text-gray-600">{additionalInfo}</p>}
+  </div>
+);
+const UserCard = ({ title, total, additionalInfo, children }) => (
+  <div className="bg-white w-[207%] px-6 py-6 rounded-lg shadow-lg">
     <h2 className="text-2xl font-semibold mb-4 text-gray-700">{title}</h2>
     {children}
     {total && <p className="mt-2 text-gray-600">{total}</p>}
@@ -316,7 +360,7 @@ const DashboardCard = ({ title, total, additionalInfo, children }) => (
 
 // Component for displaying recent connections
 const RecentConnections = ({ connections, totalConnections }) => (
-  <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+  <div className="bg-white p-6 rounded-lg shadow-lg">
     <h2 className="text-2xl font-semibold mb-4 text-gray-700">
       Recent Connections
     </h2>
