@@ -1,51 +1,86 @@
-const User = require("../models/userModels");
-const Lead = require("../models/leadModels");
-const LeadStage = require("../models/leadStagesModels");
-const Project = require("../models/projectModels");
-const Client = require("../models/clientModels");
-const ContactUs = require("../models/contactUsModels");
-const Contact = require("../models/contactModels");
-const team = require("../models/teamModels");
+const User = require("../models/userModels")
+const Lead = require("../models/leadModels")
+const Project = require("../models/projectModels")
+const Client = require("../models/clientModels")
+const ContactUs = require("../models/contactUsModels")
+const Contact = require("../models/contactModels")
+const team = require("../models/teamModels")
+
 
 const leadStatics = async () => {
-  try {
-    let leadData = {};
-    leadData.total = await Lead.countDocuments(); // Total leads
-    // Use `for...of` to iterate over stages and await the results
-    leadData.stages = await Lead.aggregate([
-      {
-        $group: {
-          _id: "$currentStage", // Group by the department field
-          count: { $sum: 1 }, // Count the number of teams in each department
-        },
-      },
-    ]);
-    return leadData;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
+    try {
+        let leadData = {}
+        leadData.total = await Lead.countDocuments(); // Total leads
+        // Use `for...of` to iterate over stages and await the results
+        leadData.stages = await Lead.aggregate([
+            {
+                $group: {
+                    _id: "$currentStage",  // Group by the department field
+                    count: { $sum: 1 }  // Count the number of teams in each department
+                }
+            }
+        ]);
+        leadData.monthlyCounts = await Lead.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
+        return leadData;
+    } catch (error) {
+        console.log(error)
+        throw error;
+
+    }
+}
 
 const projectStatics = async () => {
-  try {
-    let projectData = {};
-    projectData.total = await Project.countDocuments();
-    // ["pending", "ongoing", "completed", "cancelled"],
-    projectData.status = await Project.aggregate([
-      {
-        $group: {
-          _id: "$projectStatus", // Group by the department field
-          count: { $sum: 1 }, // Count the number of teams in each department
-        },
-      },
-    ]);
-    return projectData;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
+    try {
+        let projectData = {}
+        projectData.total = await Project.countDocuments()
+        // ["pending", "ongoing", "completed", "cancelled"],
+        projectData.status = await Project.aggregate([
+            {
+                $group: {
+                    _id: "$projectStatus",  // Group by the department field
+                    count: { $sum: 1 }  // Count the number of teams in each department
+                }
+            }
+        ]);
+        projectData.monthlyCounts = await Project.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
+        return projectData;
+    } catch (error) {
+        console.log(error)
+        throw error;
+    }
+}
 
 const userStatics = async (req) => {
   try {
@@ -70,40 +105,81 @@ const userStatics = async (req) => {
 };
 
 const clientStatics = async () => {
-  try {
-    const clientData = {};
-    clientData.total = await Client.countDocuments();
-    clientData.indian = await Client.countDocuments({
-      $or: [{ timeZone: "Asia/Kolkata" }, { timeZone: "Asia/Delhi" }],
-    });
-    clientData.foreigner = await Client.countDocuments({
-      $nor: [{ timeZone: "Asia/Kolkata" }, { timeZone: "Asia/Delhi" }],
-    });
-    return clientData;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
+    try {
+        const clientData = {}
+        clientData.total = await Client.countDocuments()
+        clientData.indian = await Client.countDocuments({
+            $or: [
+                { "timeZone": "Asia/Kolkata" },
+                { "timeZone": "Asia/Delhi" }
+            ]
+        });
+        clientData.foreigner = await Client.countDocuments({
+            $nor: [
+                { "timeZone": "Asia/Kolkata" },
+                { "timeZone": "Asia/Delhi" }
+            ]
+        });
+        clientData.monthlyCounts = await Client.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
+        return clientData
+    } catch (error) {
+        console.log(error)
+        throw error;
+    }
+}
 
 const queryStatics = async () => {
-  try {
-    const queryData = {};
-    queryData.total = await ContactUs.countDocuments();
-    queryData.status = await ContactUs.aggregate([
-      {
-        $group: {
-          _id: "$status", // Group by the department field
-          count: { $sum: 1 }, // Count the number of teams in each department
-        },
-      },
-    ]);
-    return queryData;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
+    try {
+        const queryData = {}
+        queryData.total = await ContactUs.countDocuments()
+        queryData.status = await ContactUs.aggregate([
+            {
+                $group: {
+                    _id: "$status",  // Group by the department field
+                    count: { $sum: 1 }  // Count the number of teams in each department
+                }
+            }
+        ]);
+        queryData.monthlyCounts = await ContactUs.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
+        return queryData;
+    } catch (error) {
+        console.log(error)
+        throw error;
+    }
+
+}
 
 const connectionStatics = async () => {
   try {

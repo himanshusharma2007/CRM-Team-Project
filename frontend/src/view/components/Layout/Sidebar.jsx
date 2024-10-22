@@ -30,10 +30,18 @@ const Sidebar = () => {
         <AdminSidebar handleLogout={handleLogout} location={location} />
       )}
       {user?.role === "subAdmin" && (
-        <SubAdminSidebar handleLogout={handleLogout} location={location} user={user} />
+        <SubAdminSidebar
+          handleLogout={handleLogout}
+          location={location}
+          user={user}
+        />
       )}
       {user?.role === "emp" && (
-        <EmployeeSidebar handleLogout={handleLogout} location={location} user={user} />
+        <EmployeeSidebar
+          handleLogout={handleLogout}
+          location={location}
+          user={user}
+        />
       )}
     </>
   );
@@ -264,12 +272,6 @@ const EmployeeSidebar = ({ handleLogout, location, user }) => {
       {/* Sidebar Navigation */}
       <nav className="flex-grow p-4 hideScroll">
         <ul className="space-y-2">
-          <SidebarItem
-            to="/dashboard"
-            icon={<FaHome />}
-            text="Dashboard"
-            location={location}
-          />
           <SidebarItem
             to="/profile"
             icon={<FaUser />}

@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Context } from "./context/Context";
+
 import "./view/styles/hideScroll.css";
 
 import LoginPage from "./view/screens/Login";
@@ -78,7 +79,7 @@ function App() {
               </MainLayout>
             }
           />
-
+        
           <Route
             path="/dashboard"
             element={
