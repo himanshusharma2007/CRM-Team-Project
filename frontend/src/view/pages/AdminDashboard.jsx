@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -165,7 +165,7 @@ const AdminDashboard = () => {
         </DashboardCard>
 
         {/* Clients Leads Section */}
-        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 col-span-2">
+        <div className="bg-white p-6 rounded-lg shadow-lg col-span-2">
           <h2 className="text-2xl font-semibold mb-4 text-gray-700">
             Clients & Leads
           </h2>
@@ -224,7 +224,7 @@ const AdminDashboard = () => {
 
 // Component for displaying individual dashboard cards
 const DashboardCard = ({ title, total, additionalInfo, children }) => (
-  <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+  <div className="bg-white p-6 rounded-lg shadow-lg">
     <h2 className="text-2xl font-semibold mb-4 text-gray-700">{title}</h2>
     {children}
     {total && <p className="mt-2 text-gray-600">{total}</p>}
@@ -243,7 +243,7 @@ const ClientLeadStats = ({
 }) => (
   <div>
     <p className="mt-2 text-gray-600">Today's Leads: {todayLeads}</p>
-    <p className="text-gray-600">Total Indian Clients: {totalIndianClients}</p>
+    <p className="text-gra y-600">Total Indian Clients: {totalIndianClients}</p>
     <p className="text-gray-600">
       Total Foreign Clients: {totalForeignClients}
     </p>
@@ -255,7 +255,7 @@ const ClientLeadStats = ({
 
 // Component for displaying recent connections
 const RecentConnections = ({ connections, totalConnections }) => (
-  <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+  <div className="bg-white p-6 rounded-lg shadow-lg">
     <h2 className="text-2xl font-semibold mb-4 text-gray-700">
       Recent Connections
     </h2>
