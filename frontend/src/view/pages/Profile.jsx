@@ -4,9 +4,12 @@ import { useAuth } from "../../context/Context"; // Import the useAuth hook
 import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon from React Icons
 import { uploadProfileImage } from "../../services/userService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import { getTeamById } from "../../services/TeamService";
 
 const Profile = () => {
+  const [team, setTeam] = useState({});
   const { user, loading } = useAuth(); // Get user data from context
+  console.log("User:", user);
   const navigate = useNavigate();
   const [profileImage, setProfileImage] = useState(""); // State for profile picture
   const [selectedFile, setSelectedFile] = useState(null);
@@ -37,7 +40,7 @@ const Profile = () => {
       alert("Please select a file to upload");
       return;
     }
-    
+
     const formData = new FormData();
     formData.append("profileImage", selectedFile); // Ensure the key matches the one in the backend
     setIsLoading(true); // Set loading state
@@ -57,11 +60,17 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    const fetchTeamData = async () => {
+      const teamData = await getTeamById(user?.teamId);
+      setTeam(teamData);
+      // console.log("Team:", teamData);
+    };
+    fetchTeamData();
     if (user) {
       setProfileImage(user.profileImage || ""); // Set the initial profile image if user is defined
     }
-  }, [user]); 
-  
+  }, [user]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -118,10 +127,11 @@ const Profile = () => {
           {isLoading ? "Uploading..." : "Update Picture"}
         </button>
         <div className="space-y-6">
-          {[{ label: "Name", value: user.name || "N/A" },
+          {[
+            { label: "Name", value: user.name || "N/A" },
             { label: "Email", value: user.email || "N/A" },
             { label: "Role", value: user.role || "N/A" },
-            { label: "Team", value: user.team || "N/A" },
+            { label: "Team", value: team.teamName || "N/A" },
           ].map((item, index) => (
             <div
               key={index}
@@ -137,7 +147,9 @@ const Profile = () => {
         <div className="mt-8 text-center">
           <button
             onClick={handleChangePassword}
-            className={`bg-gray-800 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-900 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-800 shadow-md ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`bg-gray-800 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-900 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-800 shadow-md ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             disabled={isLoading} // Optionally disable the button while loading
           >
             Change Password
