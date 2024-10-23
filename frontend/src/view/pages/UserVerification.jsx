@@ -406,7 +406,7 @@ const UserVerificationList = () => {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="bg-gray-700 text-white py-2 px-3 rounded-md"
+              className="bg-gray-100 text-white py-2 px-3 rounded-md"
             >
               <option value="">All Roles</option>
               <option value="admin">Admin</option>
