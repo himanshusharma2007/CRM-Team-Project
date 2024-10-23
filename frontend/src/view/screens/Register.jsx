@@ -13,7 +13,7 @@ const Register = () => {
   const handleSendOtp = async (e) => {
     e.preventDefault();
     try {
-      await sendOtpForRegister(email); // Send OTP using the email
+      await sendOtpForRegister(name, email); // Send OTP using the email
       setIsOtpSent(true); // Show additional fields for OTP and Password
       alert("OTP sent successfully!");
     } catch (error) {
