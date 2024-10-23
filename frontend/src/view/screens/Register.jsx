@@ -25,7 +25,7 @@ const Register = () => {
     e.preventDefault();
     try {
       // Register the user with the name, password, and OTP
-      await registerUser(password, otp);
+      await registerUser(otp, password);
       alert("User registered successfully!");
       navigate("/login");
     } catch (error) {
