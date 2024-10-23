@@ -179,6 +179,7 @@ export const blockUser = async (userId) => {
 
 export const unblockUser = async (userId) => {
   try {
+    console.log('userId in unBlockuser', userId)
     const response = await api.put(`/profile/unblock/${userId}`);
     return response.data;
   } catch (error) {

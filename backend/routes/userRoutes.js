@@ -26,7 +26,7 @@ routers.patch("/uploadProfileImage", jwtToken, upload.single("profileImage"), up
 routers.put("/updateUserPermission/:id", jwtToken, updateUserPermission)  
 
 // New routes for blocking and unblocking users
-routers.put("/block/:userId", jwtToken, blockUser)
-routers.put("/unblock/:userId", jwtToken, checkAdmin, unblockUser)
+routers.put("/block/:userId", jwtToken,checkAdmin(), blockUser)
+routers.put("/unblock/:userId", jwtToken, checkAdmin(), unblockUser)
 
 module.exports = routers
