@@ -24,7 +24,6 @@ const generateToken = (id,res) => {
 const msgForRegister = (otp, name) => {
   return `
 
-
   <!doctype html>
 <html lang="en">
 
@@ -202,14 +201,12 @@ const msgForRegister = (otp, name) => {
 </body>
 
 </html>
-
-
-
   `;
 }
 
 
 exports.sendOtpForRegister = async (req, res) => {
+  console.log("req.body",req.body)
   const {name, email } = req.body;
   try {
     const userData = await user.findOne({ email });
@@ -256,71 +253,72 @@ exports.sendOtpForRegister = async (req, res) => {
 // Register a new user    "/signup"
 exports.registerUser = async (req, res) => {
   const { password, otp } = req.body;
-  
   try {
-    const {otp: saveOtp, name, email} = req.cookies
+    const { otp: savedOtp, name, email } = req.cookies;
+    
     if (!password || !otp) {
       return res.status(400).send({
         success: false,
-        message: "please fill all fields",
+        message: "Please fill all fields",
       });
     }
-    if(!name || !email || !saveOtp || saveOtp !== otp){
+
+    if (!name || !email || !savedOtp || savedOtp !== otp) {
       return res.status(400).send({
         success: false,
-        message: "invalid otp or expired",
-      })
+        message: "Invalid OTP or expired",
+      });
     }
+
     const userExists = await user.findOne({ email });
-    if (userExists)
+    if (userExists) {
       return res.status(400).send({
         success: false,
         message: "User already exists",
       });
-
+    }
 
     const hashedPassword = await hashPassword(password);
-    if(!hashedPassword){
+    if (!hashedPassword) {
       return res.status(400).send({
         success: false,
         message: "Error in hashing password",
       });
     }
+
     const userData = await user.create({
       name,
       email,
       password: hashedPassword,
     });
+
     if (!userData) {
       return res.status(401).send({
         success: false,
         message: "Error in User Creation",
       });
     }
-    await Status.create({
-      name: "Todo",
-      userId: userData._id
-    });
-    await Status.create({
-      name: "Doing",
-      userId: userData._id
-    });
-    await Status.create({
-      name: "Done",
-      userId: userData._id
-    });
-    res.cookie("email", "", { maxAge: 0});
-    res.cookie("name", "", { maxAge: 0});
-    res.cookie("otp", "", { maxAge: 0});
-    res.status(201).send({
+
+    const statuses = ["Todo", "Doing", "Done"];
+    for (const status of statuses) {
+      await Status.create({
+        name: status,
+        userId: userData._id,
+      });
+    }
+
+    // Clear cookies after successful registration
+    ['email', 'name', 'otp'].forEach(cookie => res.clearCookie(cookie));
+
+    return res.status(201).send({
       success: true,
-      massage: "User Register successfully",
+      message: "User registered successfully",
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).send({
+    console.error(err);
+    return res.status(500).send({
       success: false,
-      message: "Internel server error",
+      message: "Internal server error",
     });
   }
 };
