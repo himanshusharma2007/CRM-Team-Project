@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "./api"
 
 export const login = async (email, password) => {
   try {
@@ -10,22 +10,27 @@ export const login = async (email, password) => {
   }
 };
 
-export const register = async (name, email, password) => {
+export const registerUser = async (password, otp) => {
   try {
-    const response = await api.post("/auth/signup", {
-      name,
-      email,
-      password,
-    });
+    const response = await api.post('/signup', { password, otp });
     return response.data;
   } catch (error) {
-    console.error(
-      "Error during registration:",
-      error.response?.data || error.message
-    );
-    throw error;
+    // Handle and throw error appropriately
+    console.error("Error in registering user:", error.response?.data || error.message);
+    throw error.response?.data || { success: false, message: "Registration failed." };
+  }
+}
+
+// Service to send OTP for registration
+export const sendOtpForRegister = async (email, name) => {
+  try {
+    const response = await api.post('/auth/signup/emailVerify', { email, name });
+    return response.data;
+  } catch (error) {
+    throw error.response.data; // Handle error appropriately
   }
 };
+
 
 export const logout = async () => {
   try {

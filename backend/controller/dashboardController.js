@@ -1,6 +1,5 @@
 const User = require("../models/userModels")
 const Lead = require("../models/leadModels")
-const LeadStage = require("../models/leadStagesModels")
 const Project = require("../models/projectModels")
 const Client = require("../models/clientModels")
 const ContactUs = require("../models/contactUsModels")
@@ -20,6 +19,23 @@ const leadStatics = async () => {
                     count: { $sum: 1 }  // Count the number of teams in each department
                 }
             }
+        ]);
+        leadData.monthlyCounts = await Lead.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
         ]);
         return leadData;
     } catch (error) {
@@ -42,6 +58,23 @@ const projectStatics = async () => {
                 }
             }
         ]);
+        projectData.monthlyCounts = await Project.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
         return projectData;
     } catch (error) {
         console.log(error)
@@ -50,20 +83,26 @@ const projectStatics = async () => {
 }
 
 const userStatics = async (req) => {
-    try {
-        const userData = {}
-        userData.total = await User.countDocuments()
-        userData.active = await User.countDocuments({ isActive: true })
-        userData.verify = await User.countDocuments({ verify: true, _id: { $ne: req.user._id } })
-        userData.unVerify = await User.countDocuments({ verify: false, _id: { $ne: req.user._id } })
-        userData.subAdmin = await User.countDocuments({ role: "subAdmin" })
-        userData.emp = await User.countDocuments({ role: "emp" })
-        return userData
-    } catch (error) {
-        console.log(error)
-        throw error;
-    }
-}
+  try {
+    const userData = {};
+    userData.total = await User.countDocuments();
+    userData.active = await User.countDocuments({ isActive: true });
+    userData.verify = await User.countDocuments({
+      verify: true,
+      _id: { $ne: req.user._id },
+    });
+    userData.unVerify = await User.countDocuments({
+      verify: false,
+      _id: { $ne: req.user._id },
+    });
+    userData.subAdmin = await User.countDocuments({ role: "subAdmin" });
+    userData.emp = await User.countDocuments({ role: "emp" });
+    return userData;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 const clientStatics = async () => {
     try {
@@ -81,6 +120,23 @@ const clientStatics = async () => {
                 { "timeZone": "Asia/Delhi" }
             ]
         });
+        clientData.monthlyCounts = await Client.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
         return clientData
     } catch (error) {
         console.log(error)
@@ -100,6 +156,23 @@ const queryStatics = async () => {
                 }
             }
         ]);
+        queryData.monthlyCounts = await ContactUs.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                },
+            },
+        ]);
         return queryData;
     } catch (error) {
         console.log(error)
@@ -109,51 +182,59 @@ const queryStatics = async () => {
 }
 
 const connectionStatics = async () => {
-    try {
-        const connectionData = {}
-        connectionData.total = await Contact.countDocuments()
-        connectionData.data = await Contact.find({})
-            .sort({ _id: -1 })  // Sort by _id in descending order (most recent first)
-            .limit(2);
-        return connectionData
-    } catch (error) {
-        console.log(error)
-        throw error;
-    }
-}
+  try {
+    const connectionData = {};
+    connectionData.total = await Contact.countDocuments();
+    connectionData.data = await Contact.find({})
+      .sort({ _id: -1 }) // Sort by _id in descending order (most recent first)
+      .limit(2);
+    return connectionData;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 const teamStatics = async () => {
-    try {
-        const teamData = {}
-        teamData.total = await team.countDocuments()
-        teamData.department = await team.aggregate([
-            {
-                $group: {
-                    _id: "$department",  // Group by the department field
-                    count: { $sum: 1 }  // Count the number of teams in each department
-                }
-            }
-        ]);
-        return teamData
-    } catch (error) {
-        console.log(error)
-        throw error;
-    }
-}
+  try {
+    const teamData = {};
+    teamData.total = await team.countDocuments();
+    teamData.department = await team.aggregate([
+      {
+        $group: {
+          _id: "$department", // Group by the department field
+          count: { $sum: 1 }, // Count the number of teams in each department
+        },
+      },
+    ]);
+    return teamData;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 exports.getAdminDashboardData = async (req, res) => {
-    try {
-        const leadData = await leadStatics()
-        const projectData = await projectStatics()
-        const userData = await userStatics(req)
-        const clientData = await clientStatics()
-        const queryData = await queryStatics()
-        const connectionData = await connectionStatics()
-        const teamData = await teamStatics()
+  try {
+    const leadData = await leadStatics();
+    const projectData = await projectStatics();
+    const userData = await userStatics(req);
+    const clientData = await clientStatics();
+    const queryData = await queryStatics();
+    const connectionData = await connectionStatics();
+    const teamData = await teamStatics();
 
-        return res.status(200).send({ leadData, projectData, userData, clientData, queryData, connectionData, teamData });
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ error: error.message });
-    }
-}
+    return res.status(200).send({
+      leadData,
+      projectData,
+      userData,
+      clientData,
+      queryData,
+      connectionData,
+      teamData,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.message });
+  }
+};

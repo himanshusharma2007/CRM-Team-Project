@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { login } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,6 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
   const { saveUser } = useAuth();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -19,10 +18,10 @@ const LoginPage = () => {
       const userData = await login(email, password);
       saveUser(userData);
       alert("Login Successful");
-      navigate("/dashboard");
+      userData.role === "emp" ? navigate("/todo") : navigate("/dashboard");
     } catch (error) {
       alert("Login Failed");
-      console.log('error', error)
+      console.log("error", error);
     } finally {
       setLoading(false);
     }

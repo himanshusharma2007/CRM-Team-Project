@@ -27,45 +27,66 @@ const userSchema = new mongoose.Schema(
         delete: {type: Boolean, default: false},
         updateStage: {type: Boolean, default: false},
         read: {type: Boolean, default: false},
-        requiredPermission: ["leadStage", "team"]
+        requiredPermission: {
+          type: Array,
+          default: ["leadStage", "team"]
+        }
       },
       leadStage:{
         create: {type: Boolean, default: false},
         update: {type: Boolean, default: false},
         delete: {type: Boolean, default: false},
         read: {type: Boolean, default: false},
-        requiredPermission: ["lead"]
+        requiredPermission: {
+          type: Array,
+          default: ["lead"]
+        }
       },
       project:{
         create: {type: Boolean, default: false},
         update: {type: Boolean, default: false},
         read: {type: Boolean, default: false},
-        requiredPermission: ["client", "team"]
+        requiredPermission: {
+          type: Array,
+          default: ["client", "team"]
+        }
       },
       team:{
         create: {type: Boolean, default: false} ,
         update: {type: Boolean, default: false},
         removeParticipant: {type: Boolean, default: false},
         read: {type: Boolean, default: false},
-        requiredPermission: ["user"]
+        requiredPermission: {
+          type: Array,
+          default: ["user"]
+        }
       },
       user:{
         read: {type: Boolean, default: false},
         verifyAndAssignRoleAndTeam: {type: Boolean, default: false},
-        requiredPermission: ["team"]
+        requiredPermission: {
+          type: Array,
+          default: ["team"]
+        }
       },
       client:{
         create: {type: Boolean, default: false},
         update: {type: Boolean, default: false},
         delete: {type: Boolean, default: false},
         read: {type: Boolean, default: false},
-        requiredPermission: ["lead", "project", "meeting"]
+        requiredPermission: {
+          type: Array,
+          default: ["lead", "project", "meeting"]
+        }
       },
       meeting:{
         create: {type: Boolean, default: false} ,
         update: {type: Boolean, default: false},
         read: {type: Boolean, default: false},
-        requiredPermission: ["client", "project"]
+        requiredPermission: {
+          type: Array,
+          default: ["client", "project"]
+        }
       },
       connection:{
         create: {type: Boolean, default: false} ,

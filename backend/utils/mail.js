@@ -1,16 +1,18 @@
 const nodemailer = require("nodemailer")
 
 const sendEmail = async (userEmail, sub, msg) => {
-    const transport = await nodemailer.createTransport({
+    const transport = nodemailer.createTransport({
         host: process.env.NODEMAILER_HOST,
         port: process.env.NODEMAILER_PORT,
         sender: true,
+        secure: false,
         auth: {
             user: process.env.EMAIL_ID,
             pass: process.env.APP_PASS
         }
     })
     try {
+        console.log(userEmail)
         const info = await transport.sendMail({
             from: '"CODEDEV"<codedevservices@gmail.com>',
             to: userEmail,
@@ -21,7 +23,7 @@ const sendEmail = async (userEmail, sub, msg) => {
         return true
     } catch (error) {
         console.log(error)
-        return false
+        throw Error("Error in sending mail")
     }
 }
 
