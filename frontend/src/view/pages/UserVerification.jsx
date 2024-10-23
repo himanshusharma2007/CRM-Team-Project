@@ -8,6 +8,7 @@ import {
 } from "../../services/authService";
 import { getAllTeams } from "../../services/TeamService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import { FaCheck, FaTimes, FaUserShield } from 'react-icons/fa'; // Added icons
 
 const permissionCategories = [
   "lead",
@@ -381,18 +382,18 @@ const UserVerificationList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="space-y-8">
         {/* User Verification Section */}
-        <div className="bg-white shadow-md rounded-lg w-full h-full p-8 overflow-y-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+        <div className="bg-white shadow-lg rounded-lg w-full h-full p-8 overflow-y-auto border border-gray-200">
+          <h2 className="text-4xl font-bold text-center text-gray-800 mb-6">
             User Verification
           </h2>
 
           {message && (
             <div
               className={`p-4 mb-4 text-white rounded-md ${
-                message.includes("Error") ? "bg-red-500" : "bg-green-500"
+                message.includes("Error") ? "bg-red-600" : "bg-green-600"
               }`}
             >
               {message}
@@ -408,21 +409,21 @@ const UserVerificationList = () => {
               <div className="flex gap-3 mb-4">
                 <button
                   onClick={() => handleSort("latest")}
-                  className={`py-2 px-4 rounded-lg ${
+                  className={`py-2 px-4 rounded-lg transition duration-200 ${
                     sortOrder === "latest"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-blue-600 text-white shadow-md"
                       : "bg-gray-300 text-gray-800"
-                  } transition duration-200`}
+                  }`}
                 >
                   Latest
                 </button>
                 <button
                   onClick={() => handleSort("oldest")}
-                  className={`py-2 px-4 rounded-lg ${
+                  className={`py-2 px-4 rounded-lg transition duration-200 ${
                     sortOrder === "oldest"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-blue-600 text-white shadow-md"
                       : "bg-gray-300 text-gray-800"
-                  } transition duration-200`}
+                  }`}
                 >
                   Oldest
                 </button>
@@ -432,14 +433,14 @@ const UserVerificationList = () => {
                 {users.map((user, index) => (
                   <li
                     key={user._id}
-                    className="flex justify-between items-center bg-gray-50 p-4 rounded-md shadow hover:shadow-lg transition duration-200"
+                    className="flex justify-between items-center bg-gray-100 p-4 rounded-md shadow hover:shadow-lg transition duration-200"
                   >
                     <div className="flex items-center space-x-4">
                       <span className="text-lg font-semibold text-gray-800">
                         {index + 1}.
                       </span>
                       <div>
-                        <p className="text-gray-800 font-semibold">
+                        <p className="text-lg font-semibold text-gray-800">
                           {user.name}
                         </p>
                         <p className="text-gray-600 text-sm">{user.email}</p>
@@ -447,9 +448,9 @@ const UserVerificationList = () => {
                     </div>
                     <button
                       onClick={() => openModal(user._id)}
-                      className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-500 transition duration-200"
+                      className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-500 transition duration-200 flex items-center"
                     >
-                      Verify
+                      <FaCheck className="mr-2" /> Verify
                     </button>
                   </li>
                 ))}
@@ -459,8 +460,8 @@ const UserVerificationList = () => {
         </div>
 
         {/* All Users Section */}
-        <div className="bg-slate-600 p-8 shadow-md rounded-lg h-96 overflow-y-auto">
-          <h2 className="text-3xl font-bold text-center text-white mb-6">
+        <div className="bg-slate-600 p-8 shadow-lg rounded-lg h-96 overflow-y-auto">
+          <h2 className="text-4xl font-bold text-center text-white mb-6">
             Verified Users
           </h2>
 
@@ -529,15 +530,15 @@ const UserVerificationList = () => {
                   <div className="flex space-x-2">
                     <button
                       onClick={() => openPermissionModal(verifiedUser._id)}
-                      className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-500 transition duration-200"
+                      className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-500 transition duration-200 flex items-center"
                     >
-                      Update Permissions
+                      <FaUserShield className="mr-2" /> Update Permissions
                     </button>
                     <button
                       onClick={() => handleBlockUser(verifiedUser._id)}
-                      className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-500 transition duration-200"
+                      className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-500 transition duration-200 flex items-center"
                     >
-                      Block
+                      <FaTimes className="mr-2" /> Block
                     </button>
                   </div>
                 </li>

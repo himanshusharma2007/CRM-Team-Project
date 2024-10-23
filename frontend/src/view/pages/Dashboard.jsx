@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "../../context/Context";
+import { useToast } from "../../context/ToastContext";
 const Dashboard = () => {
+    const { showToast } = useToast();
   const { user } = useAuth();
   console.log("User:", user);
   const role = user?.role;
   console.log(role);
+  useEffect(()=>{
+  showToast("Operation was successful!", "error");
+  },[])
   return (
     <>
       {role === "admin" && <AdminDashboard />}
