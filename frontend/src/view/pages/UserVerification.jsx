@@ -456,7 +456,7 @@ const UserVerificationList = () => {
                 </button>
                 <button
                   onClick={() => handleSort("oldest")}
-                  className={`py-2 px-4 rounded-lg transition duration-200 ${
+                  
                   className={`py-2 px-4 rounded-lg flex items-center gap-2 ${
                     sortOrder === "oldest"
                       ? "bg-blue-600 text-white shadow-md"
@@ -863,3 +863,4 @@ const UserVerificationList = () => {
 };
 
 export default UserVerificationList;
+
