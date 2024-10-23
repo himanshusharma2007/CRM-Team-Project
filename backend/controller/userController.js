@@ -10,7 +10,7 @@ exports.getUser = async (req, res) => {
     console.log(err);
     res.status(500).send({
       success: false,
-      message: "Internel server error",
+      message: "Internal server error",
     });
   }
 };
@@ -151,20 +151,86 @@ exports.uploadProfileImage = async (req, res) => {
 
 exports.updateUserPermission = async (req, res) => {
   try {
+    console.log("update permission called",req.body);
     const { permission } = req.body;
+    console.log("Received permission update request:", permission);
+    
     const userData = await user.findById(req.params.id);
     if (!userData) {
+      console.log(`User with ID: ${req.params.id} not found`);
       return res.status(404).json({ error: "User not found" });
     }
-    console.log("permission", permission);
+    
+    console.log(`Current permissions for user ID ${userData._id}:`, userData.permission);
     userData.permission = permission;
     await userData.save();
 
-    return res
-      .status(200)
-      .json({ message: "User permission updated successfully" });
+    console.log(`User permissions updated successfully for user ID: ${userData._id}`);
+    return res.status(200).json({ message: "User permission updated successfully" });
   } catch (error) {
     console.error("Error in updateUserPermission:", error);
     return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.blockUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log(`Attempting to block user with ID: ${userId}`);
+    
+    const userData = await user.findById(userId);
+    if (!userData) {
+      console.log(`User with ID: ${userId} not found`);
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    
+    userData.isBlocked = true;
+    await userData.save();
+    console.log(`User with ID: ${userId} has been blocked successfully`);
+    
+    return res.status(200).json({
+      success: true,
+      message: "User blocked successfully",
+    });
+  } catch (error) {
+    console.log("Error in blockUser:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+exports.unblockUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log(`Attempting to unblock user with ID: ${userId}`);
+    
+    const userData = await user.findById(userId);
+    if (!userData) {
+      console.log(`User with ID: ${userId} not found`);
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    
+    userData.isBlocked = false;
+    await userData.save();
+    console.log(`User with ID: ${userId} has been unblocked successfully`);
+    
+    return res.status(200).json({
+      success: true,
+      message: "User unblocked successfully",
+    });
+  } catch (error) {
+    console.log("Error in unblockUser:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };

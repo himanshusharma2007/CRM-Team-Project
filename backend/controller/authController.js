@@ -320,6 +320,12 @@ exports.login = async (req, res) => {
         message: "Invalid credentials",
       });
     }
+    if (userData.isBlocked) {
+      return res.status(403).send({
+        success: false,
+        message: "Your account has been blocked. Please contact the administrator.",
+      });
+    }
     console.log("userData",userData);
     const isMatch = await bcrypt.compare(password, userData.password);
     if (!isMatch) {
@@ -328,12 +334,6 @@ exports.login = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-    // if(!userData.isActive){
-    //   return res.status(203).send({
-    //     success: false,
-    //     message: "You are not active user"
-    //   })
-    // }
     generateToken(userData.id, res);
     userData.password = "*****";
     console.log("user in userController",userData)
@@ -344,7 +344,7 @@ exports.login = async (req, res) => {
     console.log(err);
     res.status(500).send({
       success: false,
-      message: "Internel server error",
+      message: "Internal server error",
     });
   }
 };
@@ -616,3 +616,5 @@ exports.resetPassword = async (req, res) => {
     });
   }
 }
+
+
