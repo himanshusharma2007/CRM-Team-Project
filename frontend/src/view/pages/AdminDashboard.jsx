@@ -304,7 +304,7 @@ const AdminDashboard = () => {
           title="Department Teams"
           total={`Total Teams: ${teamData.total || 0}`}
         >
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-scroll overflow-x-hidden">
             {teamData?.department?.map((dept, index) => (
               <div
                 key={index}
