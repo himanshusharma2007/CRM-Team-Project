@@ -3,6 +3,8 @@ import {
   getUnVerifiedUsers,
   verifyUser,
   getAllUsers,
+  blockUser,
+  updatePermissions,
 } from "../../services/authService";
 import { getAllTeams } from "../../services/TeamService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
@@ -80,6 +82,7 @@ const permissionSchema = {
 
 const UserVerificationList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectTeam, setSelectTeam] = useState({});
@@ -98,7 +101,7 @@ const UserVerificationList = () => {
     console.log("selectedTeam", JSON.stringify(selectTeam, null, 2));
   }, [selectTeam]);
 
-  const fetchUnverifiedUse  = async () => {
+  const fetchUnverifiedUsers = async () => {
     setLoading(true);
     try {
       const data = await getUnVerifiedUsers();
@@ -147,7 +150,7 @@ const UserVerificationList = () => {
   };
 
   const handleVerify = async () => {
-    if (!selectTeam || !selectedUserId ) {
+    if (!selectTeam || !selectedUserId) {
       setMessage("Please fill all fields before verifying");
       return;
     }
@@ -190,22 +193,69 @@ const UserVerificationList = () => {
     }
   };
 
-  const filteredUsers = allUsers.filter((user) => {
-    if (roleFilter) {
-      return user.role === roleFilter && user.verify;
+  const openPermissionModal = (userId) => {
+    const user = allUsers.find((u) => u._id === userId);
+    console.log("permision modal called", user.permission);
+    if (user) {
+      setPermissions(user.permission); // Load current permissions
+      setSelectedUserId(userId);
+      setIsPermissionModalOpen(true);
     }
-    return user.verify;
-  });
+  };
+
+  const closePermissionModal = () => {
+    setIsPermissionModalOpen(false);
+    setSelectedUserId(null);
+    setPermissions(permissionSchema);
+  };
+
+  const handleBlockUser = async (userId) => {
+    console.log("handleBlockUser called");
+    const confirmBlock = window.confirm("Do you want to block this user?");
+    if (confirmBlock) {
+      try {
+        await blockUser(userId);
+        setMessage("User blocked successfully");
+        // Remove the blocked user from the list
+        setUsers(users.filter((user) => user._id !== userId));
+        fetchAllUsers(); // Refresh the user list
+      } catch (error) {
+        console.error("Error blocking user:", error);
+        setMessage("Error blocking user");
+      }
+    }
+  };
+
+  const handleUpdatePermissions = async () => {
+    try {
+      console.log("handle update permision called");
+      await updatePermissions(selectedUserId, permissions);
+      setMessage("User permissions updated successfully");
+      closePermissionModal();
+      fetchAllUsers(); // Refresh the user list
+    } catch (error) {
+      console.error("Error updating permissions:", error);
+      setMessage("Error updating permissions");
+    }
+  };
+
+  // Filter to show only unblocked verified users
+  const filteredUsers = allUsers.filter(
+    (user) => !user.isBlocked && user.verify
+  );
 
   const handlePermissionChange = (category, permission) => {
     setPermissions((prevPermissions) => {
       const newPermissions = JSON.parse(JSON.stringify(prevPermissions));
-      newPermissions[category][permission] = !newPermissions[category][permission];
+      newPermissions[category][permission] =
+        !newPermissions[category][permission];
 
       // Handle required permissions
-      const requiredCategories = newPermissions[category].requiredPermission || [];
+      const requiredCategories =
+        newPermissions[category].requiredPermission || [];
       const hasActivePermissions = Object.keys(newPermissions[category]).some(
-        (perm) => perm !== "requiredPermission" && newPermissions[category][perm]
+        (perm) =>
+          perm !== "requiredPermission" && newPermissions[category][perm]
       );
 
       requiredCategories.forEach((requiredCategory) => {
@@ -220,7 +270,8 @@ const UserVerificationList = () => {
     setPermissions((prevPermissions) => {
       const newPermissions = JSON.parse(JSON.stringify(prevPermissions));
       const allChecked = Object.keys(newPermissions[category]).every(
-        (perm) => perm === "requiredPermission" || newPermissions[category][perm]
+        (perm) =>
+          perm === "requiredPermission" || newPermissions[category][perm]
       );
 
       Object.keys(newPermissions[category]).forEach((perm) => {
@@ -230,7 +281,8 @@ const UserVerificationList = () => {
       });
 
       // Handle required permissions
-      const requiredCategories = newPermissions[category].requiredPermission || [];
+      const requiredCategories =
+        newPermissions[category].requiredPermission || [];
       requiredCategories.forEach((requiredCategory) => {
         newPermissions[requiredCategory].read = !allChecked;
       });
@@ -266,11 +318,18 @@ const UserVerificationList = () => {
       <div key={category} className="mb-4 border rounded-lg p-4 shadow-sm">
         <div className="flex justify-between items-center mb-2">
           <button
-            onClick={() => setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] }))}
+            onClick={() =>
+              setExpandedCategories((prev) => ({
+                ...prev,
+                [category]: !prev[category],
+              }))
+            }
             className="text-left font-semibold text-lg capitalize flex items-center focus:outline-none"
           >
             {category} Permissions
-            <span className="ml-2">{expandedCategories[category] ? "▲" : "▼"}</span>
+            <span className="ml-2">
+              {expandedCategories[category] ? "▲" : "▼"}
+            </span>
           </button>
           <label className="inline-flex items-center">
             <input
@@ -296,13 +355,17 @@ const UserVerificationList = () => {
                       type="checkbox"
                       id={`${category}-${permission}`}
                       checked={permissions[category][permission]}
-                      onChange={() => handlePermissionChange(category, permission)}
+                      onChange={() =>
+                        handlePermissionChange(category, permission)
+                      }
                       disabled={isDisabled}
                       className="form-checkbox h-5 w-5 text-blue-600"
                     />
                     <label
                       htmlFor={`${category}-${permission}`}
-                      className={`ml-2 capitalize ${isDisabled ? "text-gray-400" : ""}`}
+                      className={`ml-2 capitalize ${
+                        isDisabled ? "text-gray-400" : ""
+                      }`}
                     >
                       {permission}
                     </label>
@@ -463,6 +526,20 @@ const UserVerificationList = () => {
                   >
                     {verifiedUser.role}
                   </span>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => openPermissionModal(verifiedUser._id)}
+                      className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-500 transition duration-200"
+                    >
+                      Update Permissions
+                    </button>
+                    <button
+                      onClick={() => handleBlockUser(verifiedUser._id)}
+                      className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-500 transition duration-200"
+                    >
+                      Block
+                    </button>
+                  </div>
                 </li>
               ))}
           </ul>
@@ -528,6 +605,36 @@ const UserVerificationList = () => {
               </button>
               <button
                 onClick={closeModal}
+                className="w-full mt-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500 transition duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Modal for Updating Permissions */}
+        {isPermissionModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full m-4">
+              <h2 className="text-2xl font-bold mb-4 text-center">
+                Update User Permissions
+              </h2>
+
+              <div className="mb-4">
+                <h3 className="font-semibold text-xl mb-2">Set Permissions</h3>
+                <div className="max-h-[30vh] overflow-y-auto border border-gray-300 rounded-md p-4">
+                  {renderPermissionDropdowns()}
+                </div>
+              </div>
+              <button
+                onClick={handleUpdatePermissions}
+                className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-500 transition duration-200"
+              >
+                Update Permissions
+              </button>
+              <button
+                onClick={closePermissionModal}
                 className="w-full mt-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500 transition duration-200"
               >
                 Cancel

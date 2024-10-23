@@ -147,3 +147,46 @@ export const getUnVerifiedUsers = async () => {
     throw error;
   }
 };
+
+export const updatePermissions = async (userId, permissions) => {
+  try {
+    console.log("user id",userId)
+    console.log("permissions",permissions)
+    const response = await api.put(`/profile/updateUserPermission/${userId}`, { permission: permissions });
+    console.log("response", response);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating user permissions:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const blockUser = async (userId) => {
+  try {
+    const response = await api.put(`/profile/block/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error blocking user:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const unblockUser = async (userId) => {
+  try {
+    const response = await api.put(`/profile/unblock/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error unblocking user:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
