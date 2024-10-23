@@ -6,6 +6,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const role = user?.role;
 
+  
   return (
     <>
       {role === "admin" && <AdminDashboard />}

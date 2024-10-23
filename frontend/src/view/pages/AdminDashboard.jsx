@@ -15,6 +15,7 @@ import {
   Line,
 } from "recharts";
 import { dashboardService } from "../../services/dashboardService";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -46,7 +47,12 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-center py-10">
+        <LoadingSpinner />
+      </div>
+    );
   if (error)
     return <div className="text-center py-10 text-red-500">{error}</div>;
 
