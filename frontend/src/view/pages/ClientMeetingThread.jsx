@@ -12,6 +12,7 @@ import { getClientById } from "../../services/clientServices";
 import { getAllMeetingsByProjectId } from "../../services/meetingService";
 import { useNavigate } from "react-router-dom";
 import MeetingDetailModal from "../modal/MeetingDetailModal";
+import LoadingSpinner from '../components/UI/LoadingSpinner'
 
 const Shape = ({ type, content, className, onClick }) => {
   const shapeClasses = {
@@ -104,7 +105,7 @@ const ClientMeetingThread = () => {
     });
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><LoadingSpinner /></div>;
   if (error) return <div>Error: {error}</div>;
   if (!clientData) return <div>No data available</div>;
 
