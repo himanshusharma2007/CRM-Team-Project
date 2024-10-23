@@ -181,7 +181,6 @@ const AdminDashboard = () => {
         <DashboardCard
           title="User Queries"
           total={`Total Queries: ${queryData.total || 0}`}
-          additionalInfo={`Today's Queries: ${queryData.todayQueries || 0}`}
         >
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
