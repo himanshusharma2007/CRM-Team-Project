@@ -10,9 +10,11 @@ export const login = async (email, password) => {
   }
 };
 
-export const registerUser = async (password, otp) => {
+export const registerUser = async (otp, password) => {
   try {
-    const response = await api.post('/signup', { password, otp });
+    // console.log("OTP : ", otp);
+    // console.log("Password : ", password);
+    const response = await api.post('/auth/signup', { otp, password });
     return response.data;
   } catch (error) {
     // Handle and throw error appropriately
@@ -22,9 +24,11 @@ export const registerUser = async (password, otp) => {
 }
 
 // Service to send OTP for registration
-export const sendOtpForRegister = async (email, name) => {
+export const sendOtpForRegister = async (name, email) => {
   try {
-    const response = await api.post('/auth/signup/emailVerify', { email, name });
+    // console.log("Name : ", name);
+    // console.log("Email : ", email);
+    const response = await api.post('/auth/signup/emailVerify', { name, email });
     return response.data;
   } catch (error) {
     throw error.response.data; // Handle error appropriately
