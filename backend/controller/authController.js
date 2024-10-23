@@ -217,7 +217,13 @@ exports.sendOtpForRegister = async (req, res) => {
       });
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    await sendMail(email, "OTP for password reset", msgForRegister(otp, name));
+    const sendOtpForEmailVerify = await sendMail(email, "OTP for password reset", msgForRegister(otp, name));
+    if(!sendOtpForEmailVerify){
+      return res.status(500).json({
+        success: false,
+        error: "email not send"
+      })
+    }
     const expirationTime = 10 * 60 * 1000; 
     res.cookie("otp", otp, { 
       maxAge: expirationTime,

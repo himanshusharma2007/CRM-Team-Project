@@ -21,10 +21,10 @@ exports.createClient = async (req, res) => {
         }
         console.log({ name, company, phone, email, location, timeZone})
         const newClient = await client.create({name, company, phone, email, location, timeZone});
-        res.status(201).json(newClient);
+        return res.status(201).json(newClient);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
@@ -35,21 +35,26 @@ exports.createClientByLead = async (req, res) => {
         if(!leadData){
             return res.status(404).json({ error: "Lead not found" });
         }
+        if(await client.find({email: leadData.email})){
+            return res.status(400).json({
+                error: "client already exists"
+            })
+        }
         const newClient = await client.create({name: leadData.contactName, company: leadData.companyName, phone: leadData.phone, email: leadData.email, location: leadData.location});
-        res.status(201).json(newClient);
+        return res.status(201).json(newClient);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
 exports.getAllClients = async (req, res) => {
     try {
         const clients = await client.find().populate("projectId");
-        res.status(200).json(clients);
+        return res.status(200).json(clients);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
@@ -60,10 +65,10 @@ exports.getClientById = async (req, res) => {
         if (!clientData) {
             return res.status(404).json({ error: "Client not found" });
         }
-        res.status(200).json(clientData);
+        return res.status(200).json(clientData);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
@@ -95,10 +100,10 @@ exports.updateClient = async (req, res) => {
         clientData.email = email || clientData.email;
         clientData.location = location || clientData.location;
         await clientData.save();
-        res.status(200).json(clientData);
+        return res.status(200).json(clientData);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
@@ -114,10 +119,10 @@ exports.deleteClient = async (req, res) => {
             return res.status(400).json({ error: "Client has a project" });
         }
         await clientData.deleteOne(); // Use deleteOne instead of delete
-        res.status(200).json({ message: "Client deleted successfully" });
+        return res.status(200).json({ message: "Client deleted successfully" });
     } catch (error) {
         console.error("Error deleting client:", error); // More detailed logging
-        res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 

@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "./api"
 
 export const login = async (email, password) => {
   try {
@@ -19,12 +19,12 @@ export const registerUser = async (password, otp) => {
     console.error("Error in registering user:", error.response?.data || error.message);
     throw error.response?.data || { success: false, message: "Registration failed." };
   }
-};
+}
 
 // Service to send OTP for registration
-export const sendOtpForRegister = async (name, email) => {
+export const sendOtpForRegister = async (email, name) => {
   try {
-    const response = await api.post('/auth/signup/emailVerify', { name, email });
+    const response = await api.post('/auth/signup/emailVerify', { email, name });
     return response.data;
   } catch (error) {
     throw error.response.data; // Handle error appropriately
