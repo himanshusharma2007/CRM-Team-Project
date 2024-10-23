@@ -92,7 +92,7 @@ exports.getAllProjects = async (req, res) => {
   try {
     const projects = await project
       .find()
-      .populate("clientId teamIds lastMeetingId");
+      .populate("clientId teamIds lastMeetingId").sort({ createdAt: -1 });
     res.status(200).json(projects);
   } catch (error) {
     console.log(error);
