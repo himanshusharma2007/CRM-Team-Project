@@ -211,7 +211,7 @@ exports.sendOtpForRegister = async (req, res) => {
   try {
     const userData = await user.findOne({ email });
     if(userData){
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
         message: "User already exists",
       });
