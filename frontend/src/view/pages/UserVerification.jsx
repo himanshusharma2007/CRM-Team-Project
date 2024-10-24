@@ -242,6 +242,7 @@ const UserVerificationList = () => {
         // Remove the blocked user from the list
         setUsers(users.filter((user) => user._id !== userId));
         fetchBlockedUser(); // Refresh the user list
+        fetchAllUsers();
       } catch (error) {
         console.error("Error blocking user:", error);
         showToast("Error blocking user", "error");
@@ -255,6 +256,7 @@ const UserVerificationList = () => {
         await unblockUser(userId);
         showToast("User unblocked successfully", "success");
         fetchBlockedUser();
+        fetchAllUsers(); 
       } catch (error) {
         console.error("Error unblocking user:", error);
         showToast("Error unblocking user", "error");
