@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -15,6 +15,7 @@ import {
   Line,
 } from "recharts";
 import { dashboardService } from "../../services/dashboardService";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -46,7 +47,12 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-center py-10 relative top-[50%]">
+        <LoadingSpinner />
+      </div>
+    );
   if (error)
     return <div className="text-center py-10 text-red-500">{error}</div>;
 
@@ -147,7 +153,7 @@ const AdminDashboard = () => {
   });
 
   // Colors for the pie chart
-  const colors = ["#4CAF50", "#FFA500"]; // Green for Indian, Orange for Foreigner
+  const colors = ["#3498DB", "#E74C3C"]; // Green for Indian, Orange for Foreigner
 
   const userChartData = [
     { name: "Active", value: userData.active || 0 },
@@ -155,7 +161,7 @@ const AdminDashboard = () => {
     { name: "Unverify", value: userData.unVerify || 0 },
   ];
 
-  const COLORS = ["#FFA500", "#4CAF50", "#8884d8"];
+  const COLORS = ["#024CAA", "#EC8305"];
 
   return (
     <div className="p-6 max-w-7xl mx-auto bg-gray-50">
@@ -172,7 +178,7 @@ const AdminDashboard = () => {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="value" fill="#FFA500" />
+              <Bar dataKey="value" fill="#FF6500" />
             </BarChart>
           </ResponsiveContainer>
         </DashboardCard>
@@ -206,13 +212,12 @@ const AdminDashboard = () => {
           </ResponsiveContainer>
         </DashboardCard>
 
-        {/* Clients Section */}
+        {/*Leads Section */}
         <div className="bg-white p-6 rounded-lg shadow-lg col-span-2">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Clients</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Line Chart for Monthly Clients Data */}
-            <ResponsiveContainer width="100%" height={200} className="mt-2">
-              <LineChart data={monthClientChartData}>
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Leads</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={monthLeadChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis
@@ -222,7 +227,26 @@ const AdminDashboard = () => {
                 <Line type="monotone" dataKey="value" stroke="#8884d8" />
               </LineChart>
             </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={stageLeadChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis
+                  tickFormatter={(tick) => (Number.isInteger(tick) ? tick : "")}
+                />
+                <Tooltip />
+                <Bar dataKey="value" fill="#7E60BF" />{" "}
+                {/* Darker shade of blue */}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-gray-600">Total Leads: {leadData.total || 0}</p>
+        </div>
 
+        {/* Clients Section */}
+        <div className="bg-white p-6 rounded-lg shadow-lg col-span-2">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Clients</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Pie Chart for Client Data */}
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
@@ -249,6 +273,19 @@ const AdminDashboard = () => {
                 Total Clients: {clientData.total || 0}
               </p>
             </ResponsiveContainer>
+
+            {/* Line Chart for Monthly Clients Data */}
+            <ResponsiveContainer width="100%" height={200} className="mt-2">
+              <LineChart data={monthClientChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis
+                  tickFormatter={(tick) => (Number.isInteger(tick) ? tick : "")}
+                />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Client Totals */}
@@ -262,42 +299,12 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/*Leads Section */}
-        <div className="bg-white p-6 rounded-lg shadow-lg col-span-2">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Leads</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={monthLeadChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis
-                  tickFormatter={(tick) => (Number.isInteger(tick) ? tick : "")}
-                />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={stageLeadChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis
-                  tickFormatter={(tick) => (Number.isInteger(tick) ? tick : "")}
-                />
-                <Tooltip />
-                <Bar dataKey="value" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="text-gray-600">Total Leads: {leadData.total || 0}</p>
-        </div>
-
         {/* Teams Section */}
         <DashboardCard
           title="Department Teams"
           total={`Total Teams: ${teamData.total || 0}`}
         >
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-scroll overflow-x-hidden">
             {teamData?.department?.map((dept, index) => (
               <div
                 key={index}

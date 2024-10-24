@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "./api"
 
 export const login = async (email, password) => {
   try {
@@ -10,22 +10,31 @@ export const login = async (email, password) => {
   }
 };
 
-export const register = async (name, email, password) => {
+export const registerUser = async (otp, password) => {
   try {
-    const response = await api.post("/auth/signup", {
-      name,
-      email,
-      password,
-    });
+    // console.log("OTP : ", otp);
+    // console.log("Password : ", password);
+    const response = await api.post('/auth/signup', { otp, password });
     return response.data;
   } catch (error) {
-    console.error(
-      "Error during registration:",
-      error.response?.data || error.message
-    );
-    throw error;
+    // Handle and throw error appropriately
+    console.error("Error in registering user:", error.response?.data || error.message);
+    throw error.response?.data || { success: false, message: "Registration failed." };
+  }
+}
+
+// Service to send OTP for registration
+export const sendOtpForRegister = async (name, email) => {
+  try {
+    // console.log("Name : ", name);
+    // console.log("Email : ", email);
+    const response = await api.post('/auth/signup/emailVerify', { name, email });
+    return response.data;
+  } catch (error) {
+    throw error.response.data; // Handle error appropriately
   }
 };
+
 
 export const logout = async () => {
   try {
@@ -138,3 +147,47 @@ export const getUnVerifiedUsers = async () => {
     throw error;
   }
 };
+
+export const updatePermissions = async (userId, permissions) => {
+  try {
+    console.log("user id",userId)
+    console.log("permissions",permissions)
+    const response = await api.put(`/profile/updateUserPermission/${userId}`, { permission: permissions });
+    console.log("response", response);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating user permissions:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const blockUser = async (userId) => {
+  try {
+    const response = await api.put(`/profile/block/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error blocking user:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const unblockUser = async (userId) => {
+  try {
+    console.log('userId in unBlockuser', userId)
+    const response = await api.put(`/profile/unblock/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error unblocking user:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
