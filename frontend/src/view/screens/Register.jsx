@@ -5,6 +5,7 @@ import { useToast } from "../../context/ToastContext";
 
 const Register = () => {
   const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,6 +67,7 @@ const Register = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              disabled={isOtpSent ? true : false}
             />
           </div>
 
@@ -83,6 +85,7 @@ const Register = () => {
               type="email"
               placeholder="you@example.com"
               value={email}
+              disabled={isOtpSent ? true : false}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
