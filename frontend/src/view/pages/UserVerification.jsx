@@ -5,15 +5,18 @@ import {
   getAllUsers,
   blockUser,
   updatePermissions,
-  unblockUser
+  unblockUser,
 } from "../../services/authService";
 import { getAllTeams } from "../../services/TeamService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import { FaCheck, FaTimes, FaUserShield } from "react-icons/fa"; // Added icons
 import { FaUserCheck, FaUserLock } from "react-icons/fa";
 import { BiSortAlt2 } from "react-icons/bi";
 import { BsFilter } from "react-icons/bs";
-import { MdVerified,MdBlock, MdClose, MdSecurity } from "react-icons/md";
+import { MdVerified, MdBlock, MdClose, MdSecurity } from "react-icons/md";
 import { FaCrown, FaUser } from "react-icons/fa";
+import { useToast } from "../../context/ToastContext";
+
 const permissionCategories = [
   "lead",
   "leadStage",
@@ -103,19 +106,20 @@ const UserVerificationList = () => {
   const [roleFilter, setRoleFilter] = useState("");
   const [blockedUsers, setBlockedUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("verified");
-  
-  useEffect(()=> {
 
-    fetchBlockedUser()
-  }, [])
+  const {showToast} = useToast()
+
+  useEffect(() => {
+    fetchBlockedUser();
+  }, []);
   const fetchBlockedUser = async () => {
-    const allUsers = await getAllUsers()
-    const block = allUsers.filter(user => user.isBlocked);
-    setBlockedUsers(block)
-  }
-  useEffect(()=>{
-    console.log("BLocked users", blockedUsers)
-  }, [blockedUsers])
+    const allUsers = await getAllUsers();
+    const block = allUsers.filter((user) => user.isBlocked);
+    setBlockedUsers(block);
+  };
+  useEffect(() => {
+    console.log("BLocked users", blockedUsers);
+  }, [blockedUsers]);
   useEffect(() => {
     console.log("selectedTeam", JSON.stringify(selectTeam, null, 2));
   }, [selectTeam]);
@@ -129,7 +133,7 @@ const UserVerificationList = () => {
       setUsers(data);
     } catch (error) {
       console.error("Error fetching unverified users:", error);
-      setMessage("Error fetching users");
+      showToast("Error fetching users", "error");
     } finally {
       setLoading(false);
     }
@@ -142,7 +146,7 @@ const UserVerificationList = () => {
       setAllUsers(allUserData);
     } catch (error) {
       console.error("Error fetching all users:", error);
-      setMessage("Error fetching all users");
+      showToast("Error fetching all users", "error");
     } finally {
       setLoading(false);
     }
@@ -170,20 +174,20 @@ const UserVerificationList = () => {
 
   const handleVerify = async () => {
     if (!selectTeam || !selectedUserId) {
-      setMessage("Please fill all fields before verifying");
+      showToast("Please fill all fields before verifying", "error");
       return;
     }
 
     try {
       await verifyUser(selectedUserId, selectTeam._id, role, permissions);
       setUsers(users.filter((u) => u._id !== selectedUserId));
-      setMessage("User verified successfully");
+      showToast("User verified successfully", "success");
       fetchUnverifiedUsers();
       fetchAllUsers();
       closeModal();
     } catch (error) {
       console.error("Error verifying user:", error);
-      setMessage("Error verifying user");
+      showToast("Error verifying user", "error");
     }
   };
 
@@ -234,13 +238,13 @@ const UserVerificationList = () => {
     if (confirmBlock) {
       try {
         await blockUser(userId);
-        setMessage("User blocked successfully");
+        showToast("User blocked successfully", "success");
         // Remove the blocked user from the list
         setUsers(users.filter((user) => user._id !== userId));
-           fetchBlockedUser();
+        fetchBlockedUser(); // Refresh the user list
       } catch (error) {
         console.error("Error blocking user:", error);
-        setMessage("Error blocking user");
+        showToast("Error blocking user","error");
       }
     }
   };
@@ -249,11 +253,11 @@ const UserVerificationList = () => {
     if (confirmUnblock) {
       try {
         await unblockUser(userId);
-        setMessage("User unblocked successfully");
+        showToast("User unblocked successfully", "success");
         fetchBlockedUser();
       } catch (error) {
         console.error("Error unblocking user:", error);
-        setMessage("Error unblocking user");
+        showToast("Error unblocking user", "error");
       }
     }
   };
@@ -262,12 +266,12 @@ const UserVerificationList = () => {
     try {
       console.log("handle update permision called");
       await updatePermissions(selectedUserId, permissions);
-      setMessage("User permissions updated successfully");
+      showToast("User permissions updated successfully", "success");
       closePermissionModal();
       fetchAllUsers(); // Refresh the user list
     } catch (error) {
       console.error("Error updating permissions:", error);
-      setMessage("Error updating permissions");
+      showToast("Error updating permissions", "error");
     }
   };
 

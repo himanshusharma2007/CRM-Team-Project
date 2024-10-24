@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -14,8 +14,8 @@ import {
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { getClientById } from "../../services/clientServices";
 import { getProjectByClientId } from "../../services/projectService";
-import { getAllMeetingsByProjectId } from "../../services/meetingService";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useToast } from "../../context/ToastContext";
 
 const ClientProjects = () => {
   const { clientId } = useParams();
@@ -27,6 +27,8 @@ const ClientProjects = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("dateDesc");
+
+  const {showToast} = useToast()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,7 +47,7 @@ const ClientProjects = () => {
         setProjects(projectsData);
         setMeetings(projectsData);
       } catch (err) {
-        setError("Error fetching data. Please try again.");
+        showToast("Error fetching data. Please try again.", "error");
         console.error(err);
       } finally {
         setLoading(false);

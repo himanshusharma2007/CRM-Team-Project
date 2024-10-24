@@ -388,7 +388,7 @@ exports.login = async (req, res) => {
 //  "/logout"
 exports.logout = async (req, res) => {
   try {
-    res.cookie("token", "", { expiresIn: "0s" });
+    res.cookie("token", "", { maxAge: 0 });
     return res.status(200).send({
       success: true,
       message: "log out successfully",

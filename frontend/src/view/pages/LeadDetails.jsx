@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { leadService } from "../../services/leadServices";
 import { useAuth } from "../../context/Context";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import { useToast } from "../../context/ToastContext";
 
 const LeadDetails = () => {
   const { updateLead, deleteLead, getLeadById } = leadService;
@@ -13,6 +14,8 @@ const LeadDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const {showToast} = useToast()
 
   const canReadLead = user?.role === "admin" || user?.permission?.lead?.read;
   const canUpdateLead = user?.role === "admin" || user?.permission?.lead?.update;
@@ -25,7 +28,7 @@ const LeadDetails = () => {
       fetchLeadDetails();
     } else {
       setLoading(false);
-      setError("You don't have permission to view lead details.");
+      showToast("You don't have permission to view lead details.", "error");
     }
   }, [isAuthenticated, canReadLead, id, navigate]);
 
@@ -36,7 +39,7 @@ const LeadDetails = () => {
       setLead(data);
     } catch (err) {
       console.error("Error fetching lead details:", err);
-      setError("Failed to fetch lead details. Please try again.");
+      showToast("Failed to fetch lead details. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -59,7 +62,7 @@ const LeadDetails = () => {
       await fetchLeadDetails();
     } catch (err) {
       console.error("Error updating lead:", err);
-      setError("Failed to update lead. Please try again.");
+      showToast("Failed to update lead. Please try again.", "error");
     }
   };
 
@@ -75,7 +78,7 @@ const LeadDetails = () => {
         navigate("/lead");
       } catch (err) {
         console.error("Error deleting lead:", err);
-        setError("Failed to delete lead. Please try again.");
+        showToast("Failed to delete lead. Please try again.", "error");
       }
     }
   };

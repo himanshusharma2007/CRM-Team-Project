@@ -13,6 +13,7 @@ import { getAllMeetingsByProjectId } from "../../services/meetingService";
 import { useNavigate } from "react-router-dom";
 import MeetingDetailModal from "../modal/MeetingDetailModal";
 import LoadingSpinner from '../components/UI/LoadingSpinner'
+import { useToast } from "../../context/ToastContext";
 
 const Shape = ({ type, content, className, onClick }) => {
   const shapeClasses = {
@@ -61,6 +62,8 @@ const ClientMeetingThread = () => {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const { id } = useParams();
 
+  const {showToast} = useToast()
+
   useEffect(() => {
     fetchData();
   }, [id]);
@@ -78,7 +81,7 @@ const ClientMeetingThread = () => {
       }
       setMeetings(meetingsData);
     } catch (err) {
-      setError("Failed to fetch client data");
+      showToast("Failed to fetch client data", "error");
       console.error("Error fetching client data:", err);
     } finally {
       setLoading(false);
