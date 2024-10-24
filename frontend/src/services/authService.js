@@ -92,9 +92,24 @@ export const getAllUsers = async () => {
   }
 }
 
+//forgot password services
+export const resetPassword = async (newPassword) => {
+  try {
+    const response = await api.post("/auth/forgotPassword/resetPassword", {
+      newPassword,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in resetPassword:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
 export const forgotPassword = async (email) => {
   try {
-    const response = await api.post("/auth/forgot-password", { email });
+    const response = await api.post("/auth/forgotPassword/sendOtp", { email });
     return response.data;
   } catch (error) {
     console.error(
@@ -105,12 +120,10 @@ export const forgotPassword = async (email) => {
   }
 };
 
-export const verifyOTP = async (email, otp, password) => {
+export const verifyOtp = async (otp) => {
   try {
-    const response = await api.post("/auth/verify-otp", {
-      email,
+    const response = await api.post("/auth/forgotPassword/verifyOtp", {
       otp,
-      password,
     });
     return response.data;
   } catch (error) {
