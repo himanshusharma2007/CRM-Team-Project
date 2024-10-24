@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { login } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context";
+import { useToast } from "../../context/ToastContext"; // Corrected import
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -11,16 +12,18 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
   const { saveUser } = useAuth();
+  const {showToast} = useToast();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const userData = await login(email, password);
       saveUser(userData);
-      alert("Login Successful");
+      showToast("Login Successful", "success");
       userData.role === "emp" ? navigate("/todo") : navigate("/dashboard");
     } catch (error) {
-      alert("Login Failed");
+      showToast("Login Failed", "error");
       console.log("error", error);
     } finally {
       setLoading(false);

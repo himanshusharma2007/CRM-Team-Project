@@ -26,6 +26,7 @@ import {
 } from "../../services/clientServices";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context";
+import { useToast } from "../../context/ToastContext";
 
 const MeetingManagement = () => {
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -46,6 +47,7 @@ const MeetingManagement = () => {
   const [showSearchFields, setShowSearchFields] = useState({});
   const navigate = useNavigate();
   const { user } = useAuth();
+  const {showToast} = useToast()
 
   const canCreateMeeting = user?.role === "admin" || user?.permission?.meeting?.create;
   const canUpdateMeeting = user?.role === "admin" || user?.permission?.meeting?.update;
@@ -72,7 +74,7 @@ const MeetingManagement = () => {
       setProjects(projectsData);
       setClients(clientsData);
     } catch (error) {
-      setError("Error fetching data. Please try again.");
+      showToast("Error fetching data. Please try again.", "error");
       console.log("error in fetchData", error);
     } finally {
       setLoading(false);
@@ -83,7 +85,7 @@ const MeetingManagement = () => {
     if (canCreateClient) {
       setIsClientModalOpen(!isClientModalOpen);
     } else {
-      alert("You don't have permission to add clients.");
+      showToast("You don't have permission to add clients.", "error");
     }
   };
 
@@ -91,7 +93,7 @@ const MeetingManagement = () => {
     if (canCreateMeeting) {
       setIsMeetingModalOpen(!isMeetingModalOpen);
     } else {
-      alert("You don't have permission to create meetings.");
+      showToast("You don't have permission to create meetings.", "error");
     }
   };
 
@@ -100,7 +102,7 @@ const MeetingManagement = () => {
       setAddProjectToClient(clientId);
       setIsProjectModalOpen(!isProjectModalOpen);
     } else {
-      alert("You don't have permission to add projects.");
+      showToast("You don't have permission to add projects.", "error");
     }
   };
 
@@ -128,7 +130,7 @@ const MeetingManagement = () => {
 
         toggleProjectModal(); // Close the modal after adding the project
       } catch (error) {
-        setError("Error creating project. Please try again.");
+        showToast("Error creating project. Please try again.", "error");
       }
     }
   };
@@ -141,7 +143,7 @@ const MeetingManagement = () => {
           prevProjects.map((p) => (p.id === id ? updatedProject : p))
         );
       } catch (error) {
-        setError("Error updating project. Please try again.");
+        showToast("Error updating project. Please try again.", "error");
         console.log("error in handleUpdateProject", error);
       }
     }
@@ -156,7 +158,7 @@ const MeetingManagement = () => {
         alert("Meeting created successfully");
         toggleMeetingModal(); // Close the modal after adding the meeting
       } catch (error) {
-        setError("Error creating meeting. Please try again.");
+        showToast("Error creating meeting. Please try again.", "error");
         console.error("Error creating meeting:", error);
       }
     }
@@ -170,7 +172,7 @@ const MeetingManagement = () => {
           prevMeetings.map((m) => (m.id === id ? updatedMeeting : m))
         );
       } catch (error) {
-        setError("Error updating meeting. Please try again.");
+        showToast("Error updating meeting. Please try again.", "error");
       }
     }
   };
@@ -185,11 +187,11 @@ const MeetingManagement = () => {
           );
           alert("Client deleted successfully.");
         } catch (error) {
-          setError("Error deleting client. Please try again.");
+          showToast("Error deleting client. Please try again.", "error");
         }
       }
     } else {
-      alert("You don't have permission to delete clients.");
+      showToast("You don't have permission to delete clients.", "error");
     }
   };
 
@@ -198,7 +200,7 @@ const MeetingManagement = () => {
       try {
         setClients((prevClients) => [...prevClients, newClient]);
       } catch (error) {
-        setError("Error creating client. Please try again.");
+        showToast("Error creating client. Please try again.", "error");
         console.log("error in handleAddClient", error);
       }
     }
@@ -209,7 +211,7 @@ const MeetingManagement = () => {
       setEditingClientId(clientId);
       setEditedClientName(clientName);
     } else {
-      alert("You don't have permission to edit clients.");
+      showToast("You don't have permission to edit clients.", "error");
     }
   };
 
@@ -229,7 +231,7 @@ const MeetingManagement = () => {
         setEditingClientId(null);
         setEditedClientName("");
       } catch (error) {
-        setError("Error updating client name. Please try again.");
+        showToast("Error updating client name. Please try again.", "error");
         console.log("error in handleSaveClientName", error);
       }
     }

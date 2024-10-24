@@ -223,7 +223,15 @@ exports.getAdminDashboardData = async (req, res) => {
     const queryData = await queryStatics();
     const connectionData = await connectionStatics();
     const teamData = await teamStatics();
-
+    console.log({
+        leadData,
+        projectData,
+        userData,
+        clientData,
+        queryData,
+        connectionData,
+        teamData,
+      })
     return res.status(200).send({
       leadData,
       projectData,
