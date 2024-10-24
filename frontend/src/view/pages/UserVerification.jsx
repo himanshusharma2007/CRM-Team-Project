@@ -238,7 +238,7 @@ const UserVerificationList = () => {
         setMessage("User blocked successfully");
         // Remove the blocked user from the list
         setUsers(users.filter((user) => user._id !== userId));
-        fetchAllUsers(); // Refresh the user list
+           fetchBlockedUser();
       } catch (error) {
         console.error("Error blocking user:", error);
         setMessage("Error blocking user");
