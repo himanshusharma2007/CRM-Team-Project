@@ -217,7 +217,7 @@ exports.sendOtpForRegister = async (req, res) => {
       });
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const sendOtpForEmailVerify = await sendMail(email, "OTP for password reset", msgForRegister(otp, name));
+    const sendOtpForEmailVerify = await sendMail(email, "OTP for Verify Email", msgForRegister(otp, name));
     if(!sendOtpForEmailVerify){
       return res.status(500).json({
         success: false,
@@ -284,7 +284,7 @@ exports.registerUser = async (req, res) => {
         message: "Invalid OTP or expired",
       });
     }
-
+    
     const userExists = await user.findOne({ email });
     if (userExists) {
       return res.status(400).send({
@@ -292,7 +292,7 @@ exports.registerUser = async (req, res) => {
         message: "User already exists",
       });
     }
-
+    
     const hashedPassword = await hashPassword(password);
     if (!hashedPassword) {
       return res.status(400).send({
@@ -300,20 +300,20 @@ exports.registerUser = async (req, res) => {
         message: "Error in hashing password",
       });
     }
-
+    
     const userData = await user.create({
       name,
       email,
       password: hashedPassword,
     });
-
+    
     if (!userData) {
       return res.status(401).send({
         success: false,
         message: "Error in User Creation",
       });
     }
-
+    
     const statuses = ["Todo", "Doing", "Done"];
     for (const status of statuses) {
       await Status.create({
@@ -321,10 +321,13 @@ exports.registerUser = async (req, res) => {
         userId: userData._id,
       });
     }
-
+    
+    
     // Clear cookies after successful registration
-    ['email', 'name', 'otp'].forEach(cookie => res.clearCookie(cookie));
-
+    res.cookie("email", "", { maxAge: 0,httpOnly: true,secure: true,sameSite: "strict"});
+    res.cookie("name", "", { maxAge: 0,httpOnly: true,secure: true,sameSite: "strict"});
+    res.cookie("otp", "", { maxAge: 0,httpOnly: true,secure: true,sameSite: "strict"});
+    
     return res.status(201).send({
       success: true,
       message: "User registered successfully",
