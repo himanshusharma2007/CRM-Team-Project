@@ -7,6 +7,7 @@ import { Card } from "../components/UI/ProjectCommanUI";
 import { Input } from "../components/UI/ProjectCommanUI";
 import CreateProjectModal from "../modal/CreateProjectModal";
 import { useAuth } from "../../context/Context";
+import LoadingSpinner from "../components/UI/LoadingSpinner"; // Import the LoadingSpinner component
 
 const ProjectPage = () => {
   const [projects, setProjects] = useState([]);
@@ -15,6 +16,7 @@ const ProjectPage = () => {
   const [usedColors, setUsedColors] = useState(new Set());
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   const canCreateProject =
     user?.role === "admin" || user?.permission?.project?.create;
@@ -52,12 +54,15 @@ const ProjectPage = () => {
   };
 
   const fetchProjects = async () => {
+    setIsLoading(true); // Set loading state to true
     try {
       const data = await getAllProjects();
       const projectsWithColors = assignUniqueColorsToProjects(data);
       setProjects(projectsWithColors);
     } catch (error) {
       console.error("Error fetching projects:", error);
+    } finally {
+      setIsLoading(false); // Set loading state to false after fetching
     }
   };
 
@@ -94,7 +99,8 @@ const ProjectPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-6 relative">
+      {isLoading && <LoadingSpinner />} {/* Render loading spinner if loading */}
       <h1 className="text-3xl font-bold mb-6">Projects</h1>
       <div className="flex justify-between items-center mb-6">
         <Input

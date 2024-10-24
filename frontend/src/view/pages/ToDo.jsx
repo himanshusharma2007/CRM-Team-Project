@@ -13,6 +13,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import "../styles/hideScroll.css";
+import { useToast } from "../../context/ToastContext";
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
@@ -53,6 +54,9 @@ const ToDo = () => {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [isUpdatingTask, setIsUpdatingTask] = useState(false);
   const [isManagingStatus, setIsManagingStatus] = useState(false);
+
+  const {showToast} = useToast();
+
   const fetchTasks = async () => {
     setIsLoading(true);
     try {
@@ -74,10 +78,10 @@ const ToDo = () => {
       setTasks(groupedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      alert(
+      showToast(
         `Error fetching tasks: ${
           error.response?.data?.message || error.message
-        }`
+        }`, "error"
       );
     } finally {
       setIsLoading(false);
@@ -122,16 +126,16 @@ const ToDo = () => {
         setTaskStage("todo");
       } catch (error) {
         console.error("Failed to save task:", error);
-        alert(
+        showToast(
           `Failed to save task: ${
             error.response?.data?.message || error.message
-          }`
+          }`, "error"
         );
       } finally {
         setIsAddingTask(false);
       }
     } else {
-      alert("Please enter a task title and select a status");
+      showToast("Please enter a task title and select a status", "error");
     }
   };
 
@@ -197,8 +201,8 @@ const ToDo = () => {
         console.error("Non-Axios error:", error);
       }
 
-      alert(
-        `Failed to move task. Please try again. If the issue persists, contact support.`
+      showToast(
+        `Failed to move task. Please try again. If the issue persists, contact support.`, "error"
       );
     } finally {
       setIsUpdating(false);
@@ -288,10 +292,10 @@ const ToDo = () => {
         fetchTasks();
       } catch (error) {
         console.error("Failed to update task:", error);
-        alert(
+        showToast(
           `Failed to update task: ${
             error.response?.data?.message || error.message
-          }`
+          }`, "error"
         );
       } finally {
         setIsUpdatingTask(false);
@@ -313,10 +317,10 @@ const ToDo = () => {
       setTasks({ ...tasks, [newStatus]: [] });
     } catch (error) {
       console.error("Failed to add status:", error);
-      alert(
+      showToast(
         `Failed to add status: ${
           error.response?.data?.message || error.message
-        }`
+        }`, "error"
       );
     } finally {
       setIsManagingStatus(false);
@@ -338,10 +342,10 @@ const ToDo = () => {
       });
     } catch (error) {
       console.error("Failed to update status:", error);
-      alert(
+      showToast(
         `Failed to update status: ${
           error.response?.data?.message || error.message
-        }`
+        }`, "error"
       );
     } finally {
       setIsManagingStatus(false);
@@ -351,7 +355,7 @@ const ToDo = () => {
   const handleStatusDelete = async (statusToDelete) => {
     console.log("statusToDelete in handleStatusDelete", statusToDelete);
     if (statuses.length <= 1) {
-      alert("Cannot delete the last remaining status.");
+      showToast("Cannot delete the last remaining status.", "error");
       return;
     }
     setIsManagingStatus(true);
@@ -369,10 +373,10 @@ const ToDo = () => {
       });
     } catch (error) {
       console.error("Failed to delete status:", error);
-      alert(
+      showToast(
         `Failed to delete status: ${
           error.response?.data?.message || error.message
-        }`
+        }`, "error"
       );
     } finally {
       setIsManagingStatus(false);
@@ -390,7 +394,7 @@ const ToDo = () => {
 
   const saveEditedStatus = async (oldStatus) => {
     if (editStatusName.trim() === "") {
-      alert("Status name cannot be empty.");
+      showToast("Status name cannot be empty.", "error");
       return;
     }
 
@@ -400,7 +404,7 @@ const ToDo = () => {
     }
 
     if (statuses.includes(editStatusName.trim())) {
-      alert("This status name already exists.");
+      showToast("This status name already exists.", "error");
       return;
     }
 
@@ -449,10 +453,10 @@ const ToDo = () => {
       cancelEditingStatus();
     } catch (error) {
       console.error("Failed to update status:", error);
-      alert(
+      showToast(
         `Failed to update status: ${
           error.response?.data?.message || error.message
-        }`
+        }`, "error"
       );
     } finally {
       setIsManagingStatus(false);

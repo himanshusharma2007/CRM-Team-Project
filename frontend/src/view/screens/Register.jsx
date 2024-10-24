@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser, sendOtpForRegister } from "../../services/authService";
+import { useToast } from "../../context/ToastContext";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -9,15 +10,16 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const {showToast} = useToast()
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
     try {
       await sendOtpForRegister(name, email); // Send OTP using the email
       setIsOtpSent(true); // Show additional fields for OTP and Password
-      alert("OTP sent successfully!");
+      showToast("OTP sent successfully!", "success");
     } catch (error) {
-      alert("Failed to send OTP. Please try again.");
+      showToast("Failed to send OTP. Please try again.", "error");
     }
   };
 
@@ -26,10 +28,10 @@ const Register = () => {
     try {
       // Register the user with the name, password, and OTP
       await registerUser(otp, password);
-      alert("User registered successfully!");
+      showToast("User registered successfully!", "success");
       navigate("/login");
     } catch (error) {
-      alert("Invalid OTP or registration failed. Please try again.");
+      showToast("Invalid OTP or registration failed. Please try again.", "error");
     }
   };
 
