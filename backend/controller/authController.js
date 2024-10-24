@@ -506,11 +506,23 @@ exports.sendOtp = async (req, res) => {
         message: "User not found",
       });
     }
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    if (userData.isBlocked) {
+      return res.status(403).send({
+        success: false,
+        message: "Your account has been blocked. Please contact the administrator.",
+      });
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     sendMail(email, "OTP for password reset", msg(otp, userData.name));
     userData.otp = otp;
     userData.otpExpiry = new Date(Date.now() + (10 * 60 * 1000));
     userData.otpVerify = false;
+    res.cookie("forgotPasswordEmail", email, { 
+      maxAge: 10 * 60 * 1000,
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict"
+    });
     await userData.save();
     return res.status(200).json({
       success: true,
@@ -528,12 +540,20 @@ exports.sendOtp = async (req, res) => {
 exports.verifyOtp = async (req, res) => {
   try {
     console.log("req.body",req.body);
-    const {email, otp} = req.body;
-    if(!email || !otp){
+    const {otp} = req.body;
+    const {forgotPasswordEmail: email} = req.cookies
+    if(!otp){
     console.log("please fill all fields");
     return res.status(400).json({
       success: false,
       message: "please fill all fields",
+      });
+    }
+    if(!email){
+      console.log("OTP expired Email not set in cookies");
+    return res.status(400).json({
+      success: false,
+      message: "OTP expired",
       });
     }
     const userData = await user.findOne({email}).select("+otp +otpExpiry +otpVerify");
@@ -600,11 +620,19 @@ const resetPasswordMsg = (name, email) => {
 
 exports.resetPassword = async (req, res) => {
   try {
-    const {email, newPassword} = req.body;
-    if(!email || !newPassword){
+    const { newPassword} = req.body;
+    const {forgotPasswordEmail: email} = req.cookies
+    if(!newPassword){
       return res.status(400).json({
         success: false,
         message: "please fill all fields",
+      });
+    }
+    if(!email){
+      console.log("OTP expired Email not set in cookies");
+    return res.status(400).json({
+      success: false,
+      message: "OTP expired",
       });
     }
     const userData = await user.findOne({email}).select("+otp +otpExpiry +otpVerify +password");
@@ -638,6 +666,9 @@ exports.resetPassword = async (req, res) => {
     userData.otp = undefined;
     userData.otpExpiry = undefined;
     userData.otpVerify = false;
+    res.cookie("forgotPasswordEmail", "", { 
+      maxAge: 0
+    });
     await userData.save();
     await sendMail(userData.email, "Password Reset Successfully", resetPasswordMsg(userData.name, userData.email));
     return res.status(200).json({

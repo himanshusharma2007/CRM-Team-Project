@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {useToast} from "../../context/ToastContext"
 
 const ForgetPassword = () => {
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
