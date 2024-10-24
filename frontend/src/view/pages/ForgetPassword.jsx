@@ -37,7 +37,7 @@ const ForgetPassword = () => {
     setError("");
     setIsLoading(true);
     try {
-      await verifyOtp(email, otpInput);
+      await verifyOtp(otpInput);
       showToast("OTP verified successfully.", "success");
       setIsModalOpen(false);
       setStep(2);
@@ -58,12 +58,14 @@ const ForgetPassword = () => {
       return;
     }
     try {
-      const response = await resetPassword(email, otp, password);
-      if (response?.message === 'Password reset successful') {
-        showToast("Password reset successful. You can now login with your new password.", "success");
+    console.log("password in reset ", password);
+
+      const response = await resetPassword(password);
+      if (response?.success) {
+        showToast("Password reset successful.", "success");
         navigate('/login');
       } else {
-        showToast("Password reset failed. Please try again.", "error");
+        showToast("Password reset failed.", "error");
       }
     } catch (error) {
       showToast(error.response?.data?.message || "Failed to reset password. Please try again.", "error");

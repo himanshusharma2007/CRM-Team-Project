@@ -95,6 +95,7 @@ export const getAllUsers = async () => {
 //forgot password services
 export const resetPassword = async (newPassword) => {
   try {
+    console.log("newPassword", newPassword);
     const response = await api.post("/auth/forgotPassword/resetPassword", {
       newPassword,
     });
