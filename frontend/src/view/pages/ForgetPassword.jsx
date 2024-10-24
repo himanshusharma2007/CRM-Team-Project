@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { forgotPassword, verifyOTP } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
+import {useToast} from "../../context/ToastContext"
 
 const ForgetPassword = () => {
   const [step, setStep] = useState(2);
@@ -10,6 +11,8 @@ const ForgetPassword = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const {showToast} = useToast()
+
   const navigate = useNavigate()
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
@@ -17,10 +20,10 @@ const ForgetPassword = () => {
     setIsLoading(true);
     try {
       await forgotPassword(email);
-      alert("OTP bhej diya bhai, mail check karle.");
+      showToast("OTP Sent, Please kindly check your email.", "success");
       setStep(2);
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to send OTP. Please try again.");
+      showToast(error.response?.data?.message || "Failed to send OTP. Please try again.","error");
     } finally {
       setIsLoading(false);
     }
@@ -33,14 +36,14 @@ const ForgetPassword = () => {
     try {
       const response = await verifyOTP(email, otp, password);
       if (response?.message === 'Password reset successful') {
-        alert("Password reset successful. You can now login with your new password.");
+        showToast("Password reset successful. You can now login with your new password.", "success");
         // Implement redirect to login page or other post-success logic here
         navigate('/login')
       } else {
-        setError("Password reset failed. Please try again.");
+        showToast("Password reset failed. Please try again.", "error");
       }
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to reset password. Please try again.");
+      showToast(error.response?.data?.message || "Failed to reset password. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }

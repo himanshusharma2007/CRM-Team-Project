@@ -5,6 +5,7 @@ import {
 } from "../../services/queryService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { useAuth } from "../../context/Context";
+import { useToast } from "../../context/ToastContext";
 
 const UserQueriesPage = () => {
   const [queries, setQueries] = useState([]);
@@ -14,6 +15,7 @@ const UserQueriesPage = () => {
   const [response, setResponse] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
+  const {showToast} = useToast();
 
   const canReadQuery = user?.role === "admin" || user?.permission?.query?.read;
   const canRespondQuery = user?.role === "admin" || user?.permission?.query?.respond;
@@ -89,12 +91,12 @@ const UserQueriesPage = () => {
 
   const handleSubmitResponse = async () => {
     if (!canRespondQuery) {
-      alert("You don't have permission to respond to queries.");
+      showToast("You don't have permission to respond to queries.", "error");
       return;
     }
 
     if (!response.trim()) {
-      alert("Please enter a response before submitting.");
+      showToast("Please enter a response before submitting.", "error");
       return;
     }
 
@@ -110,11 +112,11 @@ const UserQueriesPage = () => {
       );
       setShowModal(false);
       setResponse("");
-      alert("Response submitted successfully!");
+      showToast("Response submitted successfully!", "success");
       handleSort(sortBy); // Re-apply current sorting after update
     } catch (error) {
       console.error("Error responding to query:", error);
-      alert("Failed to submit response. Please try again.");
+      showToast("Failed to submit response. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }

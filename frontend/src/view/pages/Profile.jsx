@@ -5,10 +5,12 @@ import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon from Rea
 import { uploadProfileImage } from "../../services/userService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { getTeamById } from "../../services/TeamService";
-
+import {useToast} from "../../context/ToastContext"
 const Profile = () => {
   const [team, setTeam] = useState({});
   const { user, loading } = useAuth(); // Get user data from context
+  const {showToast} = useToast()
+
   console.log("User:", user);
   const navigate = useNavigate();
   const [profileImage, setProfileImage] = useState(""); // State for profile picture
@@ -37,7 +39,7 @@ const Profile = () => {
 
   const handleUploadProfilePic = async () => {
     if (!selectedFile) {
-      alert("Please select a file to upload");
+      showToast("Please select a file to upload", "error");
       return;
     }
 
@@ -47,14 +49,14 @@ const Profile = () => {
     try {
       const result = await uploadProfileImage(formData); // Send formData instead of selectedFile
       if (result.success) {
-        alert("Profile picture updated successfully");
+        showToast("Profile picture updated successfully", "success");
         setProfileImage(result.imageUrl); // Ensure this is the correct URL
       } else {
-        alert("Failed to update profile picture");
+        showToast("Failed to update profile picture", "error");
       }
     } catch (error) {
       console.error("Error uploading profile image:", error);
-      alert("An error occurred while uploading the profile picture.");
+      showToast("An error occurred while uploading the profile picture.", "error");
     }
     setIsLoading(false); // Reset loading state
   };

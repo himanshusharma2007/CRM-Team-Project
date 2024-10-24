@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { reset } from "../../services/authService";
+import { useToast } from "../../context/ToastContext";
 
 const ResetPassword = () => {
   
@@ -8,18 +9,20 @@ const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+  const {showToast} = useToast();
+
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     if (newPassword === confirmPassword) {
       try {
         await reset(newPassword, oldPassword);
-        alert("Password has been reset successfully!");
+        showToast("Password has been reset successfully!", "success");
         navigate("/login");
       } catch (error) {
-        alert("Failed to reset password. Please try again.", error);
+        showToast("Failed to reset password. Please try again.", "error");
       }
     } else {
-      alert("Passwords do not match.");
+      showToast("Passwords do not match.", "error");
     }
   };
 

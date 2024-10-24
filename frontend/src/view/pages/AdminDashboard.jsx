@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { dashboardService } from "../../services/dashboardService";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import { useToast } from "../../context/ToastContext";
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -30,6 +31,8 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const {showToast} = useToast()
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -38,7 +41,7 @@ const AdminDashboard = () => {
         setDashboardData(data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-        setError("Failed to fetch dashboard data. Please try again later.");
+        showToast("Failed to fetch dashboard data. Please try again later.", "error");
       } finally {
         setLoading(false);
       }

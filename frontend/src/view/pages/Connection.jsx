@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ConnectionService from "../../services/connectionService";
 import { FiSearch } from "react-icons/fi";
 import { useAuth } from "../../context/Context";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import {useToast} from "../../context/ToastContext"
 
 function Connection() {
   const [contacts, setContacts] = useState([]);
@@ -22,6 +23,7 @@ function Connection() {
 
   const navigate = useNavigate();
   const { user } = useAuth();
+  const {showToast} = useToast()
 
   const canCreateConnection = user?.role === "admin" || user?.permission?.connection?.create;
   const canUpdateConnection = user?.role === "admin" || user?.permission?.connection?.update;
@@ -35,7 +37,7 @@ function Connection() {
       setError(null);
     } else {
       setLoading(false);
-      setError("You don't have permission to view connections.");
+      showToast("You don't have permission to view connections.", "error");
     }
   }, [user, canReadConnection, navigate]);
 
@@ -60,7 +62,7 @@ function Connection() {
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch contacts:", error);
-      setError("Failed to fetch contacts. Please try again.");
+      showToast("Failed to fetch contacts. Please try again.", "error");
       setLoading(false);
     }
   };
@@ -72,7 +74,7 @@ function Connection() {
 
   const handleAddOrUpdateContact = async () => {
     if (!canCreateConnection && !canUpdateConnection) {
-      alert("You don't have permission to add or update connections.");
+      showToast("You don't have permission to add or update connections.", "error");
       return;
     }
     try {
@@ -92,13 +94,13 @@ function Connection() {
       fetchContacts();
     } catch (error) {
       console.error("Failed to add/update contact:", error);
-      alert("Failed to add/update contact. Please try again.");
+      showToast("Failed to add/update contact. Please try again.", "error");
     }
   };
 
   const handleEditContact = (contact) => {
     if (!canUpdateConnection) {
-      alert("You don't have permission to edit connections.");
+      showToast("You don't have permission to edit connections.", "error");
       return;
     }
     setCurrentContact(contact);
@@ -108,7 +110,7 @@ function Connection() {
 
   const handleDeleteContact = async (id) => {
     if (!canDeleteConnection) {
-      alert("You don't have permission to delete connections.");
+      showToast("You don't have permission to delete connections.", "error");
       return;
     }
     if (window.confirm("Are you sure you want to delete this contact?")) {
@@ -117,7 +119,7 @@ function Connection() {
         fetchContacts();
       } catch (error) {
         console.error("Failed to delete contact:", error);
-        alert("Failed to delete contact. Please try again.");
+        showToast("Failed to delete contact. Please try again.", "error");
       }
     }
   };
@@ -130,7 +132,7 @@ function Connection() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen relative">
         <LoadingSpinner />
       </div>
     );
@@ -141,7 +143,7 @@ function Connection() {
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6 relative">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl md:text-2xl font-bold">Connection</h1>
         {canCreateConnection && (
