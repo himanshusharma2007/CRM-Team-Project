@@ -30,6 +30,7 @@ exports.createClient = async (req, res) => {
 
 exports.createClientByLead = async (req, res) => {
     try {
+        console.log("Create client")
         const {leadId} = req.params;
         const leadData = await lead.findById(leadId);
         if(!leadData){
