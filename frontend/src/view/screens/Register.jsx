@@ -5,11 +5,13 @@ import { useToast } from "../../context/ToastContext";
 
 const Register = () => {
   const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
+
   const {showToast} = useToast()
 
   const handleSendOtp = async (e) => {
@@ -31,7 +33,7 @@ const Register = () => {
       showToast("User registered successfully!", "success");
       navigate("/login");
     } catch (error) {
-      showToast("Invalid OTP or registration failed. Please try again.", "error");
+      showToast(" OTP or registration failed. Please try again.", "error");
     }
   };
 
@@ -59,6 +61,7 @@ const Register = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              disabled={isOtpSent ? true : false}
             />
           </div>
 
@@ -76,6 +79,7 @@ const Register = () => {
               type="email"
               placeholder="you@example.com"
               value={email}
+              disabled={isOtpSent ? true : false}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
