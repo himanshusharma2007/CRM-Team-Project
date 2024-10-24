@@ -49,7 +49,7 @@ const AdminDashboard = () => {
 
   if (loading)
     return (
-      <div className="text-center py-10 relative top-[50%]">
+      <div className="text-center py-10">
         <LoadingSpinner />
       </div>
     );
