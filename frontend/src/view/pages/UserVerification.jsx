@@ -238,7 +238,7 @@ const UserVerificationList = () => {
         setMessage("User blocked successfully");
         // Remove the blocked user from the list
         setUsers(users.filter((user) => user._id !== userId));
-        fetchAllUsers(); // Refresh the user list
+        fetchBlockedUser(); // Refresh the user list
       } catch (error) {
         console.error("Error blocking user:", error);
         setMessage("Error blocking user");
@@ -622,211 +622,245 @@ const UserVerificationList = () => {
                 </ul>
               </div>
 
-          {/* Users List Section */}
-          <div className="h-[calc(100vh-400px)] overflow-y-auto">
-            <ul className="space-y-4">
-              {(activeTab === "verified" ? filteredUsers : blockedUsers)
-                .sort((a, b) => {
-                  if (sortOption === "name") return a.name.localeCompare(b.name);
-                  if (sortOption === "role") return a.role.localeCompare(b.role);
-                  if (sortOption === "date")
-                    return new Date(b.createdAt) - new Date(a.createdAt);
-                  return 0;
-                })
-                .map((user, index) => (
-                  <li
-                    key={user._id}
-                    className="group bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
-                  >
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
-                      <div className="flex items-center space-x-4">
-                        <div className="bg-gray-100 rounded-full p-3">
-                          <span className="text-xl font-semibold text-blue-600">
-                            {index + 1}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-3">
-                            <h3 className="text-lg font-bold text-gray-800">
-                              {user.name}
-                            </h3>
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(
-                                user.role
-                              )}`}
-                            >
-                              {user.role}
-                            </span>
+              {/* Users List Section */}
+              <div className="h-[calc(100vh-400px)] overflow-y-auto">
+                <ul className="space-y-4">
+                  {(activeTab === "verified" ? filteredUsers : blockedUsers)
+                    .sort((a, b) => {
+                      if (sortOption === "name")
+                        return a.name.localeCompare(b.name);
+                      if (sortOption === "role")
+                        return a.role.localeCompare(b.role);
+                      if (sortOption === "date")
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                      return 0;
+                    })
+                    .map((user, index) => (
+                      <li
+                        key={user._id}
+                        className="group bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
+                      >
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+                          <div className="flex items-center space-x-4">
+                            <div className="bg-gray-100 rounded-full p-3">
+                              <span className="text-xl font-semibold text-blue-600">
+                                {index + 1}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-3">
+                                <h3 className="text-lg font-bold text-gray-800">
+                                  {user.name}
+                                </h3>
+                                <span
+                                  className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(
+                                    user.role
+                                  )}`}
+                                >
+                                  {user.role}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {user.email}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {user.email}
-                          </p>
+                          <div className="flex space-x-3 w-full md:w-auto justify-end">
+                            {activeTab === "verified" ? (
+                              <>
+                                <button
+                                  onClick={() => openPermissionModal(user._id)}
+                                  className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2"
+                                >
+                                  <MdVerified className="text-lg" />
+                                  Update Permissions
+                                </button>
+                                <button
+                                  onClick={() => handleBlockUser(user._id)}
+                                  className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200 flex items-center gap-2"
+                                >
+                                  <MdBlock className="text-lg" />
+                                  Block
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                onClick={() => handleUnblockUser(user._id)}
+                                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200 flex items-center gap-2"
+                              >
+                                <FaUserCheck className="text-lg" />
+                                Unblock
+                              </button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex space-x-3 w-full md:w-auto justify-end">
-                        {activeTab === "verified" ? (
-                          <>
-                            <button
-                              onClick={() => openPermissionModal(user._id)}
-                              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2"
-                            >
-                              <MdVerified className="text-lg" />
-                              Update Permissions
-                            </button>
-                            <button
-                              onClick={() => handleBlockUser(user._id)}
-                              className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200 flex items-center gap-2"
-                            >
-                              <MdBlock className="text-lg" />
-                              Block
-                            </button>
-                          </>
-                        ) : (
-                          <button
-                            onClick={() => handleUnblockUser(user._id)}
-                            className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200 flex items-center gap-2"
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </div>
+            {/* Modal for Verification */}
+            {isModalOpen && (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex top-0 items-center justify-center overflow-y-auto p-4 z-50 min-h-screen">
+                <div className="relative bg-white rounded-2xl shadow-2xl max-w-3xl max-h-[80vh] overflow-y-auto w-full m-4 transform transition-all duration-300 ease-in-out animate-fadeIn">
+                  {/* Modal Header */}
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex items-center justify-center">
+                      <MdVerified className="text-green-500 text-4xl mr-3" />
+                      <h2 className="text-3xl font-bold text-gray-800">
+                        Verify User
+                      </h2>
+                    </div>
+                    <button
+                      onClick={closeModal}
+                      className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    >
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="p-6 space-y-6">
+                    {/* Team Selection */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Select Team
+                      </label>
+                      <div className="relative">
+                        <select
+                          onChange={(e) => {
+                            const selectedTeamId = e.target.value;
+                            const selectedTeam = teams.find(
+                              (team) => team._id === selectedTeamId
+                            );
+                            setSelectTeam(selectedTeam || {});
+                          }}
+                          value={selectTeam ? selectTeam._id : ""}
+                          className="w-full pl-4 pr-10 py-3 border border-gray-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 appearance-none"
+                        >
+                          <option value="">Choose a team...</option>
+                          {teams.map((team) => (
+                            <option key={team._id} value={team._id}>
+                              {team.teamName}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                          <svg
+                            className="w-5 h-5 text-gray-400"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
                           >
-                            <FaUserCheck className="text-lg" />
-                            Unblock
-                          </button>
-                        )}
+                            <path
+                              fillRule="evenodd"
+                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
                       </div>
                     </div>
-                  </li>
-                ))}
-            </ul>
-          </div>
-        </div>
-        {/* Modal for Verification */}
-        {isModalOpen && (
-  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex top-0 items-center justify-center overflow-y-auto p-4 z-50 min-h-screen">
-    <div 
-      className="relative bg-white rounded-2xl shadow-2xl max-w-3xl max-h-[80vh] overflow-y-auto w-full m-4 transform transition-all duration-300 ease-in-out animate-fadeIn"
-    >
-      {/* Modal Header */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-center">
-          <MdVerified className="text-green-500 text-4xl mr-3" />
-          <h2 className="text-3xl font-bold text-gray-800">
-            Verify User
-          </h2>
-        </div>
-        <button 
-          onClick={closeModal}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-        >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
 
-      {/* Modal Body */}
-      <div className="p-6 space-y-6">
-        {/* Team Selection */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Select Team
-          </label>
-          <div className="relative">
-            <select
-              onChange={(e) => {
-                const selectedTeamId = e.target.value;
-                const selectedTeam = teams.find(
-                  (team) => team._id === selectedTeamId
-                );
-                setSelectTeam(selectedTeam || {});
-              }}
-              value={selectTeam ? selectTeam._id : ""}
-              className="w-full pl-4 pr-10 py-3 border border-gray-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 appearance-none"
-            >
-              <option value="">Choose a team...</option>
-              {teams.map((team) => (
-                <option key={team._id} value={team._id}>
-                  {team.teamName}
-                </option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <svg className="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        {/* Role Selection */}
-        {!selectTeam?.leaderId && (
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Select Role
-            </label>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setRole("subAdmin")}
-                className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-center gap-2
-                  ${role === "subAdmin" 
-                    ? "border-blue-500 bg-blue-50 text-blue-700" 
-                    : "border-gray-200 hover:border-blue-200 hover:bg-gray-50"
+                    {/* Role Selection */}
+                    {!selectTeam?.leaderId && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Select Role
+                        </label>
+                        <div className="flex gap-4">
+                          <button
+                            onClick={() => setRole("subAdmin")}
+                            className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-center gap-2
+                  ${
+                    role === "subAdmin"
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-200 hover:border-blue-200 hover:bg-gray-50"
                   }`}
-              >
-                <FaCrown className={`text-xl ${role === "subAdmin" ? "text-blue-500" : "text-gray-400"}`} />
-                Leader
-              </button>
-              <button
-                onClick={() => setRole("emp")}
-                className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-center gap-2
-                  ${role === "emp" 
-                    ? "border-green-500 bg-green-50 text-green-700" 
-                    : "border-gray-200 hover:border-green-200 hover:bg-gray-50"
+                          >
+                            <FaCrown
+                              className={`text-xl ${
+                                role === "subAdmin"
+                                  ? "text-blue-500"
+                                  : "text-gray-400"
+                              }`}
+                            />
+                            Leader
+                          </button>
+                          <button
+                            onClick={() => setRole("emp")}
+                            className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-center gap-2
+                  ${
+                    role === "emp"
+                      ? "border-green-500 bg-green-50 text-green-700"
+                      : "border-gray-200 hover:border-green-200 hover:bg-gray-50"
                   }`}
-              >
-                <FaUser className={`text-xl ${role === "emp" ? "text-green-500" : "text-gray-400"}`} />
-                Member
-              </button>
-            </div>
-          </div>
-        )}
+                          >
+                            <FaUser
+                              className={`text-xl ${
+                                role === "emp"
+                                  ? "text-green-500"
+                                  : "text-gray-400"
+                              }`}
+                            />
+                            Member
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
-        {/* Permissions Section */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-800">Set Permissions</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <MdSecurity className="text-lg" />
-              Access Control
-            </div>
-          </div>
-          <div className="max-h-[40vh] overflow-y-auto border border-gray-200 rounded-xl p-4 bg-gray-50 space-y-4 custom-scrollbar">
-            {renderPermissionDropdowns()}
-          </div>
-        </div>
-      </div>
+                    {/* Permissions Section */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-800">
+                          Set Permissions
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <MdSecurity className="text-lg" />
+                          Access Control
+                        </div>
+                      </div>
+                      <div className="max-h-[40vh] overflow-y-auto border border-gray-200 rounded-xl p-4 bg-gray-50 space-y-4 custom-scrollbar">
+                        {renderPermissionDropdowns()}
+                      </div>
+                    </div>
+                  </div>
 
-      {/* Modal Footer */}
-      <div className="p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
-        <button
-          onClick={handleVerify}
-          className="flex-1 bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-500 
+                  {/* Modal Footer */}
+                  <div className="p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={handleVerify}
+                      className="flex-1 bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-500 
             active:bg-green-700 transition-all duration-200 transform hover:-translate-y-0.5
             flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
-        >
-          <MdVerified className="text-xl" />
-          Verify User
-        </button>
-        <button
-          onClick={closeModal}
-          className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-200 
+                    >
+                      <MdVerified className="text-xl" />
+                      Verify User
+                    </button>
+                    <button
+                      onClick={closeModal}
+                      className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-200 
             active:bg-gray-300 transition-all duration-200 transform hover:-translate-y-0.5
             flex items-center justify-center gap-2"
-        >
-          <MdClose className="text-xl" />
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                    >
+                      <MdClose className="text-xl" />
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Modal for Updating Permissions */}
             {isPermissionModalOpen && (
