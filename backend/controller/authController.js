@@ -224,8 +224,15 @@ exports.sendOtpForRegister = async (req, res) => {
         error: "email not send"
       })
     }
-    const expirationTime = 10 * 60 * 1000; 
-    res.cookie("otp", otp, { 
+    const expirationTime = 10 * 60 * 1000;
+    const hashOtp = await hashPassword(otp)
+    if(!hashOtp){
+      return res.status(400).send({
+        success: false,
+        message: "Error in hashing OTP",
+      });
+    }
+    res.cookie("otp", hashOtp, { 
       maxAge: expirationTime,
       httpOnly: true,
       secure: true,
@@ -269,7 +276,9 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    if (!name || !email || !savedOtp || savedOtp !== otp) {
+    const decodeOTP = await bcrypt.compare(otp, savedOtp);
+    
+    if (!name || !email || !decodeOTP){
       return res.status(400).send({
         success: false,
         message: "Invalid OTP or expired",
