@@ -261,8 +261,8 @@ exports.createMeeting = async (req, res) => {
       dateTime: meetingDateTime,
       meetingStatus,
       meetingConclusion,
-      clientNotification,
-      leaderNotification,
+      notifyClient: clientNotification,
+      notifyTeamLeader: leaderNotification,
     } = req.body;
 
     console.log("Extracted data from request body:", {
@@ -330,6 +330,7 @@ exports.createMeeting = async (req, res) => {
     }
 
     if(clientNotification){
+      console.log("clientNotification")
       let notification = await sendClientNotification(clientData, projectData, meetingDateTime, mConclusion)
       if(!notification){
         return res.status(500).json({
@@ -341,6 +342,7 @@ exports.createMeeting = async (req, res) => {
     }
 
     if(leaderNotification){
+      console.log("leaderNotification")
       let notification = await sendLeaderNotification(projectData, meetingDateTime, mConclusion)
       if(!notification){
         return res.status(500).json({
