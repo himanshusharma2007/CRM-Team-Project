@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const {showToast} = useToast()
+  const { showToast } = useToast();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -41,7 +41,10 @@ const AdminDashboard = () => {
         setDashboardData(data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-        showToast("Failed to fetch dashboard data. Please try again later.", "error");
+        showToast(
+          "Failed to fetch dashboard data. Please try again later.",
+          "error"
+        );
       } finally {
         setLoading(false);
       }
@@ -272,9 +275,6 @@ const AdminDashboard = () => {
                 <Tooltip />
                 <Legend />
               </PieChart>
-              <p className="text-gray-600 mt-8">
-                Total Clients: {clientData.total || 0}
-              </p>
             </ResponsiveContainer>
 
             {/* Line Chart for Monthly Clients Data */}
@@ -288,6 +288,9 @@ const AdminDashboard = () => {
                 <Tooltip />
                 <Line type="monotone" dataKey="value" stroke="#8884d8" />
               </LineChart>
+              <p className="text-gray-600">
+                Total Clients: {clientData.total || 0}
+              </p>
             </ResponsiveContainer>
           </div>
 
