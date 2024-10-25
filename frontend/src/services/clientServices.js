@@ -1,10 +1,10 @@
 // Import the API instance from api.js
-import api from './api';
+import api from "./api";
 
 // Service to get all client
 export const getAllClients = async () => {
   try {
-    const response = await api.get('/client');
+    const response = await api.get("/client");
     return response.data;
   } catch (error) {
     console.error("Error fetching client:", error);
@@ -26,7 +26,8 @@ export const getClientById = async (clientId) => {
 // Service to create a new client
 export const createClient = async (clientData) => {
   try {
-    const response = await api.post('/client/create', clientData);
+    console.log("ClientData:", clientData);
+    const response = await api.post("/client/create", clientData);
     return response.data;
   } catch (error) {
     console.error("Error creating client:", error);

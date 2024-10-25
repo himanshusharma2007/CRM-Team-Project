@@ -1,38 +1,67 @@
-import { useState, useEffect } from "react";
-import { leadService } from "../../services/leadServices";
-import { createClient } from "../../services/clientServices";
+import { useState } from "react";
 
-const AddClientModal = ({ isOpen, onClose }) => {
-  const [isAddClientView, setIsAddClientView] = useState(true);
-  const [leads, setLeads] = useState([]);
+const AddClientModal = ({ isOpen, onClose, onAddClient }) => {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
+  const [timeZone, setTimeZone] = useState("Asia/Kolkata"); // Default to IST
 
-
-  useEffect(() => {
-    const fetchLeads = async () => {
-      const data = await leadService.getAllLeads();
-      setLeads(data);
-    };
-    fetchLeads();
-    console.log("leads", leads);
-  }, []);
+  // Indian timezone options
+  const timezones = [
+    { value: "", label: "-- Select Time Zone --" },
+    { value: "Asia/Kolkata", label: "Asia/Kolkata" },
+    { value: "Asia/Delhi", label: "Asia/Delhi (same as Asia/Kolkata)" },
+    { value: "UTC", label: "UTC" },
+    { value: "America/New_York", label: "America/New_York (Eastern Time)" },
+    {
+      value: "America/Los_Angeles",
+      label: "America/Los_Angeles (Pacific Time)",
+    },
+    { value: "Europe/London", label: "Europe/London (GMT)" },
+    { value: "Europe/Paris", label: "Europe/Paris (CET)" },
+    { value: "Europe/Berlin", label: "Europe/Berlin (CET)" },
+    { value: "Asia/Tokyo", label: "Asia/Tokyo (JST)" },
+    { value: "Asia/Shanghai", label: "Asia/Shanghai (CST)" },
+    { value: "Asia/Dubai", label: "Asia/Dubai (GST)" },
+    { value: "Asia/Singapore", label: "Asia/Singapore (SGT)" },
+    { value: "Asia/Seoul", label: "Asia/Seoul (KST)" },
+    { value: "Asia/Hong_Kong", label: "Asia/Hong_Kong (HKT)" },
+    { value: "Australia/Sydney", label: "Australia/Sydney (AET)" },
+    { value: "Australia/Melbourne", label: "Australia/Melbourne (AET)" },
+    { value: "Africa/Cairo", label: "Africa/Cairo (EET)" },
+    { value: "Africa/Johannesburg", label: "Africa/Johannesburg (SAST)" },
+    { value: "America/Chicago", label: "America/Chicago (CST)" },
+    { value: "America/Denver", label: "America/Denver (MST)" },
+    { value: "America/Sao_Paulo", label: "America/Sao_Paulo (BRT)" },
+    {
+      value: "America/Argentina/Buenos_Aires",
+      label: "America/Argentina/Buenos_Aires (ART)",
+    },
+    { value: "Europe/Moscow", label: "Europe/Moscow (MSK)" },
+    { value: "Europe/Istanbul", label: "Europe/Istanbul (TRT)" },
+    { value: "Asia/Tehran", label: "Asia/Tehran (IRST)" },
+    { value: "Asia/Karachi", label: "Asia/Karachi (PKT)" },
+    { value: "Asia/Dhaka", label: "Asia/Dhaka (BST)" },
+    { value: "Asia/Jakarta", label: "Asia/Jakarta (WIB)" },
+    { value: "Pacific/Auckland", label: "Pacific/Auckland (NZST)" },
+    { value: "Indian/Mauritius", label: "Indian/Mauritius (MUT)" },
+  ];
 
   const handleSubmit = async (e) => {
-    // e.preventDefault();
-    const data = await createClient({
+    e.preventDefault();
+    await onAddClient({
       name,
       company,
       phone,
       email,
       location,
+      timeZone, // Adding timezone to the client data
     });
-    console.log("data", data);
-
+    onClose();
   };
+
   if (!isOpen) return null;
 
   return (
@@ -40,9 +69,7 @@ const AddClientModal = ({ isOpen, onClose }) => {
       <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg">
         {/* Modal Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">
-            {isAddClientView ? "Add New Client" : "Fetch from Lead"}
-          </h2>
+          <h2 className="text-xl font-semibold">Add New Client</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -51,119 +78,67 @@ const AddClientModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Toggle View Buttons */}
-        <div className="flex mb-6">
-          <button
-            className={`flex-1 px-4 py-2 font-semibold ${
-              isAddClientView ? "bg-blue-500 text-white" : "bg-gray-200"
-            } rounded-l-lg transition-all`}
-            onClick={() => setIsAddClientView(true)}
-          >
-            Add New Client
-          </button>
-          <button
-            className={`flex-1 px-4 py-2 font-semibold ${
-              !isAddClientView ? "bg-blue-500 text-white" : "bg-gray-200"
-            } rounded-r-lg transition-all`}
-            onClick={() => setIsAddClientView(false)}
-          >
-            Fetch from Lead
-          </button>
-        </div>
-
         {/* Add New Client Form */}
-        {isAddClientView ? (
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Name"
-                className="border border-gray-300 p-2 rounded-lg"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Company"
-                className="border border-gray-300 p-2 rounded-lg"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="tel"
-                placeholder="Phone"
-                className="border border-gray-300 p-2 rounded-lg"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                className="border border-gray-300 p-2 rounded-lg"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <input
-                type="text"
-                placeholder="Location"
-                className="border border-gray-300 p-2 rounded-lg w-full"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full"
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Name"
+              className="border border-gray-300 p-2 rounded-lg"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Company"
+              className="border border-gray-300 p-2 rounded-lg"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="tel"
+              placeholder="Phone"
+              className="border border-gray-300 p-2 rounded-lg"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              className="border border-gray-300 p-2 rounded-lg"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Location"
+              className="border border-gray-300 p-2 rounded-lg"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+            <select
+              value={timeZone}
+              onChange={(e) => setTimeZone(e.target.value)}
+              className="border border-gray-300 p-2 rounded-lg"
             >
-              Save Client
-            </button>
-          </form> 
-        ) : (
-          // Fetch from Lead Form
-          <form className="space-y-6 bg-white p-6 rounded-lg shadow-md">
-            {/* Select Lead Dropdown */}
-            <div>
-              <label
-                htmlFor="lead"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Select Lead
-              </label>
-              <select
-                id="lead"
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select Lead</option>
-                {leads.map((lead, index) => (
-                  <option key={index} value={lead.id}>
-                    {lead.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full hover:bg-blue-700 transition duration-300"
-            >
-              Fetch Client from Lead
-            </button>
-          </form>
-        )}
-
-        <div className="flex justify-center mt-4">
+              {timezones.map((tz) => (
+                <option key={tz.value} value={tz.value}>
+                  {tz.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <button
-            className="text-red-500 hover:underline"
-            onClick={onClose}
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full"
           >
-            Close
+            Save Client
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
