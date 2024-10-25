@@ -33,7 +33,11 @@ export const getProjectByClientId = async (id) => {
 export const createProject = async (projectData) => {
   try {
     console.log("Sending project data to API:", projectData);
-    const response = await api.post('/project/create', projectData);
+    const response = await api.post('/project/create', projectData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
     console.log("API response:", response.data);
     return response.data;
   } catch (error) {

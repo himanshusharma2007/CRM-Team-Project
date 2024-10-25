@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllProjects, createProject } from "../../services/projectService";
 import { FiSearch, FiPlus } from "react-icons/fi";
@@ -75,6 +75,7 @@ const ProjectPage = () => {
   );
 
   const handleCreateProject = async (projectData) => {
+    console.log("crete project called",projectData)
     if (canCreateProject) {
       try {
         console.log("projectData",projectData)
