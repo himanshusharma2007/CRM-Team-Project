@@ -31,7 +31,8 @@ const uploadProjectImage = async (req, res, projectId) => {
 
 exports.createProject = async (req, res) => {
   try {
-    console.log("req.body", req.body);
+    console.log("req.file", req.file)
+    console.log("req.file in create project ", req.body);
     const { name, description, serviceType, projectStatus, clientId, teamIds } =
       req.body;
 
@@ -80,10 +81,10 @@ exports.createProject = async (req, res) => {
 
     clientData.projectId.push(newProject._id);
     await clientData.save();
-    res.status(201).json(newProject);
+    return res.status(201).json(newProject);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 

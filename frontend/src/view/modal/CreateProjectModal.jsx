@@ -5,7 +5,7 @@ import { Select } from "../components/UI/ProjectCommanUI";
 import { Button } from "../components/UI/ProjectCommanUI";
 import {getAllClients} from "../../services/clientServices";
 import {createProject} from "../../services/projectService";
-import {getAllTeams} from "../../services/TeamService"
+import {getAllTeams} from "../../services/TeamService";
 import { Checkbox } from "../components/UI/ProjectCommanUI";
 import { FaChevronDown } from 'react-icons/fa';
 
@@ -24,7 +24,7 @@ const CreateProjectModal = ({
     clientId: "",
     teamIds: [],
     hashtags: "",
-    projectImage: ""
+    projectImage: null // Initialize as null for the image
   });
   const [clients, setClients] = useState([]);
   const [allTeams, setAllTeams] = useState([]);
@@ -32,24 +32,25 @@ const CreateProjectModal = ({
   const [isCreating, setIsCreating] = useState(false);
   const dropdownRef = useRef(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetchAllTeams = async () => {
       try {
         const allFetchedTeams = await getAllTeams();
         setAllTeams(allFetchedTeams);
       } catch (error) {
-        console.log("Error in fetch all teams: ", error.message)
+        console.log("Error in fetch all teams: ", error.message);
       }
+    };
+    fetchAllTeams();
+    if (isOpen) {
+      console.log("All teams : ", allTeams);
+      console.log("Team ids : ");
     }
-    fetchAllTeams()
-    if(isOpen){
-      console.log("All teams : ", allTeams)
-      console.log("Team ids : ", )
-    }
-  }, [isOpen])
+  }, [isOpen]);
+
   useEffect(() => {
     if (initialData && isEditing) {
-      console.log("initial data in useEffect",initialData);
+      console.log("initial data in useEffect", initialData);
       setFormData({
         ...initialData,
         hashtags: initialData.hashtags?.join(", "),
@@ -77,7 +78,6 @@ const CreateProjectModal = ({
         setIsTeamDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -85,19 +85,32 @@ const CreateProjectModal = ({
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === "projectImage") {
+      setFormData((prevData) => ({ ...prevData, projectImage: files[0] }));
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsCreating(true);
     try {
+      console.log(formData)
       const submissionData = {
         ...formData,
         hashtags: formData.hashtags.split(",").map((tag) => tag.trim()),
       };
-     
+      
+      // // Handle the image upload separately if needed
+      if (submissionData.projectImage) {
+        console.log("projectImagef",submissionData.projectImage)
+        const imageData = new FormData();
+        imageData.append("file", submissionData.projectImage);
+       
+      }
+      console.log("submissionData: ", submissionData); // Log the submission data
       onSubmit(submissionData);
     } catch (error) {
       console.error("Error creating project:", error);
@@ -191,7 +204,6 @@ const CreateProjectModal = ({
             </select>
           </div>
           <div className="flex-1 relative" ref={dropdownRef}>
-          
             <div
               className="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer"
               onClick={() => setIsTeamDropdownOpen(!isTeamDropdownOpen)}
@@ -239,16 +251,24 @@ const CreateProjectModal = ({
               onChange={handleChange}
             />
           </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Project Image
+            </label>
+            <input
+              type="file"
+              name="projectImage"
+              accept="image/*"
+              onChange={handleChange}
+              className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
         </div>
 
-        <div className="mt-5 sm:mt-6">
-          <button
-            type="submit"
-            className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-            disabled={isCreating}
-          >
-            {isCreating ? 'Creating...' : 'Create Project'}
-          </button>
+        <div className="mt-6 flex justify-end">
+          <Button type="submit" loading={isCreating}>
+            {isEditing ? "Save Changes" : "Create Project"}
+          </Button>
         </div>
       </form>
     </Modal>
