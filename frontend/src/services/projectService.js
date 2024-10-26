@@ -50,10 +50,12 @@ export const createProject = async (projectData) => {
 // Service to update a project
 export const updateProject = async (id, projectData) => {
   try {
+    console.log("in project service");
     const response = await api.put(`/project/update/${id}`, projectData);
+    console.log("after response of project service");
     return response.data;
   } catch (error) {
-    throw new Error(error.response.data.message || 'Error updating project');
+    throw new Error(error.response.data.message);
   }
 };
 

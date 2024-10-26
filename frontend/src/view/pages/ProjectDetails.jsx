@@ -48,6 +48,7 @@ const ProjectDetails = () => {
     if (canUpdateProject) {
       try {
         await updateProject(id, projectData);
+        console.log("I am updating")
         fetchProjectDetails();
         setIsEditModalOpen(false);
       } catch (error) {
