@@ -721,7 +721,14 @@ exports.googleUser = async (req, res)=>{
       return res.redirect('http://localhost:5173/dashboard')
     }
     const createUserData = await user.create({name, email: emails[0].value, signupMode: "google", profileImage: photos[0].value})
-    console.log("crete ",createUserData)
+    
+    const statuses = ["Todo", "Doing", "Done"];
+    for (const status of statuses) {
+      await Status.create({
+        name: status,
+        userId: userData._id,
+      });
+    }
     generateToken(createUserData.id, res);
     return res.redirect('http://localhost:5173/dashboard')
   }catch(error){
