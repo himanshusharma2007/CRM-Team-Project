@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser, sendOtpForRegister } from "../../services/authService";
 import { useToast } from "../../context/ToastContext";
+import Googlebutton from "../components/UI/Googlebutton";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -173,6 +174,15 @@ const Register = () => {
             )}
           </button>
         </form>
+
+        <div className="mt-2 text-center text-white font-bold">
+          <p>OR</p>
+        </div>
+        <div className="mt-2 text-center">
+          
+        <Googlebutton name="SIGNUP"/>
+
+        </div>
 
         {/* Redirect to Login */}
         <div className="mt-6 text-center">

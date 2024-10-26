@@ -32,14 +32,8 @@ const uploadProjectImage = async (req, res, projectId) => {
 exports.createProject = async (req, res) => {
   try {
     console.log("req.body", req.body);
-    const { name, description, serviceType, projectStatus, clientId, teamIds } =
+    const { name, description, serviceType, projectStatus, clientId, teamIds, hashtags } =
       req.body;
-
-    // Correct typo: hashtages -> hashtags
-    let hashtags =
-      req.body.hashtags && req.body.hashtags.length > 0
-        ? req.body.hashtags
-        : null;
 
     if (!name || !description || !serviceType || !clientId) {
       console.log("all fields are required");
@@ -54,13 +48,6 @@ exports.createProject = async (req, res) => {
     if (!clientData) {
       return res.status(404).json({ error: "Client not found" });
     }
-
-    // Handle hashtags as an array
-    hashtags = hashtags
-      ? Array.isArray(hashtags)
-        ? hashtags
-        : hashtags.split(",")
-      : [];
 
     const newProject = await project.create({
       name,
@@ -133,8 +120,7 @@ exports.getProjectByClientId = async (req, res) => {
 
 exports.updateProject = async (req, res) => {
   try {
-    const { name, description, serviceType, projectStatus, teamIds } = req.body;
-    let hashtags = req.body.hashtags;
+    const { name, description, serviceType, projectStatus, teamIds, hashtags } = req.body;
     const projectData = await project.findById(req.params.id);
     if (!projectData) {
       return res.status(404).json({ error: "Project not found" });
@@ -146,12 +132,6 @@ exports.updateProject = async (req, res) => {
     if (existingProject) {
       return res.status(400).json({ error: "Project name already exists" });
     }
-    hashtags = hashtags ? hashtags?.split(",") : [];
-    await hashtags.map(async (item) => {
-      if (!projectData.hashtags.includes(item)) {
-        projectData.hashtags.push(item);
-      }
-    });
     await teamIds.map(async (item) => {
       if (!projectData.teamIds.includes(item)) {
         projectData.teamIds.push(item);
@@ -161,6 +141,7 @@ exports.updateProject = async (req, res) => {
     projectData.description = description || projectData.description;
     projectData.serviceType = serviceType || projectData.serviceType;
     projectData.projectStatus = projectStatus || projectData.projectStatus;
+    projectData.hashtags = hashtags || projectData.hashtags;
     await projectData.save();
     res.status(200).json(projectData);
   } catch (error) {

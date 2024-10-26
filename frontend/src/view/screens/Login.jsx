@@ -4,6 +4,7 @@ import { login } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context";
 import { useToast } from "../../context/ToastContext"; // Corrected import
+import Googlebutton from "../components/UI/Googlebutton";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -12,8 +13,8 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
   const { saveUser } = useAuth();
-  const {showToast} = useToast();
-  
+  const { showToast } = useToast();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -73,9 +74,8 @@ const LoginPage = () => {
           </div>
           <div className="flex items-center justify-between">
             <button
-              className={`w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50 transition duration-200 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50 transition duration-200 ${loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               type="submit"
               disabled={loading} // Disable button when loading
             >
@@ -101,11 +101,19 @@ const LoginPage = () => {
                   ></path>
                 </svg>
               ) : (
-                "Login"
+                "LOGIN"
               )}
             </button>
           </div>
         </form>
+        <div className="mt-2 text-center text-white font-bold">
+          <p>OR</p>
+        </div>
+        <div className="mt-2 text-center">
+          
+        <Googlebutton name="LOGIN"/>
+
+        </div>
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Don’t have an account?{" "}

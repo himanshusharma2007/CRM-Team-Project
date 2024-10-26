@@ -1,3 +1,4 @@
+
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -17,6 +18,9 @@ const meetingRoutes = require("./routes/meetingRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes")
 const cookieParser = require("cookie-parser");
+const passport = require("passport");
+const session = require("express-session");
+const googleAuth = require("./routes/googleAuthRoutes")
 
 require("dotenv").config();
 
@@ -33,6 +37,21 @@ app.use(
   })
 );
 
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+const GoogleStrategy = require("./possport")
+
+
+app.use("/auth", googleAuth)
 app.use("/api/auth", authRoutes);
 app.use("/api/todo", todoRoutes);
 app.use("/api/profile", userRoutes);
