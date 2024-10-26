@@ -3,14 +3,7 @@ import AddClientModal from "../modal/AddClientModal";
 import NewMeetingModal from "../modal/NewMeetingModal";
 import AddProjectModal from "../modal/AddProjectModal";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
-import {
-  FaPencilAlt,
-  FaPlus,
-  FaTrash,
-  FaSave,
-  FaSearch,
-  FaSort,
-} from "react-icons/fa";
+import { FaPencilAlt, FaPlus, FaTrash, FaSave, FaSearch } from "react-icons/fa";
 import { PiGraphBold } from "react-icons/pi";
 
 import {
@@ -23,6 +16,7 @@ import {
   getAllClients,
   deleteClient,
   updateClient,
+  createClient,
 } from "../../services/clientServices";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Context";
@@ -47,16 +41,24 @@ const MeetingManagement = () => {
   const [showSearchFields, setShowSearchFields] = useState({});
   const navigate = useNavigate();
   const { user } = useAuth();
-  const {showToast} = useToast()
+  const { showToast } = useToast();
 
-  const canCreateMeeting = user?.role === "admin" || user?.permission?.meeting?.create;
-  const canUpdateMeeting = user?.role === "admin" || user?.permission?.meeting?.update;
-  const canReadMeeting = user?.role === "admin" || user?.permission?.meeting?.read;
-  const canCreateClient = user?.role === "admin" || user?.permission?.client?.create;
-  const canUpdateClient = user?.role === "admin" || user?.permission?.client?.update;
-  const canDeleteClient = user?.role === "admin" || user?.permission?.client?.delete;
-  const canCreateProject = user?.role === "admin" || user?.permission?.project?.create;
-  const canUpdateProject = user?.role === "admin" || user?.permission?.project?.update;
+  const canCreateMeeting =
+    user?.role === "admin" || user?.permission?.meeting?.create;
+  const canUpdateMeeting =
+    user?.role === "admin" || user?.permission?.meeting?.update;
+  const canReadMeeting =
+    user?.role === "admin" || user?.permission?.meeting?.read;
+  const canCreateClient =
+    user?.role === "admin" || user?.permission?.client?.create;
+  const canUpdateClient =
+    user?.role === "admin" || user?.permission?.client?.update;
+  const canDeleteClient =
+    user?.role === "admin" || user?.permission?.client?.delete;
+  const canCreateProject =
+    user?.role === "admin" || user?.permission?.project?.create;
+  const canUpdateProject =
+    user?.role === "admin" || user?.permission?.project?.update;
 
   useEffect(() => {
     console.log("clients in useEffect", clients);
@@ -92,6 +94,7 @@ const MeetingManagement = () => {
   const toggleMeetingModal = () => {
     if (canCreateMeeting) {
       setIsMeetingModalOpen(!isMeetingModalOpen);
+      
     } else {
       showToast("You don't have permission to create meetings.", "error");
     }
@@ -195,17 +198,12 @@ const MeetingManagement = () => {
     }
   };
 
-  const handleAddClient = async (newClient) => {
-    if (canCreateClient) {
-      try {
-        setClients((prevClients) => [...prevClients, newClient]);
-      } catch (error) {
-        showToast("Error creating client. Please try again.", "error");
-        console.log("error in handleAddClient", error);
-      }
-    }
+  const handleCreateClient = async (newClient) => {
+    console.log("new client in handle client ", newClient);
+    const data = await createClient(newClient);
+    fetchData();
+    console.log("data", data);
   };
-
   const handleEditClient = (clientId, clientName) => {
     if (canUpdateClient) {
       setEditingClientId(clientId);
@@ -595,7 +593,7 @@ const MeetingManagement = () => {
         <AddClientModal
           isOpen={isClientModalOpen}
           onClose={toggleClientModal}
-          onAddClient={handleAddClient}
+          onAddClient={handleCreateClient}
         />
       )}
       {canCreateMeeting && (

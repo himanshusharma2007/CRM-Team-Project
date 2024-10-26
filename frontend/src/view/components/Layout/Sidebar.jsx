@@ -169,7 +169,7 @@ const SubAdminSidebar = ({ handleLogout, location, user }) => {
       </div>
 
       {/* Sidebar Navigation */}
-      <nav className="flex-grow p-4 hideScroll">
+      <nav className="flex-grow overflow-y-auto p-4 hideScroll">
         <ul className="space-y-2">
           <SidebarItem
             to="/dashboard"

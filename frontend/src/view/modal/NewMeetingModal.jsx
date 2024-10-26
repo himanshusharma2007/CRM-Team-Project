@@ -18,7 +18,8 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
   const [meetingTitle, setMeetingTitle] = useState("");
   const [conclusions, setConclusions] = useState([]);
   const [newConclusion, setNewConclusion] = useState("");
-  const [isNewConclusionCompleted, setIsNewConclusionCompleted] = useState(false);
+  const [isNewConclusionCompleted, setIsNewConclusionCompleted] =
+    useState(false);
   const [showConclusionInput, setShowConclusionInput] = useState(true);
 
   const allProjectsFun = async () => {
@@ -70,7 +71,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
     if (newConclusion.trim()) {
       setConclusions([
         ...conclusions,
-        { note: newConclusion.trim(), isCompleted: isNewConclusionCompleted }
+        { note: newConclusion.trim(), isCompleted: isNewConclusionCompleted },
       ]);
       setNewConclusion("");
       setIsNewConclusionCompleted(false);
@@ -87,11 +88,11 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
       notifyClient,
       notifyTeamLeader,
       title: meetingTitle,
-      meetingConclusion: conclusions
+      meetingConclusion: conclusions,
     };
     console.log("meetingData", meetingData);
     onAddMeeting(meetingData);
-    
+
     // Reset modal fields
     setSelectedClient("");
     setSelectedProject("");
@@ -103,7 +104,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
     setNewConclusion("");
     setIsNewConclusionCompleted(false);
     setShowConclusionInput(true);
-    
+
     onClose();
   };
 
@@ -207,7 +208,11 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
             <h3 className="font-semibold">Meeting Conclusions</h3>
             {conclusions.map((conclusion, index) => (
               <div key={index} className="flex items-center space-x-2">
-                <FaCheck className={conclusion.isCompleted ? "text-green-500" : "text-gray-300"} />
+                <FaCheck
+                  className={
+                    conclusion.isCompleted ? "text-green-500" : "text-gray-300"
+                  }
+                />
                 <span>{conclusion.note}</span>
               </div>
             ))}
@@ -216,7 +221,9 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
                 <input
                   type="checkbox"
                   checked={isNewConclusionCompleted}
-                  onChange={(e) => setIsNewConclusionCompleted(e.target.checked)}
+                  onChange={(e) =>
+                    setIsNewConclusionCompleted(e.target.checked)
+                  }
                   className="mr-2"
                 />
                 <input
@@ -240,7 +247,12 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
                 onClick={() => setShowConclusionInput(true)}
                 className="flex items-center space-x-2 text-blue-500"
               >
-                <FaPlus /> <span>{conclusions.length > 0 ? "Add another conclusion" : "Add a conclusion"}</span>
+                <FaPlus />{" "}
+                <span>
+                  {conclusions.length > 0
+                    ? "Add another conclusion"
+                    : "Add a conclusion"}
+                </span>
               </button>
             )}
           </div>
