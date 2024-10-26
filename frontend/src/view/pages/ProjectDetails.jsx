@@ -33,8 +33,7 @@ const ProjectDetails = () => {
 
   const canUpdateProject =
     user?.role === "admin" || user?.permission?.project?.update;
-  const canDeleteProject =
-    user?.role === "admin" || user?.permission?.project?.delete;
+
   const canReadProject =
     user?.role === "admin" || user?.permission?.project?.read;
 
@@ -69,16 +68,7 @@ const ProjectDetails = () => {
     }
   };
 
-  const handleDeleteProject = async () => {
-    if (canDeleteProject) {
-      try {
-        await deleteProject(id);
-        navigate("/projects");
-      } catch (error) {
-        console.error("Error deleting project:", error);
-      }
-    }
-  };
+
 
   if (!project) return <LoadingSpinner />;
 
@@ -142,16 +132,7 @@ const ProjectDetails = () => {
                   Edit Project
                 </Button>
               )}
-              {canDeleteProject && (
-                <Button
-                  variant="danger"
-                  icon={<FiTrash2 />}
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                  className="px-4 py-2 bg-red-500 text-white hover:bg-red-600 shadow-sm transition duration-200 rounded-lg flex items-center gap-2"
-                >
-                  Delete
-                </Button>
-              )}
+             
             </div>
           </div>
         </div>
@@ -237,15 +218,7 @@ const ProjectDetails = () => {
           isEditing={true}
         />
       )}
-      {canDeleteProject && (
-        <ConfirmDialog
-          isOpen={isDeleteDialogOpen}
-          onClose={() => setIsDeleteDialogOpen(false)}
-          onConfirm={handleDeleteProject}
-          title="Delete Project"
-          message="Are you sure you want to delete this project? This action cannot be undone."
-        />
-      )}
+  
     </div>
   );
 };
