@@ -3,11 +3,10 @@ import Modal from "../Modal/Modal";
 import { Input } from "../components/UI/ProjectCommanUI";
 import { Select } from "../components/UI/ProjectCommanUI";
 import { Button } from "../components/UI/ProjectCommanUI";
-import {getAllClients} from "../../services/clientServices";
-import {createProject} from "../../services/projectService";
-import {getAllTeams} from "../../services/TeamService";
+import { getAllClients } from "../../services/clientServices";
+import { getAllTeams } from "../../services/TeamService";
 import { Checkbox } from "../components/UI/ProjectCommanUI";
-import { FaChevronDown } from 'react-icons/fa';
+import { FaChevronDown } from "react-icons/fa";
 
 const CreateProjectModal = ({
   isOpen,
@@ -24,7 +23,7 @@ const CreateProjectModal = ({
     clientId: "",
     teamIds: [],
     hashtags: "",
-    projectImage: null // Initialize as null for the image
+    projectImage: null, // Initialize as null for the image
   });
   const [clients, setClients] = useState([]);
   const [allTeams, setAllTeams] = useState([]);
@@ -78,9 +77,9 @@ const CreateProjectModal = ({
         setIsTeamDropdownOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -97,18 +96,17 @@ const CreateProjectModal = ({
     e.preventDefault();
     setIsCreating(true);
     try {
-      console.log(formData)
+      console.log(formData);
       const submissionData = {
         ...formData,
         hashtags: formData.hashtags.split(",").map((tag) => tag.trim()),
       };
-      
+
       // // Handle the image upload separately if needed
       if (submissionData.projectImage) {
-        console.log("projectImagef",submissionData.projectImage)
+        console.log("projectImagef", submissionData.projectImage);
         const imageData = new FormData();
         imageData.append("file", submissionData.projectImage);
-       
       }
       console.log("submissionData: ", submissionData); // Log the submission data
       onSubmit(submissionData);

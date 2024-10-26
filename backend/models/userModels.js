@@ -11,9 +11,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    signupMode:{
+      type: String,
+      enum: ["google", "email"],
+      default: "email",
+    },
     password: {
       type: String,
-      required: true,
       select: false,
     },
     profileImage: {

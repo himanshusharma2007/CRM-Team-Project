@@ -359,6 +359,12 @@ exports.login = async (req, res) => {
         message: "Invalid credentials",
       });
     }
+    if(userData.signupMode==="google"){
+      return res.status(400).send({
+        success: false,
+        message: "please login by google",
+      });
+    }
     if (userData.isBlocked) {
       return res.status(403).send({
         success: false,
@@ -424,6 +430,12 @@ exports.updatePassword = async (req, res) => {
       return res.status(401).send({
         success: false,
         message: "User not found",
+      });
+    }
+    if(userData.signupMode==="google"){
+      return res.status(400).send({
+        success: false,
+        message: "you can not set or update password",
       });
     }
 
@@ -507,6 +519,12 @@ exports.sendOtp = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "User not found",
+      });
+    }
+    if(userData.signupMode==="google"){
+      return res.status(400).send({
+        success: false,
+        message: "you can not set or update password",
       });
     }
     if (userData.isBlocked) {
@@ -689,3 +707,35 @@ exports.resetPassword = async (req, res) => {
 }
 
 
+exports.googleUser = async (req, res)=>{
+  try{
+    const {displayName: name, emails, photos} = req.user;
+    console.log("ahfoiewh", req.user)
+    const userData = await user.findOne({ email: emails[0].value});
+    if(userData){
+      if(userData.signupMode==="email"){
+        res.s = true;
+        return res.redirect('http://localhost:5173/login')
+      }
+      generateToken(userData._id, res);
+      return res.redirect('http://localhost:5173/dashboard')
+    }
+    const createUserData = await user.create({name, email: emails[0].value, signupMode: "google", profileImage: photos[0].value})
+    
+    const statuses = ["Todo", "Doing", "Done"];
+    for (const status of statuses) {
+      await Status.create({
+        name: status,
+        userId: userData._id,
+      });
+    }
+    generateToken(createUserData.id, res);
+    return res.redirect('http://localhost:5173/dashboard')
+  }catch(error){
+    console.log(error);
+    return res.redirect('http://localhost:5173/login')
+  }
+}
+
+
+// res.redirect('http://localhost:5173/')

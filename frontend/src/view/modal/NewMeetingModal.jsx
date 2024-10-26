@@ -108,6 +108,22 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
     onClose();
   };
 
+  const handleOnClose = (e) =>{
+    e.preventDefault();
+    setSelectedClient("");
+    setSelectedProject("");
+    setMeetingDateTime("");
+    setNotifyClient(false);
+    setNotifyTeamLeader(false);
+    setMeetingTitle("");
+    setConclusions([]);
+    setNewConclusion("");
+    setIsNewConclusionCompleted(false);
+    setShowConclusionInput(true);
+    
+    onClose();
+  }
+
   const handleClientChange = (e) => {
     const clientId = e.target.value;
     setSelectedClient(clientId);
@@ -251,7 +267,7 @@ const NewMeetingModal = ({ isOpen, onClose, onAddMeeting }) => {
             <button
               type="button"
               className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-200"
-              onClick={onClose}
+              onClick={handleOnClose}
             >
               Close
             </button>

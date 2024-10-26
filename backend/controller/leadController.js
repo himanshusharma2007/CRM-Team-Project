@@ -41,21 +41,16 @@ exports.createLead = async (req, res) => {
       });
     }
     if (
-      (await contact.findOne({ email })) ||
-      (await lead.findOne({ phoneNo: phone }))
+      !(await contact.findOne({ email })) ||
+      !(await contact.findOne({ phoneNo: phone }))
     ) {
-      console.log("email or phoneNo already exists");
-      return res.status(400).send({
-        success: false,
-        message: "email or phoneNo already exists",
+      const contactData = await contact.create({
+        contactName,
+        companyName,
+        email,
+        phoneNo: phone,
       });
     }
-    const contactData = await contact.create({
-      contactName,
-      companyName,
-      email,
-      phoneNo: phone,
-    });
     const leaddata = await lead.create({
       title,
       companyName,
