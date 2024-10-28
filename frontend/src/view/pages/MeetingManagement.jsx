@@ -449,7 +449,7 @@ const MeetingManagement = () => {
     text-xl font-bold text-gray-900 
     transform transition-transform duration-1000
     hover:scale-105 hover:text-blue-600
-    focus:scale-105 focus:text-blue-600
+    focus:scale-105 focus:text-blue-600 cursor-pointer
   "
                   >
                     {client.name}
