@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useToast } from "../../context/ToastContext";
 
 const AddClientModal = ({ isOpen, onClose, onAddClient }) => {
   const [name, setName] = useState("");
@@ -7,7 +8,7 @@ const AddClientModal = ({ isOpen, onClose, onAddClient }) => {
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
   const [timeZone, setTimeZone] = useState("Asia/Kolkata"); // Default to IST
-
+  const { showToast } = useToast();
   // Indian timezone options
   const timezones = [
     { value: "", label: "-- Select Time Zone --" },
@@ -51,14 +52,31 @@ const AddClientModal = ({ isOpen, onClose, onAddClient }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await onAddClient({
-      name,
-      company,
-      phone,
-      email,
-      location,
-      timeZone, // Adding timezone to the client data
-    });
+    try {
+      await onAddClient({
+        name,
+        company,
+        phone,
+        email,
+        location,
+        timeZone, // Adding timezone to the client data
+      });
+      onClose();
+    } catch (err) {
+      if (
+        err.response &&
+        err.response.status === 400 &&
+        err.response.data.message === "Client email already exists"
+      ) {
+        showToast(
+          "Client email already exists. Please use a different email.",
+          "error"
+        );
+      } else {
+        showToast("An error occurred. Please try again.", "error");
+      }
+    }
+
     onClose();
   };
 

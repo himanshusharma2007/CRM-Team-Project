@@ -31,6 +31,7 @@ import ClientMeetingThread from "./view/pages/ClientMeetingThread";
 import ClientProjects from "./view/pages/ClientProjects";
 import ProjectMeeting from "./view/pages/ProjectMeeting";
 import { ToastProvider } from "./context/ToastContext";
+import ClientInfo from "./view/pages/ClientInfo";
 function App() {
   return (
     <ToastProvider>
@@ -110,6 +111,14 @@ function App() {
               element={
                 <Layout>
                   <Lead />
+                </Layout>
+              }
+            />
+            <Route
+              path="/client-info/:clientId"
+              element={
+                <Layout>
+                  <ClientInfo />
                 </Layout>
               }
             />

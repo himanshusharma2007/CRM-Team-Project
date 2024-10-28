@@ -83,6 +83,10 @@ const MeetingManagement = () => {
     }
   };
 
+  const clientInfoHandler = (clientId) => {
+    navigate(`/client-info/${clientId}`);
+  };
+
   const toggleClientModal = () => {
     if (canCreateClient) {
       setIsClientModalOpen(!isClientModalOpen);
@@ -94,7 +98,6 @@ const MeetingManagement = () => {
   const toggleMeetingModal = () => {
     if (canCreateMeeting) {
       setIsMeetingModalOpen(!isMeetingModalOpen);
-      
     } else {
       showToast("You don't have permission to create meetings.", "error");
     }
@@ -440,7 +443,15 @@ const MeetingManagement = () => {
                     className="text-xl font-bold text-gray-900 border-b border-gray-300 focus:outline-none focus:border-blue-500"
                   />
                 ) : (
-                  <h2 className="text-xl font-bold text-gray-900">
+                  <h2
+                    onClick={() => clientInfoHandler(client._id)}
+                    className="
+    text-xl font-bold text-gray-900 
+    transform transition-transform duration-1000
+    hover:scale-105 hover:text-blue-600
+    focus:scale-105 focus:text-blue-600
+  "
+                  >
                     {client.name}
                   </h2>
                 )}

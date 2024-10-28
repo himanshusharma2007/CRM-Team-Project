@@ -60,7 +60,7 @@ const ProjectDetails = () => {
       try {
         console.log("Id:", id);
         await updateProject(id, projectData);
-        console.log("I am updating")
+        console.log("I am updating");
         fetchProjectDetails();
         setIsEditModalOpen(false);
       } catch (error) {
@@ -68,8 +68,6 @@ const ProjectDetails = () => {
       }
     }
   };
-
-
 
   if (!project) return <LoadingSpinner />;
 
@@ -133,7 +131,6 @@ const ProjectDetails = () => {
                   Edit Project
                 </Button>
               )}
-             
             </div>
           </div>
         </div>
@@ -152,6 +149,18 @@ const ProjectDetails = () => {
               <p className="text-gray-600 leading-relaxed">
                 {project.description}
               </p>
+            </Card>
+
+            <Card className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <FiFileText className="text-gray-400 text-xl" />
+                <h2 className="text-xl font-semibold text-gray-800">Teams</h2>
+              </div>
+              {project.teamIds.map((team, index) => (
+                <li key={index} className="text-gray-600 leading-relaxed">
+                  {team.teamName}
+                </li>
+              ))}
             </Card>
 
             <Card className="bg-white p-6 rounded-xl shadow-sm">
@@ -219,7 +228,6 @@ const ProjectDetails = () => {
           isEditing={true}
         />
       )}
-  
     </div>
   );
 };
