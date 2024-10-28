@@ -112,6 +112,7 @@ const UserQueriesPage = () => {
       );
       setShowModal(false);
       setResponse("");
+      fetchData();
       showToast("Response submitted successfully!", "success");
       handleSort(sortBy); // Re-apply current sorting after update
     } catch (error) {
