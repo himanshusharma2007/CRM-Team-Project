@@ -235,10 +235,12 @@ const Lead = () => {
 
   return (
     <div className="relative p-6 mx-auto bg-white rounded-lg shadow-lg">
-      <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
-        CRM Pipeline
+      <div className="flex justify-between mb-10">
+
+      <h1 className="text-4xl font-bold text-center  text-gray-800">
+        Lead Management
       </h1>
-      <div className="text-center mb-6">
+      <div className="text-center ">
         <button
           onClick={() => setShowModal(true)}
           className={`bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition duration-300 mr-4 ${
@@ -257,6 +259,7 @@ const Lead = () => {
         >
           <FaPlus className="inline mr-2" /> Add Stage
         </button>
+      </div>
       </div>
 
       {loading ? (
