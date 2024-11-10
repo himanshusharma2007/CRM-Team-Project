@@ -381,9 +381,9 @@ const MeetingManagement = () => {
           </button>
         </div>
       </div>
-
       {/* Projects and Meetings Section */}
       <div className="flex gap-6 px-6 py-4">
+      <h1 className="text-2xl font-bold text-gray-800">Clients</h1>
         {searchTerm && filteredProjects.length > 0
           ? filteredProjects.map((project, index) => (
               <div

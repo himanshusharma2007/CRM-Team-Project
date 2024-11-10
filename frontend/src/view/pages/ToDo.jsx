@@ -530,7 +530,7 @@ const ToDo = () => {
               className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             >
-              <option value="">--select status---</option>
+              <option value="">Select State</option>
               {statuses.map((status) => (
                 <option key={status} value={status}>
                   {status}

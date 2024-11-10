@@ -119,13 +119,7 @@ const AdminSidebar = ({ handleLogout, location }) => {
             text="Query"
             location={location}
           />
-        </ul>
-      </nav>
-
-      {/* Logout Button */}
-      <div className="flex space-y-3 flex-col">
-        <ul className="list-none">
-          <SidebarItem
+            <SidebarItem
             to="/profile"
             icon={<FaUser />}
             text="Profile"
@@ -133,8 +127,13 @@ const AdminSidebar = ({ handleLogout, location }) => {
             className="flex items-center p-3 space-x-2 rounded hover:bg-gray-700 transition duration-200"
           />
         </ul>
+      </nav>
+
+      {/* Logout Button */}
+      <div className="flex space-y-3 flex-col items-center mb-2">
+    
         <button
-          className="flex items-center justify-center w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-lg shadow-md hover:shadow-lg transition duration-200 transform hover:scale-105"
+          className="flex items-center text-xl  w-[80%] justify-center  bg-gradient-to-r from-red-600 to-red-700 text-white p-2 rounded-lg shadow-md hover:shadow-lg transition duration-200 transform hover:scale-105"
           onClick={handleLogout}
         >
           <FaSignOutAlt className="mr-2" />
