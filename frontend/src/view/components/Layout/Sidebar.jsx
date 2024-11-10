@@ -6,6 +6,7 @@ import {
   FaClipboardList,
   FaHandshake,
   FaUsers,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { FaCalendar } from "react-icons/fa6";
 import { MdQueryBuilder, MdVerifiedUser } from "react-icons/md";
@@ -66,16 +67,11 @@ const AdminSidebar = ({ handleLogout, location }) => {
             text="Dashboard"
             location={location}
           />
-          <SidebarItem
-            to="/profile"
-            icon={<FaUser />}
-            text="Profile"
-            location={location}
-          />
+
           <SidebarItem
             to="/todo"
             icon={<FaClipboardList />}
-            text="To-Do"
+            text="Tasks"
             location={location}
           />
           <SidebarItem
@@ -127,11 +123,21 @@ const AdminSidebar = ({ handleLogout, location }) => {
       </nav>
 
       {/* Logout Button */}
-      <div className="flex-shrink-0 p-4">
+      <div className="flex space-y-3 flex-col">
+        <ul className="list-none">
+          <SidebarItem
+            to="/profile"
+            icon={<FaUser />}
+            text="Profile"
+            location={location}
+            className="flex items-center p-3 space-x-2 rounded hover:bg-gray-700 transition duration-200"
+          />
+        </ul>
         <button
-          className="flex items-center justify-center w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
+          className="flex items-center justify-center w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-lg shadow-md hover:shadow-lg transition duration-200 transform hover:scale-105"
           onClick={handleLogout}
         >
+          <FaSignOutAlt className="mr-2" />
           Logout
         </button>
       </div>
@@ -140,7 +146,7 @@ const AdminSidebar = ({ handleLogout, location }) => {
 };
 
 // SidebarItem component to handle active state
-const SidebarItem = ({ to, icon, text, location }) => {
+const SidebarItem = ({ to, icon, text, location, className }) => {
   const isActive = location.pathname === to; // Check if current path matches
 
   return (
@@ -151,7 +157,7 @@ const SidebarItem = ({ to, icon, text, location }) => {
           isActive
             ? "bg-gray-700 text-white"
             : "text-gray-300 hover:bg-gray-700"
-        }`}
+        } ${className}`}
       >
         <div>{icon}</div>
         <div>{text}</div>

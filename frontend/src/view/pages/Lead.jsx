@@ -234,7 +234,7 @@ const Lead = () => {
   };
 
   return (
-    <div className="relative p-6 mx-auto bg-white rounded-lg shadow-lg">
+    <div className="relative p-6 mx-auto">
       <div className="flex justify-between mb-10">
 
       <h1 className="text-4xl font-bold text-center  text-gray-800">
@@ -275,7 +275,7 @@ const Lead = () => {
           {stages.map((stage) => (
             <div
               key={stage.stageName}
-              className="w-64 bg-gray-50 p-4 rounded-lg shadow-md flex-shrink-0 flex flex-col"
+              className="min-w-80 bg-gray-50 p-4 rounded-lg shadow-md flex-shrink-0 flex flex-col"
               style={{ maxHeight: "100%" }}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, stage.stageName)}
@@ -347,10 +347,10 @@ const Lead = () => {
                     <p className="text-gray-500 break-all">
                       Email: {lead.email}
                     </p>
-                    <p className="text-gray-500 break-all">Team: {lead.team}</p>
+                   
                     <button
                       onClick={() => handleViewDetails(lead)}
-                      className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+                      className="mt-2 px-4 py-2 bg-blue-500 w-full text-white rounded-lg hover:bg-blue-600 transition duration-300"
                     >
                       View Details
                     </button>

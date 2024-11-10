@@ -150,9 +150,7 @@ const ClientMeetingThread = () => {
                         <h3 className="text-lg font-semibold">
                           {project.name}
                         </h3>
-                        <p className="text-xs text-gray-600">
-                          {project.description}
-                        </p>
+                       
                       </div>
                     }
                     className="bg-white w-32 h-32"

@@ -7,6 +7,7 @@ const sendMail = require("../utils/mail");
 
 // Generate JWT token
 const generateToken = (id,res) => {
+  console.log("generate token called")
   console.log("id",id);
   const token = jwt.sign({ id }, process.env.JWT_KEY, { expiresIn: '1d' });
   const expirationTime = 24 * 60 * 60 * 1000; 
@@ -16,7 +17,7 @@ const generateToken = (id,res) => {
     secure: true,
     sameSite: "strict"
   })
-  console.log("token " + token)
+  console.log("token " ,token)
   // return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
